@@ -261,3 +261,93 @@ export function IconShare({ className }: { className?: string }) {
     </svg>
   )
 }
+
+export function IconPin({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M12 21s7-4.5 7-10a7 7 0 10-14 0c0 5.5 7 10 7 10z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="11" r="2.5" fill="currentColor" />
+    </svg>
+  )
+}
+
+export function IconWeatherSunny({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="4" fill="#F9A825" stroke="#F57F17" strokeWidth="1" />
+      <path
+        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+        stroke="#F57F17"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+export function IconWeatherCloudy({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M6.5 18h11a4 4 0 000-8h-.5a5 5 0 00-9.7 1.5A3.5 3.5 0 006.5 18z"
+        fill="#ECEFF1"
+        stroke="#90A4AE"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export function IconWeatherRainy({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M6.5 15h11a4 4 0 000-8h-.5a5 5 0 00-9.7 1.5A3.5 3.5 0 006.5 15z"
+        fill="#CFD8DC"
+        stroke="#78909C"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 19l-1 2M12 18l-1 2M15 19l-1 2"
+        stroke="#42A5F5"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}

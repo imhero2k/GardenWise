@@ -6,9 +6,6 @@ export function HomePage() {
     <>
       <header className="top-bar">
         <span className="app-brand">GardenWise</span>
-        <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>
-          Australia
-        </span>
       </header>
 
       <section className="hero fade-up">

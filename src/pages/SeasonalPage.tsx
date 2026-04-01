@@ -1,13 +1,25 @@
+import { useLocationArea } from '../context/LocationContext'
 import { seasonalCards } from '../data/seasonal'
 
 export function SeasonalPage() {
+  const { areaLabel, regionCode } = useLocationArea()
+
   return (
     <>
       <header className="page-header">
         <p className="eyebrow">Seasonal</p>
         <h1>Recommendations</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Horizontal scroll for the best picks and eco-friendly ideas this season.
+          Horizontal scroll for the best picks and eco-friendly ideas this season
+          {regionCode ? (
+            <>
+              {' '}
+              — personalised for{' '}
+              <strong style={{ color: 'var(--color-text)' }}>{areaLabel}</strong>.
+            </>
+          ) : (
+            '. Set your local area in the bar above for climate-relevant tips.'
+          )}
         </p>
       </header>
 

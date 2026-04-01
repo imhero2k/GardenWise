@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { GardenProvider } from './context/GardenContext'
+import { LocationProvider } from './context/LocationContext'
 import { Layout } from './components/Layout'
 import { CommunityPage } from './pages/CommunityPage'
 import { HomePage } from './pages/HomePage'
@@ -13,6 +14,7 @@ import { WeedPage } from './pages/WeedPage'
 export default function App() {
   return (
     <GardenProvider>
+      <LocationProvider>
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
@@ -28,6 +30,7 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </LocationProvider>
     </GardenProvider>
   )
 }

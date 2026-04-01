@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
+import { useLocationArea } from '../context/LocationContext'
 import { nurseries } from '../data/nurseries'
 import type { Nursery } from '../types/plant'
 
 type Filter = 'all' | 'low' | 'nearby' | 'organic'
 
 export function NurseryMapPage() {
+  const { areaLabel, regionCode } = useLocationArea()
   const [filter, setFilter] = useState<Filter>('all')
   const [selected, setSelected] = useState<Nursery | null>(null)
 
@@ -25,7 +27,16 @@ export function NurseryMapPage() {
         <p className="eyebrow">Local</p>
         <h1>Nursery map</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Tap pins for details. Filters help you find responsible stockists.
+          Tap pins for details. Filters help you find responsible stockists
+          {regionCode ? (
+            <>
+              {' '}
+              — area focus:{' '}
+              <strong style={{ color: 'var(--color-text)' }}>{areaLabel}</strong>.
+            </>
+          ) : (
+            '. Set your area above to personalise nearby results.'
+          )}
         </p>
       </header>
 
