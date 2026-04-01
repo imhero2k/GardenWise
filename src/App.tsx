@@ -11,11 +11,14 @@ import { PlantSearchPage } from './pages/PlantSearchPage'
 import { SeasonalPage } from './pages/SeasonalPage'
 import { WeedPage } from './pages/WeedPage'
 
+const routerBasename =
+  import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '')
+
 export default function App() {
   return (
     <GardenProvider>
       <LocationProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={routerBasename}>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<HomePage />} />
