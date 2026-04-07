@@ -1,0 +1,18 @@
+# GitHub sometimes adds a Jekyll-based Pages workflow with this filename.
+# That builds only README/markdown — not the Vite app. This stub replaces it:
+# it does NOT run on push, so only pages.yml (Vite → dist) deploys the real site.
+name: Jekyll Pages (disabled — use Vite workflow)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "This workflow is intentionally inactive."
+          echo "Deploy GardenWise from: Deploy GardenWise (Vite) → GitHub Pages (pages.yml on push to main)."

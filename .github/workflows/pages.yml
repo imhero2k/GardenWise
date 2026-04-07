@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Deploy GardenWise (Vite) → GitHub Pages
 
 on:
   push:
