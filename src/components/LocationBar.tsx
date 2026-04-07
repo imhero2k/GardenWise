@@ -166,16 +166,24 @@ export function LocationBar() {
 
           <div className="location-dialog__or">or</div>
 
+          <p className="location-dialog__permission-hint" role="note">
+            When you tap the button below, your browser should show a <strong>location permission</strong>{' '}
+            pop-up — choose <strong>Allow</strong> (once). If nothing appears, open the lock/site icon in
+            the address bar and set location to <strong>Allow</strong> for this site (it may have been
+            blocked earlier).
+          </p>
+
           <button
             type="button"
             className="btn btn-primary btn-block"
             disabled={isDetecting}
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
               clearGeoError()
               requestGeolocation()
             }}
           >
-            {isDetecting ? 'Detecting…' : 'Use current location once'}
+            {isDetecting ? 'Waiting for location…' : 'Allow location in browser'}
           </button>
 
           {geoError && (

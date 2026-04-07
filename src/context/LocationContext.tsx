@@ -140,28 +140,38 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setIsDetecting(false)
     }
 
-    // Prefer a fresh-ish reading; if that fails, one retry with any cached position (helps Safari/desktop).
-    const tryFresh = () => {
-      navigator.geolocation.getCurrentPosition(onSuccess, tryStale, {
+    // 1) Fast / Wi‑Fi–style fix (often enough for the permission prompt + a reading)
+    const tryLowAccuracy = () => {
+      navigator.geolocation.getCurrentPosition(onSuccess, tryHighAccuracy, {
         enableHighAccuracy: false,
-        timeout: 18_000,
+        timeout: 22_000,
         maximumAge: 60_000,
       })
     }
 
-    const tryStale = (_firstErr: GeolocationPositionError) => {
+    // 2) GPS / finer fix (helps phones; some laptops after Allow)
+    const tryHighAccuracy = (_e: GeolocationPositionError) => {
+      navigator.geolocation.getCurrentPosition(onSuccess, tryStale, {
+        enableHighAccuracy: true,
+        timeout: 18_000,
+        maximumAge: 0,
+      })
+    }
+
+    // 3) Any cached position (Safari / desktop after user allowed before)
+    const tryStale = (_e: GeolocationPositionError) => {
       navigator.geolocation.getCurrentPosition(
         onSuccess,
-        (secondErr) => finishError(secondErr),
+        (lastErr) => finishError(lastErr),
         {
           enableHighAccuracy: false,
-          timeout: 10_000,
+          timeout: 12_000,
           maximumAge: Infinity,
         },
       )
     }
 
-    tryFresh()
+    tryLowAccuracy()
   }, [persist])
 
   const clearGeoError = useCallback(() => setGeoError(null), [])
