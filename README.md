@@ -1,73 +1,35 @@
-# React + TypeScript + Vite
+# GardenWise
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Grow Smart. Garden Responsibly.** — React + Vite app for plant search, local area, weather, and GitHub Pages hosting.
 
-Currently, two official plugins are available:
+## GitHub Pages (important)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The live app is the **built** output in `dist/` (JS/CSS bundles), not the repo’s dev `index.html`.
 
-## React Compiler
+If **Pages → Build and deployment** is set to **Deploy from a branch**, GitHub serves the repo root — including `index.html` that points at `/src/main.tsx`. That file is for local dev only, so **[the site will look blank or broken](https://imhero2k.github.io/GardenWise/)**.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Fix:**
 
-## Expanding the ESLint configuration
+1. Repo **Settings → Pages**
+2. **Build and deployment → Source:** choose **GitHub Actions** (not “Deploy from a branch”).
+3. Let the workflow **Deploy GardenWise (Vite) → GitHub Pages** run on `main` (it runs `npm run build` and uploads `dist/`).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Optional: remove any old workflow that uses `jekyll-build-pages` so only the Vite workflow deploys.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Local development
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Copy `.env.example` to `.env.local` and set `VITE_GOOGLE_MAPS_API_KEY` if you want Google Weather (otherwise Open-Meteo is used).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| Script        | Purpose                          |
+| ------------- | -------------------------------- |
+| `npm run dev` | Dev server                       |
+| `npm run build` | Production build + `404.html` for SPA |
+| `npm run typecheck` | TypeScript check only      |
+| `npm run lint`    | ESLint                     |
