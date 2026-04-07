@@ -85,43 +85,83 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setGeoError('Location is not supported in this browser.')
       return
     }
+    if (typeof window !== 'undefined' && !window.isSecureContext) {
+      setGeoError(
+        'Location needs a secure site (https). Open the app over HTTPS or use localhost for testing.',
+      )
+      return
+    }
+
     setGeoError(null)
     setIsDetecting(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude
-        const lng = pos.coords.longitude
-        if (!isLikelyAustraliaRegion(lat, lng)) {
-          setGeoError(
-            'Detected position looks outside Australia. Pick your state manually instead.',
-          )
-          setIsDetecting(false)
-          return
-        }
-        const inferred = nearestAustralianRegion(lat, lng)
-        const nextCoords: GeoCoords = {
-          lat,
-          lng,
-          accuracy: pos.coords.accuracy,
-        }
-        setRegionCode(inferred)
-        setSource('gps')
-        setCoords(nextCoords)
-        persist({ source: 'gps', regionCode: inferred, coords: nextCoords })
+
+    const finishError = (err: GeolocationPositionError) => {
+      setIsDetecting(false)
+      // 1 = denied, 2 = unavailable, 3 = timeout (GeolocationPositionError codes)
+      if (err.code === 1) {
+        setGeoError(
+          'Location access was denied. Allow location for this site in your browser settings, or pick your state below.',
+        )
+      } else if (err.code === 3) {
+        setGeoError(
+          'Location timed out. Try again (Wi‑Fi often helps on laptops), or pick your state below.',
+        )
+      } else if (err.code === 2) {
+        setGeoError(
+          'Your device couldn’t get a fix (common indoors, on VPN, or with desktop browsers). Pick your state below, or try again near a window with location allowed.',
+        )
+      } else {
+        setGeoError(
+          'Could not read your location. Pick your state below, or try again in a moment.',
+        )
+      }
+    }
+
+    const onSuccess = (pos: GeolocationPosition) => {
+      const lat = pos.coords.latitude
+      const lng = pos.coords.longitude
+      if (!isLikelyAustraliaRegion(lat, lng)) {
+        setGeoError(
+          'Detected position looks outside Australia. Pick your state manually instead.',
+        )
         setIsDetecting(false)
-      },
-      (err) => {
-        setIsDetecting(false)
-        if (err.code === 1) {
-          setGeoError('Location access was denied. Choose your state below or enable location in browser settings.')
-        } else if (err.code === 3) {
-          setGeoError('Location request timed out. Try again or set your state manually.')
-        } else {
-          setGeoError('Could not read your location. Set your state manually.')
-        }
-      },
-      { enableHighAccuracy: false, timeout: 12_000, maximumAge: 60_000 },
-    )
+        return
+      }
+      const inferred = nearestAustralianRegion(lat, lng)
+      const nextCoords: GeoCoords = {
+        lat,
+        lng,
+        accuracy: pos.coords.accuracy,
+      }
+      setRegionCode(inferred)
+      setSource('gps')
+      setCoords(nextCoords)
+      persist({ source: 'gps', regionCode: inferred, coords: nextCoords })
+      setIsDetecting(false)
+    }
+
+    // Prefer a fresh-ish reading; if that fails, one retry with any cached position (helps Safari/desktop).
+    const tryFresh = () => {
+      navigator.geolocation.getCurrentPosition(onSuccess, tryStale, {
+        enableHighAccuracy: false,
+        timeout: 18_000,
+        maximumAge: 60_000,
+      })
+    }
+
+    const tryStale = (_firstErr: GeolocationPositionError) => {
+      navigator.geolocation.getCurrentPosition(
+        onSuccess,
+        (secondErr) => finishError(secondErr),
+        {
+          enableHighAccuracy: false,
+          timeout: 10_000,
+          maximumAge: Infinity,
+        },
+      )
+    }
+
+    tryFresh()
   }, [persist])
 
   const clearGeoError = useCallback(() => setGeoError(null), [])
