@@ -1,0 +1,4 @@
+# NumPy 2.x may fall back to source builds in slim Lambda images (no compiler).
+numpy>=1.24.0,<2.0.0
+Pillow>=10.0.0
+onnxruntime>=1.16.0,<2
