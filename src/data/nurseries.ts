@@ -1,59 +1,19 @@
 import type { Nursery } from '../types/plant'
+import type { VicNurseryJsonRow } from './vic-nurseries.types'
+import vicNurseriesJson from './vic-nurseries.json'
 
-export const nurseries: Nursery[] = [
-  {
-    id: 'n1',
-    name: 'GreenLeaf Native Nursery',
-    lat: 28,
-    lng: 35,
-    address: '142 Bushland Rd, Brisbane QLD',
-    phone: '07 3000 0001',
-    rating: 4.8,
-    organic: true,
-    lowInvasiveFocus: true,
-  },
-  {
-    id: 'n2',
-    name: 'Coastal Organics',
-    lat: 62,
-    lng: 28,
-    address: '88 Ocean View Pde, Sunshine Coast QLD',
-    phone: '07 3000 0002',
-    rating: 4.6,
-    organic: true,
-    lowInvasiveFocus: true,
-  },
-  {
-    id: 'n3',
-    name: 'Urban Garden Supply',
-    lat: 45,
-    lng: 58,
-    address: '12 Market St, Sydney NSW',
-    phone: '02 9000 0003',
-    rating: 4.3,
-    organic: false,
-    lowInvasiveFocus: true,
-  },
-  {
-    id: 'n4',
-    name: 'Wildflower Walk Nursery',
-    lat: 72,
-    lng: 48,
-    address: '400 Hill Rd, Adelaide SA',
-    phone: '08 8000 0004',
-    rating: 4.9,
-    organic: true,
-    lowInvasiveFocus: true,
-  },
-  {
-    id: 'n5',
-    name: 'General Landscape Depot',
-    lat: 38,
-    lng: 72,
-    address: '900 Industrial Ave, Melbourne VIC',
-    phone: '03 9000 0005',
-    rating: 3.9,
-    organic: false,
-    lowInvasiveFocus: false,
-  },
-]
+function rowToNursery(r: VicNurseryJsonRow): Nursery {
+  return {
+    id: r.id,
+    name: r.name,
+    lat: r.lat,
+    lng: r.lng,
+    kind: r.kind,
+    description: r.description,
+    websites: r.websites.length > 0 ? r.websites : undefined,
+    phone: r.phone ?? undefined,
+  }
+}
+
+/** Victorian native nurseries & public gardens (APS Vic My Maps layer, exported as KML → JSON). */
+export const nurseries: Nursery[] = (vicNurseriesJson as VicNurseryJsonRow[]).map(rowToNursery)

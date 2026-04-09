@@ -21,16 +21,25 @@ export interface GardenPlant extends Plant {
   waterDue: string
 }
 
+export type NurseryKind = 'nursery' | 'public_garden'
+
 export interface Nursery {
   id: string
   name: string
+  /** WGS84 latitude (decimal degrees) */
   lat: number
+  /** WGS84 longitude (decimal degrees) */
   lng: number
-  address: string
-  phone: string
-  rating: number
-  organic: boolean
-  lowInvasiveFocus: boolean
+  kind: NurseryKind
+  /** Raw layer description (may include line breaks as HTML) */
+  description?: string | null
+  /** URLs parsed from the layer description */
+  websites?: string[]
+  address?: string
+  phone?: string
+  rating?: number
+  organic?: boolean
+  lowInvasiveFocus?: boolean
 }
 
 export interface CommunityPost {
