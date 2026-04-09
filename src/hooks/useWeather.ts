@@ -12,12 +12,13 @@ export function useWeather(lat: number | null, lng: number | null): WeatherFetch
 
   useEffect(() => {
     if (lat == null || lng == null) {
-      setState({ status: 'idle' })
       return
     }
 
     const ac = new AbortController()
-    setState({ status: 'loading' })
+    queueMicrotask(() => {
+      if (!ac.signal.aborted) setState({ status: 'loading' })
+    })
 
     fetchCurrentWeather(lat, lng, ac.signal)
       .then((data) => {
@@ -29,6 +30,10 @@ export function useWeather(lat: number | null, lng: number | null): WeatherFetch
 
     return () => ac.abort()
   }, [lat, lng])
+
+  if (lat == null || lng == null) {
+    return { status: 'idle' }
+  }
 
   return state
 }

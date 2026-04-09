@@ -150,7 +150,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     }
 
     // 2) GPS / finer fix (helps phones; some laptops after Allow)
-    const tryHighAccuracy = (_e: GeolocationPositionError) => {
+    const tryHighAccuracy = () => {
       navigator.geolocation.getCurrentPosition(onSuccess, tryStale, {
         enableHighAccuracy: true,
         timeout: 18_000,
@@ -159,7 +159,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     }
 
     // 3) Any cached position (Safari / desktop after user allowed before)
-    const tryStale = (_e: GeolocationPositionError) => {
+    const tryStale = () => {
       navigator.geolocation.getCurrentPosition(
         onSuccess,
         (lastErr) => finishError(lastErr),
