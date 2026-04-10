@@ -33,8 +33,11 @@ export interface GeoCoords {
 
 export interface StoredLocationV1 {
   v: 1
-  source: 'manual' | 'gps'
+  /** manual = state only; gps = browser geolocation; place = postcode/suburb look-up */
+  source: 'manual' | 'gps' | 'place'
   regionCode: AURegionCode
   coords?: GeoCoords
+  /** Short label from geocoder, e.g. "Carlton, VIC" */
+  placeLabel?: string
   updatedAt: number
 }

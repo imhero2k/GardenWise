@@ -18,6 +18,9 @@ function loadStored(): StoredLocationV1 | null {
     if (!raw) return null
     const parsed = JSON.parse(raw) as StoredLocationV1
     if (parsed?.v !== 1 || !parsed.regionCode || !AU_REGIONS[parsed.regionCode]) return null
+    if (parsed.regionCode !== 'VIC') return null
+    const src = parsed.source
+    if (src !== 'manual' && src !== 'gps' && src !== 'place') return null
     return parsed
   } catch {
     return null
@@ -30,8 +33,10 @@ function saveStored(data: StoredLocationV1) {
 
 interface LocationContextValue {
   regionCode: AURegionCode | null
-  source: 'manual' | 'gps' | null
+  source: 'manual' | 'gps' | 'place' | null
   coords: GeoCoords | null
+  /** Set when source === 'place' (postcode / suburb look-up) */
+  placeLabel: string | null
   geoError: string | null
   isDetecting: boolean
   /** Primary line for UI, e.g. "Queensland" or "Near you · Queensland" */
@@ -39,6 +44,8 @@ interface LocationContextValue {
   /** Short badge, e.g. "QLD" */
   areaShort: string
   setManualRegion: (code: AURegionCode) => void
+  /** Postcode or suburb resolved via geocoder; sets region + coords for local tips / bioregion */
+  setLocationFromPlace: (regionCode: AURegionCode, coords: GeoCoords, placeLabel: string) => void
   requestGeolocation: () => void
   clearGeoError: () => void
 }
@@ -50,13 +57,19 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [regionCode, setRegionCode] = useState<AURegionCode | null>(
     initial?.regionCode ?? null,
   )
-  const [source, setSource] = useState<'manual' | 'gps' | null>(initial?.source ?? null)
+  const [source, setSource] = useState<'manual' | 'gps' | 'place' | null>(initial?.source ?? null)
   const [coords, setCoords] = useState<GeoCoords | null>(initial?.coords ?? null)
+  const [placeLabel, setPlaceLabel] = useState<string | null>(initial?.placeLabel ?? null)
   const [geoError, setGeoError] = useState<string | null>(null)
   const [isDetecting, setIsDetecting] = useState(false)
 
   const persist = useCallback(
-    (next: { source: 'manual' | 'gps'; regionCode: AURegionCode; coords?: GeoCoords | null }) => {
+    (next: {
+      source: 'manual' | 'gps' | 'place'
+      regionCode: AURegionCode
+      coords?: GeoCoords | null
+      placeLabel?: string | null
+    }) => {
       const payload: StoredLocationV1 = {
         v: 1,
         source: next.source,
@@ -64,9 +77,22 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         updatedAt: Date.now(),
       }
       if (next.coords) payload.coords = next.coords
+      if (next.source === 'place' && next.placeLabel) payload.placeLabel = next.placeLabel
       saveStored(payload)
     },
     [],
+  )
+
+  const setLocationFromPlace = useCallback(
+    (code: AURegionCode, nextCoords: GeoCoords, label: string) => {
+      setRegionCode(code)
+      setSource('place')
+      setCoords(nextCoords)
+      setPlaceLabel(label)
+      setGeoError(null)
+      persist({ source: 'place', regionCode: code, coords: nextCoords, placeLabel: label })
+    },
+    [persist],
   )
 
   const setManualRegion = useCallback(
@@ -74,6 +100,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setRegionCode(code)
       setSource('manual')
       setCoords(null)
+      setPlaceLabel(null)
       setGeoError(null)
       persist({ source: 'manual', regionCode: code, coords: null })
     },
@@ -100,19 +127,19 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       // 1 = denied, 2 = unavailable, 3 = timeout (GeolocationPositionError codes)
       if (err.code === 1) {
         setGeoError(
-          'Location access was denied. Allow location for this site in your browser settings, or pick your state below.',
+          'Location access was denied. Allow location for this site in your browser settings, or enter a Victorian postcode or suburb.',
         )
       } else if (err.code === 3) {
         setGeoError(
-          'Location timed out. Try again (Wi‑Fi often helps on laptops), or pick your state below.',
+          'Location timed out. Try again (Wi‑Fi often helps on laptops), or enter a Victorian postcode or suburb.',
         )
       } else if (err.code === 2) {
         setGeoError(
-          'Your device couldn’t get a fix (common indoors, on VPN, or with desktop browsers). Pick your state below, or try again near a window with location allowed.',
+          'Your device couldn’t get a fix (common indoors, on VPN, or with desktop browsers). Enter a Victorian postcode or suburb, or try again near a window with location allowed.',
         )
       } else {
         setGeoError(
-          'Could not read your location. Pick your state below, or try again in a moment.',
+          'Could not read your location. Enter a Victorian postcode or suburb, or try again in a moment.',
         )
       }
     }
@@ -122,12 +149,19 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       const lng = pos.coords.longitude
       if (!isLikelyAustraliaRegion(lat, lng)) {
         setGeoError(
-          'Detected position looks outside Australia. Pick your state manually instead.',
+          'Detected position looks outside Australia. Enter a Victorian postcode or suburb instead.',
         )
         setIsDetecting(false)
         return
       }
       const inferred = nearestAustralianRegion(lat, lng)
+      if (inferred !== 'VIC') {
+        setGeoError(
+          'GardenWise is Victoria-only. Your location appears to be outside Victoria. Enter a Victorian postcode or suburb instead.',
+        )
+        setIsDetecting(false)
+        return
+      }
       const nextCoords: GeoCoords = {
         lat,
         lng,
@@ -136,6 +170,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setRegionCode(inferred)
       setSource('gps')
       setCoords(nextCoords)
+      setPlaceLabel(null)
       persist({ source: 'gps', regionCode: inferred, coords: nextCoords })
       setIsDetecting(false)
     }
@@ -187,19 +222,27 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         areaShort: r.short,
       }
     }
+    if (source === 'place' && coords && placeLabel) {
+      return {
+        areaLabel: placeLabel,
+        areaShort: r.short,
+      }
+    }
     return { areaLabel: r.label, areaShort: r.short }
-  }, [regionCode, source, coords])
+  }, [regionCode, source, coords, placeLabel])
 
   const value = useMemo<LocationContextValue>(
     () => ({
       regionCode,
       source,
       coords,
+      placeLabel,
       geoError,
       isDetecting,
       areaLabel,
       areaShort,
       setManualRegion,
+      setLocationFromPlace,
       requestGeolocation,
       clearGeoError,
     }),
@@ -207,11 +250,13 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       regionCode,
       source,
       coords,
+      placeLabel,
       geoError,
       isDetecting,
       areaLabel,
       areaShort,
       setManualRegion,
+      setLocationFromPlace,
       requestGeolocation,
       clearGeoError,
     ],

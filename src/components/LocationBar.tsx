@@ -1,8 +1,9 @@
 import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { useLocationArea } from '../context/LocationContext'
 import { useWeather } from '../hooks/useWeather'
+import { geocodeAustralia } from '../lib/geocodeAu'
 import { getRegionCentroid } from '../lib/nearestRegion'
-import { AU_REGION_LIST, AU_REGIONS, type AURegionCode } from '../types/location'
+import { AU_REGIONS, type AURegionCode } from '../types/location'
 import { IconPin } from './Icons'
 import { WeatherMini } from './WeatherMini'
 
@@ -26,6 +27,8 @@ export function LocationBar() {
     areaLabel,
     areaShort,
     setManualRegion,
+    setLocationFromPlace,
+    placeLabel,
     requestGeolocation,
     clearGeoError,
   } = useLocationArea()
@@ -44,10 +47,16 @@ export function LocationBar() {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const prevDetecting = useRef(false)
   const selectId = useId()
+  const placeInputId = useId()
   const titleId = useId()
+
+  const [placeQuery, setPlaceQuery] = useState('')
+  const [placeLoading, setPlaceLoading] = useState(false)
+  const [placeError, setPlaceError] = useState<string | null>(null)
 
   const openDialog = () => {
     clearGeoError()
+    setPlaceError(null)
     dialogRef.current?.showModal()
   }
 
@@ -84,6 +93,36 @@ export function LocationBar() {
     setManualRegion(v)
   }
 
+  const applyPostcodeOrSuburb = async () => {
+    const q = placeQuery.trim()
+    if (q.length < 2) {
+      setPlaceError('Enter at least 2 characters (e.g. postcode or suburb).')
+      return
+    }
+    setPlaceLoading(true)
+    setPlaceError(null)
+    try {
+      const result = await geocodeAustralia(q)
+      if (!result) {
+        setPlaceError(
+          'No match found in Victoria. Try a Victorian postcode or suburb (e.g. 3000 or Carlton).',
+        )
+        return
+      }
+      setLocationFromPlace(
+        result.regionCode,
+        { lat: result.lat, lng: result.lng },
+        result.label,
+      )
+      setPlaceQuery('')
+      closeDialog()
+    } catch (e) {
+      setPlaceError(e instanceof Error ? e.message : 'Look-up failed')
+    } finally {
+      setPlaceLoading(false)
+    }
+  }
+
   const showNudge = !regionCode && !softDismissed
 
   return (
@@ -98,7 +137,11 @@ export function LocationBar() {
             <span className="location-bar__summary" title={areaLabel}>
               <span className="location-bar__badge">{areaShort}</span>
               <span className="location-bar__truncate">
-                {source === 'gps' ? 'Near you' : AU_REGIONS[regionCode].label}
+                {source === 'gps'
+                  ? 'Near you'
+                  : source === 'place' && placeLabel
+                    ? placeLabel
+                    : AU_REGIONS[regionCode].label}
               </span>
             </span>
           ) : showNudge ? (
@@ -142,11 +185,53 @@ export function LocationBar() {
             Local area
           </h2>
           <p className="location-dialog__hint">
-            Pick your state, or detect once. We use this for tips and nearby ideas — not for ads.
+            GardenWise covers <strong>Victoria only</strong>. Enter a Victorian postcode or suburb, or use browser
+            location once. We use this for tips and nearby ideas — not for ads.
           </p>
 
           <div className="location-dialog__field">
-            <label htmlFor={selectId}>State or territory</label>
+            <label htmlFor={placeInputId}>Postcode or suburb</label>
+            <input
+              id={placeInputId}
+              type="text"
+              className="location-dialog__input"
+              placeholder="e.g. 3000 or Carlton"
+              value={placeQuery}
+              onChange={(e) => setPlaceQuery(e.target.value)}
+              autoComplete="postal-code"
+              disabled={placeLoading}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  void applyPostcodeOrSuburb()
+                }
+              }}
+            />
+            <p className="location-dialog__hint" style={{ margin: '0.25rem 0 0', fontSize: '0.78rem' }}>
+              Look-up is biased to Victoria. Data from{' '}
+              <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noreferrer">
+                OpenStreetMap Nominatim
+              </a>
+              .
+            </p>
+            <button
+              type="button"
+              className="btn btn-secondary btn-block"
+              style={{ marginTop: 'var(--space-sm)' }}
+              disabled={placeLoading}
+              onClick={() => void applyPostcodeOrSuburb()}
+            >
+              {placeLoading ? 'Looking up…' : 'Use this postcode / suburb'}
+            </button>
+            {placeError && (
+              <p className="location-dialog__error" role="alert" style={{ marginTop: 'var(--space-sm)' }}>
+                {placeError}
+              </p>
+            )}
+          </div>
+
+          <div className="location-dialog__field">
+            <label htmlFor={selectId}>Region</label>
             <select
               id={selectId}
               className="location-dialog__select"
@@ -156,11 +241,7 @@ export function LocationBar() {
               <option value="" disabled>
                 Select…
               </option>
-              {AU_REGION_LIST.map((code) => (
-                <option key={code} value={code}>
-                  {AU_REGIONS[code].label}
-                </option>
-              ))}
+              <option value="VIC">{AU_REGIONS.VIC.label}</option>
             </select>
           </div>
 

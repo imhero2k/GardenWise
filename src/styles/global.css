@@ -449,6 +449,19 @@ img {
   background: var(--color-bg);
 }
 
+.vicflora-card__image {
+  flex-shrink: 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.vicflora-card__image-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 6rem;
+  background: linear-gradient(145deg, var(--color-bg) 0%, var(--color-border) 100%);
+  opacity: 0.85;
+}
+
 .plant-card-image-wrap img {
   width: 100%;
   height: 100%;
@@ -456,7 +469,8 @@ img {
   transition: transform 0.35s ease;
 }
 
-.plant-card:hover .plant-card-image-wrap img {
+.plant-card:hover .plant-card-image-wrap img,
+.vicflora-card:hover .plant-card-image-wrap img {
   transform: scale(1.04);
 }
 
@@ -1289,7 +1303,8 @@ img {
   color: var(--color-text);
 }
 
-.location-dialog__select {
+.location-dialog__select,
+.location-dialog__input {
   width: 100%;
   padding: 0.65rem 0.75rem;
   border-radius: var(--radius-sm);
@@ -1300,7 +1315,8 @@ img {
   color: var(--color-text);
 }
 
-.location-dialog__select:focus {
+.location-dialog__select:focus,
+.location-dialog__input:focus {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(165, 214, 167, 0.35);
@@ -1325,4 +1341,131 @@ img {
 
 .location-dialog__actions {
   margin-top: var(--space-md);
+}
+
+/* VicFlora plant cards (button) + detail dialog */
+button.vicflora-card {
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: var(--color-surface);
+}
+
+.plant-detail-dialog {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0;
+  max-width: min(520px, 94vw);
+  max-height: min(88vh, 720px);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hover);
+}
+
+.plant-detail-dialog::backdrop {
+  background: rgba(27, 45, 29, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.plant-detail-dialog__inner {
+  display: flex;
+  flex-direction: column;
+  max-height: min(88vh, 720px);
+}
+
+.plant-detail-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.plant-detail-dialog__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.25;
+  padding-right: var(--space-sm);
+}
+
+.plant-detail-dialog__close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.plant-detail-dialog__close:hover {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.plant-detail-dialog__body {
+  padding: var(--space-md);
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.plant-detail-dialog__hero {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+  background: var(--color-bg);
+}
+
+.plant-detail-dialog__hero img {
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.plant-detail-dialog__intro {
+  margin-bottom: var(--space-md);
+}
+
+.plant-detail-dialog__primary {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 0 0.25rem;
+}
+
+.plant-detail-dialog__sci {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0 0 var(--space-sm);
+}
+
+.plant-detail-dialog__meta {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.plant-detail-dialog__summary {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--color-text);
+  margin: 0;
 }
