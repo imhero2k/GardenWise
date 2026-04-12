@@ -1,9 +1,58 @@
-import { type ChangeEventHandler, useId, useRef, useState } from 'react'
+import { type ChangeEventHandler, useEffect, useId, useRef, useState } from 'react'
 import { IconCamera } from '../components/Icons'
+import type { PlantEnrichment } from '../lib/plantEnrichment'
+import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
 import { predictPlantFromBase64 } from '../lib/predict'
 
 type AnalysisState = 'idle' | 'analyzing' | 'done' | 'error'
+
+type ConfidenceTier = 'high' | 'medium' | 'low'
+
+function getConfidenceTier(confidence: number): ConfidenceTier {
+  if (confidence >= 0.8) return 'high'
+  if (confidence >= 0.5) return 'medium'
+  return 'low'
+}
+
+const CONFIDENCE_TIER = {
+  high: {
+    label: 'Strong match',
+    subtitle: 'Model is highly confident.',
+    gradient:
+      'linear-gradient(145deg, rgba(46, 125, 50, 0.22) 0%, rgba(129, 199, 132, 0.38) 45%, rgba(200, 230, 201, 0.35) 100%)',
+    border: '2px solid rgba(46, 125, 50, 0.5)',
+    shadow: '0 8px 28px rgba(46, 125, 50, 0.18)',
+    badgeBg: 'linear-gradient(135deg, #1b5e20, #2e7d32)',
+    badgeColor: '#fff',
+    bar: '#2e7d32',
+    accent: '#1b5e20',
+  },
+  medium: {
+    label: 'Moderate confidence',
+    subtitle: 'Good hint — confirm with another photo or a field guide.',
+    gradient:
+      'linear-gradient(145deg, rgba(255, 193, 7, 0.28) 0%, rgba(255, 224, 130, 0.45) 50%, rgba(255, 249, 196, 0.35) 100%)',
+    border: '2px solid rgba(245, 124, 0, 0.45)',
+    shadow: '0 8px 28px rgba(245, 124, 0, 0.15)',
+    badgeBg: 'linear-gradient(135deg, #e65100, #fb8c00)',
+    badgeColor: '#fff',
+    bar: '#f57c00',
+    accent: '#e65100',
+  },
+  low: {
+    label: 'Uncertain',
+    subtitle: 'Treat as a suggestion only — verify before acting.',
+    gradient:
+      'linear-gradient(145deg, rgba(239, 83, 80, 0.2) 0%, rgba(255, 138, 128, 0.32) 55%, rgba(255, 205, 210, 0.28) 100%)',
+    border: '2px solid rgba(198, 40, 40, 0.45)',
+    shadow: '0 8px 28px rgba(198, 40, 40, 0.14)',
+    badgeBg: 'linear-gradient(135deg, #b71c1c, #e53935)',
+    badgeColor: '#fff',
+    bar: '#c62828',
+    accent: '#b71c1c',
+  },
+} as const
 
 async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -12,6 +61,305 @@ async function fileToDataUrl(file: File): Promise<string> {
     reader.onload = () => resolve(String(reader.result ?? ''))
     reader.readAsDataURL(file)
   })
+}
+
+function PredictionResultCard({ result }: { result: PredictResponse }) {
+  const tier = getConfidenceTier(result.confidence)
+  const theme = CONFIDENCE_TIER[tier]
+  const pct = Math.round(result.confidence * 10000) / 100
+  const barPct = Math.min(100, Math.max(0, result.confidence * 100))
+
+  const [enrichment, setEnrichment] = useState<PlantEnrichment | null>(null)
+  const [enrichState, setEnrichState] = useState<'loading' | 'done' | 'error'>('loading')
+
+  useEffect(() => {
+    const ac = new AbortController()
+    enrichPlantByScientificName(result.label, ac.signal)
+      .then((data) => {
+        if (ac.signal.aborted) return
+        setEnrichment(data)
+        setEnrichState('done')
+      })
+      .catch(() => {
+        if (ac.signal.aborted) return
+        setEnrichState('error')
+      })
+    return () => ac.abort()
+  }, [result.label])
+
+  return (
+    <div
+      className="card card-body fade-up"
+      style={{
+        marginTop: 'var(--space-lg)',
+        background: theme.gradient,
+        border: theme.border,
+        boxShadow: theme.shadow,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 'var(--space-md)',
+          marginBottom: 'var(--space-md)',
+        }}
+      >
+        <h2 style={{ margin: 0, color: theme.accent }}>Likely match</h2>
+        <span
+          style={{
+            display: 'inline-block',
+            padding: '0.35rem 0.85rem',
+            borderRadius: 999,
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+            background: theme.badgeBg,
+            color: theme.badgeColor,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+          }}
+        >
+          {theme.label}
+        </span>
+      </div>
+      <p style={{ fontWeight: 700, marginBottom: 'var(--space-sm)', fontSize: '1.15rem', color: 'var(--color-text)' }}>
+        {result.label}
+      </p>
+      <p style={{ margin: '0 0 var(--space-md)', fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>
+        {theme.subtitle}
+      </p>
+
+      <div style={{ marginBottom: 'var(--space-md)' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            marginBottom: 'var(--space-xs)',
+          }}
+        >
+          <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Model confidence</span>
+          <span style={{ fontWeight: 800, fontSize: '1.25rem', color: theme.accent }}>{pct}%</span>
+        </div>
+        <div
+          style={{
+            height: 12,
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.65)',
+            overflow: 'hidden',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}
+        >
+          <div
+            style={{
+              height: '100%',
+              width: `${barPct}%`,
+              borderRadius: 999,
+              background: `linear-gradient(90deg, ${theme.bar}, ${theme.bar}cc)`,
+              transition: 'width 0.45s ease',
+            }}
+          />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 'var(--space-md)',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          padding: 'var(--space-sm) 0',
+        }}
+      >
+        <div
+          style={{
+            padding: 'var(--space-sm) var(--space-md)',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(255,255,255,0.55)',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Class index</div>
+          <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>{result.class_index}</div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: 'var(--space-lg)',
+          paddingTop: 'var(--space-md)',
+          borderTop: '1px solid rgba(0,0,0,0.08)',
+        }}
+      >
+        <h3 style={{ fontSize: '1rem', marginBottom: 'var(--space-sm)', color: theme.accent }}>Learn more</h3>
+        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-md)' }}>
+          Reference photos and text from Wikipedia, GBIF taxonomy, and iNaturalist (public APIs — POC).
+        </p>
+
+        {enrichState === 'loading' && (
+          <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading reference info…</p>
+        )}
+
+        {enrichState === 'error' && (
+          <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            Could not load extra info right now. Try again later.
+          </p>
+        )}
+
+        {enrichState === 'done' && enrichment && (
+          <>
+            {enrichment.images.length > 0 && (
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 'var(--space-sm)',
+                  flexWrap: 'wrap',
+                  marginBottom: 'var(--space-md)',
+                }}
+              >
+                {enrichment.images.map((img) => (
+                  <figure
+                    key={img.url}
+                    style={{
+                      margin: 0,
+                      width: 140,
+                      borderRadius: 'var(--radius-md)',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      background: 'rgba(255,255,255,0.6)',
+                    }}
+                  >
+                    <img
+                      src={img.url}
+                      alt=""
+                      style={{ width: '100%', height: 100, objectFit: 'cover', display: 'block' }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                    <figcaption
+                      style={{
+                        fontSize: '0.65rem',
+                        color: 'var(--color-text-muted)',
+                        padding: '0.25rem 0.35rem',
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {img.source === 'wikipedia' ? 'Wikipedia' : 'iNaturalist'}
+                      {img.attribution ? ` · ${img.attribution.slice(0, 80)}${img.attribution.length > 80 ? '…' : ''}` : ''}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
+
+            {enrichment.wikipedia && (
+              <div style={{ marginBottom: 'var(--space-md)' }}>
+                <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                  {enrichment.wikipedia.extract}
+                </p>
+                <a
+                  href={enrichment.wikipedia.pageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontWeight: 600, color: theme.accent, fontSize: '0.88rem' }}
+                >
+                  Read on Wikipedia →
+                </a>
+              </div>
+            )}
+
+            {!enrichment.wikipedia && enrichment.images.length === 0 && (
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-md)' }}>
+                No Wikipedia summary or community photos found for this exact name. Try verifying the spelling or check GBIF / iNaturalist below.
+              </p>
+            )}
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', alignItems: 'center' }}>
+              {enrichment.gbif && (
+                <a
+                  href={enrichment.gbif.speciesPageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    padding: '0.4rem 0.75rem',
+                    borderRadius: 999,
+                    background: 'rgba(255,255,255,0.75)',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  GBIF: {enrichment.gbif.canonicalName}
+                  {enrichment.gbif.rank ? ` (${enrichment.gbif.rank})` : ''}
+                </a>
+              )}
+              {enrichment.inaturalist && (
+                <a
+                  href={enrichment.inaturalist.taxonPageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    padding: '0.4rem 0.75rem',
+                    borderRadius: 999,
+                    background: 'rgba(255,255,255,0.75)',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  iNaturalist
+                  {enrichment.inaturalist.commonName ? `: ${enrichment.inaturalist.commonName}` : ''}
+                </a>
+              )}
+              {enrichment.inaturalist?.wikipediaUrl && (
+                <a
+                  href={enrichment.inaturalist.wikipediaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: '0.82rem', fontWeight: 600, color: theme.accent }}
+                >
+                  iNat Wikipedia link →
+                </a>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {Array.isArray(result.probabilities) && result.probabilities.length > 0 && (
+        <details style={{ marginTop: 'var(--space-md)' }}>
+          <summary style={{ cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+            Show model probabilities
+          </summary>
+          <pre
+            style={{
+              marginTop: 'var(--space-sm)',
+              background: 'rgba(255,255,255,0.5)',
+              padding: 'var(--space-sm)',
+              borderRadius: 'var(--radius-md)',
+              overflowX: 'auto',
+              border: '1px solid rgba(0,0,0,0.06)',
+            }}
+          >
+            {JSON.stringify(result.probabilities.slice(0, 50), null, 2)}
+          </pre>
+        </details>
+      )}
+
+      <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: 'var(--space-md)' }}>
+        Always confirm ID with your state biosecurity resource. This feature uses an ML model and can be wrong.
+      </p>
+    </div>
+  )
 }
 
 export function WeedPage() {
@@ -115,45 +463,7 @@ export function WeedPage() {
         </div>
       )}
 
-      {state === 'done' && result && (
-        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
-          <h2 style={{ marginBottom: 'var(--space-md)' }}>Likely match</h2>
-          <p style={{ fontWeight: 700, marginBottom: 'var(--space-sm)' }}>{result.label}</p>
-          <div style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div>
-              <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Confidence</div>
-              <div style={{ fontWeight: 700 }}>{Math.round(result.confidence * 10000) / 100}%</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Class index</div>
-              <div style={{ fontWeight: 700 }}>{result.class_index}</div>
-            </div>
-          </div>
-
-          {Array.isArray(result.probabilities) && result.probabilities.length > 0 && (
-            <details style={{ marginTop: 'var(--space-md)' }}>
-              <summary style={{ cursor: 'pointer', color: 'var(--color-text-muted)' }}>
-                Show model probabilities
-              </summary>
-              <pre
-                style={{
-                  marginTop: 'var(--space-sm)',
-                  background: 'rgba(0,0,0,0.04)',
-                  padding: 'var(--space-sm)',
-                  borderRadius: 'var(--radius-md)',
-                  overflowX: 'auto',
-                }}
-              >
-                {JSON.stringify(result.probabilities.slice(0, 50), null, 2)}
-              </pre>
-            </details>
-          )}
-
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: 'var(--space-md)' }}>
-            Always confirm ID with your state biosecurity resource. This feature uses an ML model and can be wrong.
-          </p>
-        </div>
-      )}
+      {state === 'done' && result && <PredictionResultCard key={result.label} result={result} />}
     </>
   )
 }
