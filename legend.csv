@@ -1,0 +1,22 @@
+page,code,file,label
+12,A,ref_A.png,Seed or plant pieces spread in farm produce such as grain or fodder
+12,B,ref_B.png,Movement of seed or plant pieces in contaminated soil
+12,C,ref_C.png,Seed eaten or carried by birds or other native or pest animals
+12,D,ref_D.png,Seed or plant pieces carried in water
+12,E,ref_E.png,Seed blown by wind
+12,F,ref_F.png,Seed eaten or carried by livestock
+12,G,ref_G.png,Seed spread by slashing or mowing
+12,H,ref_H.png,Seed or plant pieces spread by cultivation
+12,I,ref_I.png,"Seed or plant pieces carried on machinery, equipment, and/or vehicles"
+12,J,ref_J.png,"Seeds spread by humans via clothing, boots and planting activities"
+13,K,ref_K.png,Chemical
+13,L,ref_L.png,Cut and paint with appropriate herbicide
+13,M,ref_M.png,Manual Removal
+13,N,ref_N.png,Cultivation prior to flowering
+13,O,ref_O.png,Drill and Fill
+13,P,ref_P.png,Grazing of young growth
+13,Q,ref_Q.png,Slashing or mowing
+13,R,ref_R.png,Fire
+13,S,ref_S.png,Competition
+13,T,ref_T.png,Biological Control
+13,U,ref_U.png,Grooming

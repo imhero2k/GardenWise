@@ -1,0 +1,117 @@
+[
+  {
+    "page": 12,
+    "icons": [
+      {
+        "code": "A",
+        "file": "ref_A.png",
+        "label": "Seed or plant pieces spread in farm produce such as grain or fodder"
+      },
+      {
+        "code": "B",
+        "file": "ref_B.png",
+        "label": "Movement of seed or plant pieces in contaminated soil"
+      },
+      {
+        "code": "C",
+        "file": "ref_C.png",
+        "label": "Seed eaten or carried by birds or other native or pest animals"
+      },
+      {
+        "code": "D",
+        "file": "ref_D.png",
+        "label": "Seed or plant pieces carried in water"
+      },
+      {
+        "code": "E",
+        "file": "ref_E.png",
+        "label": "Seed blown by wind"
+      },
+      {
+        "code": "F",
+        "file": "ref_F.png",
+        "label": "Seed eaten or carried by livestock"
+      },
+      {
+        "code": "G",
+        "file": "ref_G.png",
+        "label": "Seed spread by slashing or mowing"
+      },
+      {
+        "code": "H",
+        "file": "ref_H.png",
+        "label": "Seed or plant pieces spread by cultivation"
+      },
+      {
+        "code": "I",
+        "file": "ref_I.png",
+        "label": "Seed or plant pieces carried on machinery, equipment, and/or vehicles"
+      },
+      {
+        "code": "J",
+        "file": "ref_J.png",
+        "label": "Seeds spread by humans via clothing, boots and planting activities"
+      }
+    ]
+  },
+  {
+    "page": 13,
+    "icons": [
+      {
+        "code": "K",
+        "file": "ref_K.png",
+        "label": "Chemical"
+      },
+      {
+        "code": "L",
+        "file": "ref_L.png",
+        "label": "Cut and paint with appropriate herbicide"
+      },
+      {
+        "code": "M",
+        "file": "ref_M.png",
+        "label": "Manual Removal"
+      },
+      {
+        "code": "N",
+        "file": "ref_N.png",
+        "label": "Cultivation prior to flowering"
+      },
+      {
+        "code": "O",
+        "file": "ref_O.png",
+        "label": "Drill and Fill"
+      },
+      {
+        "code": "P",
+        "file": "ref_P.png",
+        "label": "Grazing of young growth"
+      },
+      {
+        "code": "Q",
+        "file": "ref_Q.png",
+        "label": "Slashing or mowing"
+      },
+      {
+        "code": "R",
+        "file": "ref_R.png",
+        "label": "Fire"
+      },
+      {
+        "code": "S",
+        "file": "ref_S.png",
+        "label": "Competition"
+      },
+      {
+        "code": "T",
+        "file": "ref_T.png",
+        "label": "Biological Control"
+      },
+      {
+        "code": "U",
+        "file": "ref_U.png",
+        "label": "Grooming"
+      }
+    ]
+  }
+]
