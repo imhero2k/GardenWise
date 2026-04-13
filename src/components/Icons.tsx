@@ -1,3 +1,4 @@
+/** Single serrated / jagged leaf (Weeds nav, Plant Safety Check). */
 export function IconLeaf({ className }: { className?: string }) {
   return (
     <svg
@@ -10,17 +11,12 @@ export function IconLeaf({ className }: { className?: string }) {
       aria-hidden
     >
       <path
-        d="M12 3C7 3 3 7 3 12c0 5 4 9 9 9 5 0 9-4 9-9 0-5-4-9-9-9z"
+        d="M12 4L14.5 6.5 13 8 15.5 9.5 14 11.5 16.5 12.5 15 14.5 17.5 15.5 12 17.5 6.5 15.5 9 14.5 7.5 12.5 10 11.5 8.5 9.5 11 8 9.5 6.5 12 4z"
         stroke="currentColor"
         strokeWidth="1.5"
-        fill="none"
+        strokeLinejoin="round"
       />
-      <path
-        d="M12 3c3 4 4 8 3 12-1 3-3 5-6 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
+      <path d="M12 17.5v3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -136,6 +132,35 @@ export function IconSprout({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  )
+}
+
+/** Weed prevention — warning triangle with exclamation (Weeds page). */
+export function IconPrevent({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M12 4.5 20.5 19.5H3.5L12 4.5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 9.5v4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="17" r="1" fill="currentColor" />
     </svg>
   )
 }
@@ -258,6 +283,44 @@ export function IconShare({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  )
+}
+
+/** Waste / weed disposal — wheelie-bin style outline. */
+export function IconBin({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M4 7h16"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6 7v12a2 2 0 002 2h8a2 2 0 002-2V7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }

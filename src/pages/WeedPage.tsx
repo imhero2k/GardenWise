@@ -1,6 +1,6 @@
 import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { IconCamera, IconDroplet, IconPin, IconSprout } from '../components/Icons'
+import { IconBin, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
@@ -469,7 +469,7 @@ export function WeedPage() {
           </a>
           <a href="#prevention" className="feature-tile">
             <div className="feature-tile__icon">
-              <IconSprout />
+              <IconPrevent />
             </div>
             <div>
               <h3>Weed prevention</h3>
@@ -487,7 +487,7 @@ export function WeedPage() {
           </a>
           <a href="#disposal" className="feature-tile">
             <div className="feature-tile__icon">
-              <IconPin />
+              <IconBin />
             </div>
             <div>
               <h3>Safe disposal</h3>
