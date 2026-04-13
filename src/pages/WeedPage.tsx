@@ -1,5 +1,6 @@
-import { type ChangeEventHandler, useEffect, useId, useRef, useState } from 'react'
-import { IconCamera } from '../components/Icons'
+import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { IconBin, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
@@ -362,7 +363,36 @@ function PredictionResultCard({ result }: { result: PredictResponse }) {
   )
 }
 
+function WeedSection({
+  id,
+  title,
+  eyebrow,
+  children,
+}: {
+  id: string
+  title: string
+  eyebrow?: string
+  children: ReactNode
+}) {
+  return (
+    <section
+      id={id}
+      className="weed-page__section card"
+      style={{
+        scrollMarginTop: 'var(--space-xl)',
+        padding: 'var(--space-lg)',
+        marginTop: 'var(--space-lg)',
+      }}
+    >
+      {eyebrow && <p className="eyebrow">{eyebrow}</p>}
+      <h2 style={{ marginTop: eyebrow ? 'var(--space-sm)' : 0, marginBottom: 'var(--space-md)' }}>{title}</h2>
+      {children}
+    </section>
+  )
+}
+
 export function WeedPage() {
+  const location = useLocation()
   const inputId = useId()
   const [state, setState] = useState<AnalysisState>('idle')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -370,6 +400,15 @@ export function WeedPage() {
   const [error, setError] = useState<string | null>(null)
   const [imageInfo, setImageInfo] = useState<{ bytes: number; base64Chars: number } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+
+  useLayoutEffect(() => {
+    const raw = location.hash.replace(/^#/, '')
+    if (!raw) return
+    const el = document.getElementById(raw)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [location.hash, location.pathname])
 
   const handleFile: ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0]
@@ -389,11 +428,9 @@ export function WeedPage() {
       setPreviewUrl(dataUrl)
 
       const base64 = dataUrl.startsWith('data:') ? dataUrl.split(',', 2)[1] ?? '' : dataUrl
-      // Remove whitespace/newlines just in case (some environments insert line breaks)
       const trimmed = base64.replace(/\s+/g, '').trim()
       if (!trimmed) throw new Error('Could not encode image (empty payload)')
 
-      // Approx bytes (base64 -> 3/4) without padding
       const pad = trimmed.endsWith('==') ? 2 : trimmed.endsWith('=') ? 1 : 0
       const approxBytes = Math.max(0, Math.floor((trimmed.length * 3) / 4) - pad)
       setImageInfo({ bytes: approxBytes, base64Chars: trimmed.length })
@@ -411,59 +448,167 @@ export function WeedPage() {
   return (
     <>
       <header className="page-header">
-        <p className="eyebrow">Identify</p>
-        <h1>Weed identification</h1>
+        <p className="eyebrow">Weeds</p>
+        <h1>Weed help</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Upload a photo or use your camera — we will identify the plant and return a confidence score.
+          Identify risky plants, reduce spread, and dispose of material responsibly.
         </p>
       </header>
 
-      <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
-        <input
-          id={inputId}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="sr-only"
-          onChange={handleFile}
-        />
-        <IconCamera />
-        <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-          JPG or PNG — sent to the prediction API
-        </p>
-      </label>
+      <div className="section-block" style={{ marginBottom: 0 }}>
+        <h2 className="sr-only">Quick links</h2>
+        <div className="feature-grid">
+          <a href="#weed-checker" className="feature-tile">
+            <div className="feature-tile__icon">
+              <IconCamera />
+            </div>
+            <div>
+              <h3>Weed checker</h3>
+              <p>Scan or upload a plant to check invasive risk — same as Plant Safety Check on Home.</p>
+            </div>
+          </a>
+          <a href="#prevention" className="feature-tile">
+            <div className="feature-tile__icon">
+              <IconPrevent />
+            </div>
+            <div>
+              <h3>Weed prevention</h3>
+              <p>General tips to stop weeds taking hold in your garden.</p>
+            </div>
+          </a>
+          <a href="#hygiene" className="feature-tile">
+            <div className="feature-tile__icon">
+              <IconDroplet />
+            </div>
+            <div>
+              <h3>Weed hygiene</h3>
+              <p>Stop weeds moving between vehicles, tools, and bushland.</p>
+            </div>
+          </a>
+          <a href="#disposal" className="feature-tile">
+            <div className="feature-tile__icon">
+              <IconBin />
+            </div>
+            <div>
+              <h3>Safe disposal</h3>
+              <p>How to discard weeds and garden waste without spreading them.</p>
+            </div>
+          </a>
+        </div>
+      </div>
 
-      {previewUrl && (
-        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
-          <h2 style={{ marginBottom: 'var(--space-md)' }}>Selected image</h2>
-          <img
-            src={previewUrl}
-            alt="Uploaded plant preview"
-            style={{ width: '100%', maxHeight: 340, objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
+      <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
+        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
+          Upload a photo or use your camera — we will identify the plant and return a confidence score.
+        </p>
+
+        <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
+          <input
+            id={inputId}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="sr-only"
+            onChange={handleFile}
           />
-          {imageInfo && (
-            <p style={{ margin: 'var(--space-md) 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-              Payload: ~{Math.round(imageInfo.bytes / 1024)} KB ({imageInfo.base64Chars.toLocaleString()} base64 chars)
-            </p>
-          )}
-        </div>
-      )}
+          <IconCamera />
+          <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
+          <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+            JPG or PNG — sent to the prediction API
+          </p>
+        </label>
 
-      {state === 'analyzing' && (
-        <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
-          Analysing image…
+        {previewUrl && (
+          <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
+            <h3 style={{ marginBottom: 'var(--space-md)', fontSize: '1rem' }}>Selected image</h3>
+            <img
+              src={previewUrl}
+              alt="Uploaded plant preview"
+              style={{ width: '100%', maxHeight: 340, objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
+            />
+            {imageInfo && (
+              <p style={{ margin: 'var(--space-md) 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                Payload: ~{Math.round(imageInfo.bytes / 1024)} KB ({imageInfo.base64Chars.toLocaleString()} base64 chars)
+              </p>
+            )}
+          </div>
+        )}
+
+        {state === 'analyzing' && (
+          <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
+            Analysing image…
+          </p>
+        )}
+
+        {state === 'error' && error && (
+          <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
+            <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn’t analyse that image</h3>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
+          </div>
+        )}
+
+        {state === 'done' && result && <PredictionResultCard key={result.label} result={result} />}
+      </WeedSection>
+
+      <WeedSection id="prevention" title="General weed prevention tips" eyebrow="Stop weeds early">
+        <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
+          <li>Choose plants that are unlikely to become weeds in your area.</li>
+          <li>Check existing garden plants are safe.</li>
+          <li>Remove potentially weedy plants.</li>
+          <li>Dispose of garden waste carefully.</li>
+          <li>Be careful not to spread weeds.</li>
+          <li>Place mulch on soil surfaces in the garden to reduce weed growth.</li>
+        </ul>
+      </WeedSection>
+
+      <WeedSection id="hygiene" title="General weed hygiene tips" eyebrow="Limit spread">
+        <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
+          <li>
+            Inspect vehicles thoroughly — e.g. tyres, mud in wheel arches, guards and mudguards (check panels and
+            fairings where relevant).
+          </li>
+          <li>Carry a brush or broom; simple tools are often the best.</li>
+          <li>Carry a sealable bag for weeds and plant material; dispose of it thoroughly according to local rules.</li>
+          <li>
+            If wash-down is necessary, do it on a tarp in an area that is already weed-infested where possible, and
+            watch for runoff.
+          </li>
+          <li>Be careful with livestock and stock feed (weeds and seeds can hitchhike).</li>
+          <li>Check your socks and trouser cuffs for seeds and fragments.</li>
+        </ul>
+      </WeedSection>
+
+      <WeedSection id="disposal" title="General safe weed disposal tips" eyebrow="Dispose responsibly">
+        <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
+          <li>
+            Use council green-waste bins or drop-off days where allowed — follow your council’s rules for weeds.
+          </li>
+          <li>Avoid home compost for weeds with persistent roots, bulbs, or abundant seed.</li>
+          <li>Bag and landfill (as local rules require) species that reproduce easily from fragments.</li>
+          <li>Check state and council lists for <strong>declared</strong> or <strong>noxious</strong> species — disposal may be mandatory.</li>
+          <li>Never burn weeds without knowing fire regulations and smoke impacts in your area.</li>
+        </ul>
+        <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>
+          For authoritative rules, use your state agriculture or biosecurity website and local council.
         </p>
-      )}
+      </WeedSection>
 
-      {state === 'error' && error && (
-        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
-          <h2 style={{ marginBottom: 'var(--space-sm)' }}>Couldn’t analyse that image</h2>
-          <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
-        </div>
-      )}
-
-      {state === 'done' && result && <PredictionResultCard key={result.label} result={result} />}
+      <footer
+        style={{
+          marginTop: 'var(--space-xl)',
+          paddingTop: 'var(--space-md)',
+          borderTop: '1px solid var(--color-border)',
+          fontSize: '0.85rem',
+          color: 'var(--color-text-muted)',
+          textAlign: 'center',
+        }}
+      >
+        Content on this page adapted from{' '}
+        <a href="https://weeds.org.au/" target="_blank" rel="noreferrer">
+          Weeds Australia
+        </a>
+        .
+      </footer>
     </>
   )
 }

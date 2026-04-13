@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { IconCamera, IconLeaf, IconMap, IconSearch, IconSprout, IconUsers } from '../components/Icons'
+import { IconCamera, IconLeaf, IconMap, IconSprout, IconUsers } from '../components/Icons'
 
 export function HomePage() {
   return (
@@ -22,9 +22,6 @@ export function HomePage() {
             <Link to="/plants" className="btn btn-primary">
               Start Gardening
             </Link>
-            <Link to="/seasonal" className="btn btn-secondary" style={{ background: 'rgba(255,255,255,0.95)', color: 'var(--color-primary-dark)' }}>
-              Seasonal tips
-            </Link>
           </div>
         </div>
       </section>
@@ -32,22 +29,13 @@ export function HomePage() {
       <div className="section-block">
         <h2>Explore</h2>
         <div className="feature-grid">
-          <Link to="/weed" className="feature-tile">
+          <Link to="/weed#weed-checker" className="feature-tile">
             <div className="feature-tile__icon">
               <IconLeaf />
             </div>
             <div>
               <h3>Plant Safety Check</h3>
               <p>Scan or upload a plant to check invasive risk before you plant.</p>
-            </div>
-          </Link>
-          <Link to="/seasonal" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconSearch />
-            </div>
-            <div>
-              <h3>Seasonal Recommendations</h3>
-              <p>What to grow now — with eco-friendly tips for Australian climates.</p>
             </div>
           </Link>
           <Link to="/garden" className="feature-tile">

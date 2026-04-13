@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { IconHome, IconMap, IconSearch, IconSprout, IconUsers } from './Icons'
+import { IconHome, IconLeaf, IconMap, IconSearch, IconSprout, IconUsers } from './Icons'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `bottom-nav__link${isActive ? ' bottom-nav__link--active' : ''}`
@@ -14,6 +14,10 @@ export function BottomNav() {
       <NavLink to="/plants" className={linkClass}>
         <IconSearch />
         <span>PlantMe</span>
+      </NavLink>
+      <NavLink to="/weed" className={linkClass}>
+        <IconLeaf />
+        <span>Weeds</span>
       </NavLink>
       <NavLink to="/garden" className={linkClass}>
         <IconSprout />
