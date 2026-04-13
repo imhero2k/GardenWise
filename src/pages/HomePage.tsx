@@ -32,7 +32,7 @@ export function HomePage() {
       <div className="section-block">
         <h2>Explore</h2>
         <div className="feature-grid">
-          <Link to="/weed" className="feature-tile">
+          <Link to="/weed#weed-checker" className="feature-tile">
             <div className="feature-tile__icon">
               <IconLeaf />
             </div>

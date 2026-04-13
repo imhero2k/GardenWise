@@ -2,11 +2,6 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { IconSearch } from '../components/Icons'
 import { useLocationArea } from '../context/LocationContext'
 import {
-  fetchPerenualCareByScientificName,
-  perenualSpeciesWebUrl,
-  type PerenualCareSummary,
-} from '../lib/perenual'
-import {
   fetchLocalGovernmentAreasAtPoint,
   fetchNativeSpeciesForLgaPage,
   fetchTaxonConceptDetail,
@@ -16,8 +11,6 @@ import {
   type VicFloraSearchDoc,
   type VicFloraTaxonDetail,
 } from '../lib/vicflora'
-
-const PERENUAL_API_ENABLED = Boolean(import.meta.env.VITE_PERENUAL_API_KEY?.trim())
 
 /** Solr rows per request (VicFlora search pagination). */
 const SUGGESTION_API_PAGE_SIZE = 10
@@ -189,101 +182,6 @@ function PlantDetailDialogContent({
   )
 }
 
-function PerenualCareSection({
-  care,
-  loading,
-  scientificName,
-}: {
-  care: PerenualCareSummary | null
-  loading: boolean
-  scientificName: string
-}) {
-  return (
-    <section
-      className="plant-detail-dialog__perenual"
-      aria-labelledby="perenual-care-heading"
-      style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--color-border)' }}
-    >
-      <h3 id="perenual-care-heading" style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)' }}>
-        Garden care (Perenual)
-      </h3>
-      <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-md)', lineHeight: 1.45 }}>
-        General gardening hints from Perenual’s global database — not Victorian distribution or conservation status. Shown
-        only when your species name matches an entry in their index.
-      </p>
-      {loading && <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading care…</p>}
-      {!loading && !care && (
-        <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: 0 }}>
-          No matching species in Perenual for <span style={{ fontStyle: 'italic' }}>{scientificName}</span>.
-        </p>
-      )}
-      {care && (
-        <>
-          {care.imageUrl && (
-            <div className="plant-detail-dialog__perenual-img" style={{ marginBottom: 'var(--space-md)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-              <img src={care.imageUrl} alt="" loading="lazy" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', display: 'block' }} />
-            </div>
-          )}
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>
-            Matched: <span style={{ fontStyle: 'italic' }}>{care.matchedScientificName}</span>
-            {care.commonName ? ` · ${care.commonName}` : ''}
-          </p>
-          <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.88rem', lineHeight: 1.55 }}>
-            {care.cycle && (
-              <li>
-                <strong>Cycle:</strong> {care.cycle}
-              </li>
-            )}
-            {care.watering && (
-              <li>
-                <strong>Watering:</strong> {care.watering}
-              </li>
-            )}
-            {care.sunlight.length > 0 && (
-              <li>
-                <strong>Sunlight:</strong> {care.sunlight.join(', ')}
-              </li>
-            )}
-            {care.careLevel && (
-              <li>
-                <strong>Care level:</strong> {care.careLevel}
-              </li>
-            )}
-            {care.maintenance && (
-              <li>
-                <strong>Maintenance:</strong> {care.maintenance}
-              </li>
-            )}
-            {care.growthRate && (
-              <li>
-                <strong>Growth rate:</strong> {care.growthRate}
-              </li>
-            )}
-            {care.poisonousToHumans !== null && (
-              <li>
-                <strong>Poisonous to humans:</strong> {care.poisonousToHumans ? 'Yes' : 'No'}
-              </li>
-            )}
-            {care.poisonousToPets !== null && (
-              <li>
-                <strong>Poisonous to pets:</strong> {care.poisonousToPets ? 'Yes' : 'No'}
-              </li>
-            )}
-          </ul>
-          {care.description && (
-            <p style={{ fontSize: '0.88rem', lineHeight: 1.55, margin: 'var(--space-md) 0 0' }}>{care.description}</p>
-          )}
-          <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
-            <a href={perenualSpeciesWebUrl(care.id)} target="_blank" rel="noreferrer">
-              Open this species on Perenual →
-            </a>
-          </p>
-        </>
-      )}
-    </section>
-  )
-}
-
 export function PlantSearchPage() {
   const { coords, areaLabel } = useLocationArea()
   const [q, setQ] = useState('')
@@ -307,20 +205,14 @@ export function PlantSearchPage() {
   const plantDetailDialogRef = useRef<HTMLDialogElement>(null)
   const plantDetailTitleId = useId()
   const [plantDetailId, setPlantDetailId] = useState<string | null>(null)
-  /** Card row used when opening the modal (scientific name for Perenual lookup). */
-  const [plantDetailOpenDoc, setPlantDetailOpenDoc] = useState<VicFloraSearchDoc | null>(null)
   const [plantDetail, setPlantDetail] = useState<VicFloraTaxonDetail | null>(null)
   const [plantDetailLoading, setPlantDetailLoading] = useState(false)
   const [plantDetailError, setPlantDetailError] = useState<string | null>(null)
-  const [perenualCare, setPerenualCare] = useState<PerenualCareSummary | null>(null)
-  const [perenualLoading, setPerenualLoading] = useState(false)
 
   const openPlantDetail = useCallback((doc: VicFloraSearchDoc) => {
     setPlantDetailId(doc.id)
-    setPlantDetailOpenDoc(doc)
     setPlantDetail(null)
     setPlantDetailError(null)
-    setPerenualCare(null)
     plantDetailDialogRef.current?.showModal()
   }, [])
 
@@ -342,28 +234,6 @@ export function PlantSearchPage() {
       })
     return () => ac.abort()
   }, [plantDetailId])
-
-  useEffect(() => {
-    if (!plantDetailId || !plantDetailOpenDoc || !PERENUAL_API_ENABLED) {
-      setPerenualCare(null)
-      setPerenualLoading(false)
-      return
-    }
-    const ac = new AbortController()
-    setPerenualCare(null)
-    setPerenualLoading(true)
-    fetchPerenualCareByScientificName(plantDetailOpenDoc.scientificName, ac.signal)
-      .then((c) => {
-        if (!ac.signal.aborted) setPerenualCare(c)
-      })
-      .catch(() => {
-        if (!ac.signal.aborted) setPerenualCare(null)
-      })
-      .finally(() => {
-        if (!ac.signal.aborted) setPerenualLoading(false)
-      })
-    return () => ac.abort()
-  }, [plantDetailId, plantDetailOpenDoc])
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebounced(q.trim()), 380)
@@ -716,12 +586,9 @@ export function PlantSearchPage() {
         aria-labelledby={plantDetailTitleId}
         onClose={() => {
           setPlantDetailId(null)
-          setPlantDetailOpenDoc(null)
           setPlantDetail(null)
           setPlantDetailError(null)
           setPlantDetailLoading(false)
-          setPerenualCare(null)
-          setPerenualLoading(false)
         }}
       >
         <div className="plant-detail-dialog__inner">
@@ -758,13 +625,6 @@ export function PlantSearchPage() {
               <PlantDetailDialogContent
                 detail={plantDetail}
                 vicFloraPageUrl={vicfloraTaxonUrl(plantDetail.id)}
-              />
-            )}
-            {plantDetailId && plantDetailOpenDoc && PERENUAL_API_ENABLED && (
-              <PerenualCareSection
-                care={perenualCare}
-                loading={perenualLoading}
-                scientificName={plantDetailOpenDoc.scientificName}
               />
             )}
           </div>
