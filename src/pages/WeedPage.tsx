@@ -1,6 +1,31 @@
-import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import {
+  type ChangeEventHandler,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useLocation } from 'react-router-dom'
 import { IconBin, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
+import { useLocationArea } from '../context/LocationContext'
+import {
+  alaBieSpeciesPageUrl,
+  alaWeedsAustraliaProfileUrl,
+  fetchAlaSpeciesSearch,
+  type AlaSpeciesHit,
+} from '../lib/alaSpecies'
+import { WEEDS_LOCAL_ADVICE_HINTS } from '../data/weedsLocalAdviceHints'
+import {
+  fetchWeedsAustraliaManagementAdvice,
+  weedsAustraliaProfileJsonUrl,
+  type WeedsManagementAdvice,
+} from '../lib/alaWeedsProfile'
+import { getCachedWeedsManagementAdvice, setCachedWeedsManagementAdvice } from '../lib/weedsAdviceCache'
+import { advicePlainTextForMatching, matchLocalAdviceToAlaText } from '../lib/weedsAdviceMatch'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
@@ -54,6 +79,12 @@ const CONFIDENCE_TIER = {
     accent: '#b71c1c',
   },
 } as const
+
+/** Sample species for the “near you” preview until location lists load from AWS. */
+const PREVIEW_LOCAL_WEEDS = [
+  { scientificName: 'Alternanthera philoxeroides', commonName: 'Alligator weed' },
+  { scientificName: 'Acacia baileyana', commonName: 'Cootamundra wattle' },
+] as const
 
 async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -393,7 +424,18 @@ function WeedSection({
 
 export function WeedPage() {
   const location = useLocation()
+  const { areaLabel } = useLocationArea()
   const inputId = useId()
+  const alaDialogRef = useRef<HTMLDialogElement>(null)
+  const alaDialogTitleId = useId()
+  const [alaHit, setAlaHit] = useState<AlaSpeciesHit | null>(null)
+  const [alaLoading, setAlaLoading] = useState(false)
+  const [alaError, setAlaError] = useState<string | null>(null)
+  const [weedsAdvice, setWeedsAdvice] = useState<WeedsManagementAdvice | null>(null)
+  const [weedsAdviceLoading, setWeedsAdviceLoading] = useState(false)
+  const [weedsAdviceError, setWeedsAdviceError] = useState<string | null>(null)
+  /** Which preview card was opened (drives ALA + Weeds Australia lookups). */
+  const [alaPreviewTarget, setAlaPreviewTarget] = useState<(typeof PREVIEW_LOCAL_WEEDS)[number] | null>(null)
   const [state, setState] = useState<AnalysisState>('idle')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [result, setResult] = useState<PredictResponse | null>(null)
@@ -444,6 +486,54 @@ export function WeedPage() {
       setError(err instanceof Error ? err.message : 'Prediction failed')
     }
   }
+
+  const openAlaPreview = useCallback(async (weed: (typeof PREVIEW_LOCAL_WEEDS)[number]) => {
+    setAlaPreviewTarget(weed)
+    setAlaLoading(true)
+    setAlaError(null)
+    setAlaHit(null)
+    setWeedsAdviceError(null)
+    const cached = getCachedWeedsManagementAdvice(weed.scientificName)
+    setWeedsAdvice(cached)
+    setWeedsAdviceLoading(!cached)
+    alaDialogRef.current?.showModal()
+    try {
+      const [speciesResult, weedsResult] = await Promise.allSettled([
+        fetchAlaSpeciesSearch(weed.scientificName),
+        fetchWeedsAustraliaManagementAdvice(weed.scientificName),
+      ])
+      if (speciesResult.status === 'fulfilled') {
+        const h = speciesResult.value
+        setAlaHit(h)
+        if (!h) setAlaError('No species match returned from ALA for this name.')
+      } else {
+        const e = speciesResult.reason
+        setAlaError(e instanceof Error ? e.message : 'Could not load ALA data.')
+      }
+      if (weedsResult.status === 'fulfilled') {
+        setWeedsAdvice(weedsResult.value)
+        setCachedWeedsManagementAdvice(weed.scientificName, weedsResult.value)
+        setWeedsAdviceError(null)
+      } else {
+        if (!getCachedWeedsManagementAdvice(weed.scientificName)) {
+          setWeedsAdviceError(
+            weedsResult.reason instanceof Error
+              ? weedsResult.reason.message
+              : 'Could not load Weeds Australia profile JSON.',
+          )
+        }
+      }
+    } finally {
+      setAlaLoading(false)
+      setWeedsAdviceLoading(false)
+    }
+  }, [])
+
+  const weedsLocalMatches = useMemo(() => {
+    if (!weedsAdvice?.bestPracticeManagementHtml) return []
+    const plain = advicePlainTextForMatching(weedsAdvice)
+    return matchLocalAdviceToAlaText(plain, WEEDS_LOCAL_ADVICE_HINTS, 1)
+  }, [weedsAdvice])
 
   return (
     <>
@@ -496,6 +586,53 @@ export function WeedPage() {
           </a>
         </div>
       </div>
+
+      <section
+        id="local-weeds"
+        className="card"
+        style={{
+          padding: 'var(--space-lg)',
+          marginTop: 'var(--space-lg)',
+          scrollMarginTop: 'var(--space-xl)',
+        }}
+      >
+        <p className="eyebrow">Your area</p>
+        <h2 style={{ fontSize: '1.1rem', margin: '0 0 var(--space-sm)' }}>Weeds near your location</h2>
+        <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-md)', lineHeight: 1.5 }}>
+          Preview: sample species for testing. Location shown from your header settings:{' '}
+          <strong>{areaLabel}</strong>. Later, this list will use a location-specific dataset (e.g. hosted on AWS).
+        </p>
+        <div className="plant-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+          {PREVIEW_LOCAL_WEEDS.map((weed) => (
+            <button
+              key={weed.scientificName}
+              type="button"
+              className="card card-interactive vicflora-card"
+              onClick={() => void openAlaPreview(weed)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                textAlign: 'left',
+                width: '100%',
+              }}
+            >
+              <div className="plant-card-image-wrap vicflora-card__image">
+                <div className="vicflora-card__image-placeholder" aria-hidden />
+              </div>
+              <div className="card-body" style={{ flex: 1 }}>
+                <h3 className="plant-card-title">{weed.commonName}</h3>
+                <p className="plant-card-sci" style={{ margin: 0 }}>
+                  {weed.scientificName}
+                </p>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-primary)', margin: 'var(--space-sm) 0 0' }}>
+                  View ALA species data
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
@@ -609,6 +746,179 @@ export function WeedPage() {
         </a>
         .
       </footer>
+
+      <dialog
+        ref={alaDialogRef}
+        className="plant-detail-dialog"
+        aria-labelledby={alaDialogTitleId}
+        onClose={() => {
+          setAlaHit(null)
+          setAlaError(null)
+          setAlaLoading(false)
+          setWeedsAdvice(null)
+          setWeedsAdviceError(null)
+          setWeedsAdviceLoading(false)
+          setAlaPreviewTarget(null)
+        }}
+      >
+        <div className="plant-detail-dialog__inner">
+          <header className="plant-detail-dialog__header">
+            <h2 id={alaDialogTitleId} className="plant-detail-dialog__title">
+              {alaHit?.commonName || alaHit?.scientificName || alaPreviewTarget?.commonName || 'Species'}
+            </h2>
+            <button
+              type="button"
+              className="plant-detail-dialog__close"
+              aria-label="Close"
+              onClick={() => alaDialogRef.current?.close()}
+            >
+              ×
+            </button>
+          </header>
+          <div className="plant-detail-dialog__body">
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-md)' }}>
+              Data from the Atlas of Living Australia species search API (
+              <a href="https://api.ala.org.au/species/search" target="_blank" rel="noreferrer">
+                api.ala.org.au
+              </a>
+              ). Occurrence counts are national, not filtered to your council. Management text below comes from the
+              Weeds Australia profile JSON on ALA Profiles (dev server uses a Vite proxy because the site does not
+              send CORS headers).
+            </p>
+            {alaLoading && <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Loading ALA data…</p>}
+            {alaError && !alaLoading && (
+              <p style={{ color: 'var(--color-danger)', margin: 0 }}>{alaError}</p>
+            )}
+            {alaHit && !alaLoading && (
+              <>
+                {alaHit.thumbnailUrl && (
+                  <div className="plant-detail-dialog__hero">
+                    <img src={alaHit.thumbnailUrl} alt="" loading="lazy" />
+                  </div>
+                )}
+                <div className="plant-detail-dialog__intro">
+                  <p className="plant-detail-dialog__primary">
+                    {alaHit.commonName || alaHit.nameComplete || alaHit.scientificName}
+                  </p>
+                  {alaHit.commonName && (alaHit.nameComplete || alaHit.scientificName) && (
+                    <p className="plant-detail-dialog__sci">{alaHit.nameComplete || alaHit.scientificName}</p>
+                  )}
+                  <ul className="plant-detail-dialog__meta">
+                    {alaHit.rank && <li>Rank: {alaHit.rank}</li>}
+                    {alaHit.taxonomicStatus && <li>Status: {alaHit.taxonomicStatus}</li>}
+                    {alaHit.occurrenceCount != null && (
+                      <li>ALA occurrence records (Australia-wide): {alaHit.occurrenceCount.toLocaleString()}</li>
+                    )}
+                    {alaHit.kingdom && <li>Kingdom: {alaHit.kingdom}</li>}
+                    {alaHit.family && <li>Family: {alaHit.family}</li>}
+                    {alaHit.genus && <li>Genus: {alaHit.genus}</li>}
+                    {alaHit.infoSourceName && <li>Name source: {alaHit.infoSourceName}</li>}
+                  </ul>
+                </div>
+                {(weedsAdviceLoading || weedsAdvice || weedsAdviceError) && (
+                  <div
+                    className="card card-body fade-up"
+                    style={{
+                      marginTop: 'var(--space-md)',
+                      padding: 'var(--space-md)',
+                      background: 'var(--color-bg)',
+                      border: '1px solid var(--color-border)',
+                    }}
+                  >
+                    <h3 style={{ margin: '0 0 var(--space-sm)', fontSize: '0.95rem' }}>Best practice management</h3>
+                    {weedsAdviceLoading && (
+                      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.88rem' }}>
+                        Loading Weeds Australia profile…
+                      </p>
+                    )}
+                    {weedsAdviceError && !weedsAdviceLoading && (
+                      <p style={{ margin: 0, color: 'var(--color-danger)', fontSize: '0.88rem' }}>{weedsAdviceError}</p>
+                    )}
+                    {weedsAdvice?.bestPracticeManagementHtml && !weedsAdviceLoading && (
+                      <>
+                        <div
+                          className="weeds-ala-html"
+                          style={{ fontSize: '0.88rem', lineHeight: 1.55, color: 'var(--color-text)' }}
+                          dangerouslySetInnerHTML={{ __html: weedsAdvice.bestPracticeManagementHtml }}
+                        />
+                        {weedsAdvice.licenseLine && (
+                          <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                            {weedsAdvice.licenseLine}
+                          </p>
+                        )}
+                        {weedsLocalMatches.length > 0 && (
+                          <div style={{ marginTop: 'var(--space-md)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--color-border)' }}>
+                            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.82rem', fontWeight: 600 }}>
+                              Related tips (keyword match with your dataset)
+                            </p>
+                            <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                              {weedsLocalMatches.map(({ entry }) => (
+                                <li key={entry.id}>{entry.advice}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {weedsAdvice && !weedsAdvice.bestPracticeManagementHtml && !weedsAdviceLoading && !weedsAdviceError && (
+                      <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>
+                        No &quot;Best practice management&quot; block in this profile JSON.
+                      </p>
+                    )}
+                  </div>
+                )}
+                <details style={{ marginTop: 'var(--space-md)' }}>
+                  <summary style={{ cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '0.88rem' }}>
+                    Raw API fields (debug)
+                  </summary>
+                  <pre
+                    style={{
+                      marginTop: 'var(--space-sm)',
+                      fontSize: '0.72rem',
+                      overflow: 'auto',
+                      maxHeight: 320,
+                      padding: 'var(--space-sm)',
+                      background: 'var(--color-bg)',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border)',
+                    }}
+                  >
+                    {JSON.stringify(
+                      {
+                        alaSpeciesSearch: alaHit,
+                        weedsProfileJsonUrl: alaPreviewTarget
+                          ? weedsAustraliaProfileJsonUrl(alaPreviewTarget.scientificName)
+                          : null,
+                        weedsAustraliaManagement: weedsAdvice,
+                      },
+                      null,
+                      2,
+                    )}
+                  </pre>
+                </details>
+                <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
+                  <a
+                    href={alaBieSpeciesPageUrl(alaPreviewTarget?.scientificName ?? '')}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open species in ALA (BIE) →
+                  </a>
+                </p>
+                <p style={{ margin: 'var(--space-sm) 0 0', fontSize: '0.88rem' }}>
+                  <a
+                    href={alaWeedsAustraliaProfileUrl(alaPreviewTarget?.scientificName ?? '')}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Weeds Australia profile (ALA Profiles) →
+                  </a>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      </dialog>
     </>
   )
 }
