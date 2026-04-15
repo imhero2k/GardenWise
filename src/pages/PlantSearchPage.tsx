@@ -4,7 +4,6 @@ import { useLocationArea } from '../context/LocationContext'
 import {
   fetchRecommendations,
   type RecommendedPlant,
-  type RegionMatchKind,
 } from '../lib/recommendationsApi'
 import {
   useRecommendedPlantEnrichment,
@@ -142,10 +141,9 @@ function DbPlantDetailContent({
 }
 
 export function PlantSearchPage() {
-  const { coords, areaLabel } = useLocationArea()
+  const { coords } = useLocationArea()
   const [rdsPlants, setRdsPlants] = useState<RecommendedPlant[]>([])
   const [rdsRegionName, setRdsRegionName] = useState<string | null>(null)
-  const [rdsRegionMatch, setRdsRegionMatch] = useState<RegionMatchKind | null>(null)
   const [rdsSearch, setRdsSearch] = useState('')
   const [rdsOffset, setRdsOffset] = useState(0)
   const [rdsLoading, setRdsLoading] = useState(false)
@@ -168,7 +166,6 @@ export function PlantSearchPage() {
         setRdsLoading(false)
         setRdsPlants([])
         setRdsRegionName(null)
-        setRdsRegionMatch(null)
         setRdsOffset(0)
         setRdsHasMore(false)
         setRdsError(null)
@@ -187,14 +184,12 @@ export function PlantSearchPage() {
           setRdsPlants(res.plants)
           setRdsHasMore(res.hasMore)
           setRdsRegionName(res.regionName)
-          setRdsRegionMatch(res.regionMatch ?? null)
         })
         .catch((e) => {
           if (!ac.signal.aborted) {
             setRdsError(e instanceof Error ? e.message : 'Could not load recommendations')
             setRdsPlants([])
             setRdsRegionName(null)
-            setRdsRegionMatch(null)
             setRdsHasMore(false)
           }
         })
@@ -228,26 +223,6 @@ export function PlantSearchPage() {
         <h2 id="rds-heading" style={{ fontSize: '1.1rem', marginBottom: 'var(--space-sm)' }}>
           Recommended for your location
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: 'var(--space-md)' }}>
-          <strong>Location:</strong> {areaLabel}
-          {coords && (
-            <>
-              {' '}
-              — coordinates{' '}
-              <strong>
-                {coords.lat.toFixed(4)}°, {coords.lng.toFixed(4)}°
-              </strong>
-              . Plants are matched to your bioregion using the GardenWise database (PostgreSQL / PostGIS).
-            </>
-          )}
-          {!coords && (
-            <>
-              {' '}
-              — use <strong>Change</strong> in the header to set <strong>GPS</strong> or a <strong>postcode or suburb</strong>{' '}
-              so we can recommend species for your area.
-            </>
-          )}
-        </p>
 
         {rdsError && (
           <div className="card card-body" style={{ borderColor: 'var(--color-danger)', marginBottom: 'var(--space-md)' }}>
@@ -265,13 +240,6 @@ export function PlantSearchPage() {
         {!rdsLoading && coords && !rdsError && rdsRegionName && (
           <p style={{ fontSize: '0.88rem', marginBottom: 'var(--space-md)' }}>
             <strong>Matched region:</strong> {rdsRegionName}
-            {rdsRegionMatch === 'nearest' && (
-              <span style={{ color: 'var(--color-text-muted)' }}>
-                {' '}
-                — nearest bioregion in the dataset (this location is not inside a boundary polygon;
-                often harbours and dense urban blocks).
-              </span>
-            )}
           </p>
         )}
 
@@ -280,22 +248,17 @@ export function PlantSearchPage() {
             <IconSearch />
           </span>
           <label htmlFor="recommended-search" className="sr-only">
-            Search recommended plants
+            Search
           </label>
           <input
             id="recommended-search"
             type="search"
-            placeholder="Search within recommendations (scientific or common name)…"
+            placeholder="Search recommendations…"
             value={rdsSearch}
             onChange={(e) => setRdsSearch(e.target.value)}
             autoComplete="off"
           />
         </div>
-
-        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 'var(--space-md)' }}>
-          Cards show a short blurb and image from your database when present; otherwise we load a summary and photo
-          from Wikipedia / iNaturalist (no API key).
-        </p>
 
         <div className="plant-grid">
           {rdsPlants.map((p) => (

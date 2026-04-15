@@ -88,54 +88,6 @@ export function IconMap({ className }: { className?: string }) {
   )
 }
 
-export function IconUsers({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-    >
-      <path
-        d="M17 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M21 20v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
-export function IconSprout({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-    >
-      <path
-        d="M12 22v-8M8 14c-2-4-1-8 4-10-1 4 0 7 2 10M16 14c2-4 1-8-4-10 1 4 0 7-2 10"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 /** Weed prevention — warning triangle with exclamation (Weeds page). */
 export function IconPrevent({ className }: { className?: string }) {
   return (

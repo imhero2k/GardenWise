@@ -546,12 +546,7 @@ export function WeedPage() {
         </div>
       </div>
 
-      <WeedSection id="top-weeds" title="Top weeds (Victoria)" eyebrow="Statewide">
-        <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
-          This is a statewide list from your database (<code>weed_info</code>) sorted by WoNS and risk score. Use the local
-          region-linked weeds for postcode-level accuracy once your database contains those links.
-        </p>
-
+      <WeedSection id="top-weeds" title="Top weeds (Victoria)">
         <div className="search-field" style={{ marginBottom: 'var(--space-md)' }}>
           <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
             <IconSearch />
@@ -562,7 +557,7 @@ export function WeedPage() {
           <input
             id="top-weeds-search"
             type="search"
-            placeholder="Search statewide weeds…"
+            placeholder="Search weeds…"
             value={topWeedsSearch}
             onChange={(e) => setTopWeedsSearch(e.target.value)}
             autoComplete="off"

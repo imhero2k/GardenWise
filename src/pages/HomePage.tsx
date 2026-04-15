@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { IconCamera, IconLeaf, IconMap, IconSprout, IconUsers } from '../components/Icons'
+import { IconCamera, IconLeaf, IconMap, IconSearch } from '../components/Icons'
 
 export function HomePage() {
   return (
@@ -38,22 +38,13 @@ export function HomePage() {
               <p>Scan or upload a plant to check invasive risk before you plant.</p>
             </div>
           </Link>
-          <Link to="/garden" className="feature-tile">
+          <Link to="/plants" className="feature-tile">
             <div className="feature-tile__icon">
-              <IconSprout />
+              <IconSearch />
             </div>
             <div>
-              <h3>Manage Your Garden</h3>
-              <p>Track plants, watering, and alerts in one calm dashboard.</p>
-            </div>
-          </Link>
-          <Link to="/community" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconUsers />
-            </div>
-            <div>
-              <h3>Community Gallery</h3>
-              <p>Get inspired by gardens across Australia — like, comment, and share.</p>
+              <h3>PlantMe</h3>
+              <p>Search and discover recommended plants for your area.</p>
             </div>
           </Link>
         </div>

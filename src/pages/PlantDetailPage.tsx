@@ -1,12 +1,10 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useGarden } from '../context/GardenContext'
 import { getPlantById } from '../data/plants'
 import { RiskBadge } from '../components/RiskBadge'
 
 export function PlantDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { addPlant, hasPlant } = useGarden()
   const plant = id ? getPlantById(id) : undefined
 
   if (!plant) {
@@ -20,7 +18,6 @@ export function PlantDetailPage() {
     )
   }
 
-  const inGarden = hasPlant(plant.id)
   const highRisk = plant.invasiveRisk === 'High'
 
   return (
@@ -108,15 +105,6 @@ export function PlantDetailPage() {
           {plant.seasonalNote}
         </p>
       </div>
-
-      <button
-        type="button"
-        className="btn btn-primary btn-block"
-        disabled={inGarden}
-        onClick={() => addPlant(plant.id)}
-      >
-        {inGarden ? 'Already in My Garden' : 'Add to My Garden'}
-      </button>
     </>
   )
 }

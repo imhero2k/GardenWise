@@ -16,11 +16,6 @@ export interface Plant {
   tags: string[]
 }
 
-export interface GardenPlant extends Plant {
-  health: 'Thriving' | 'Good' | 'Needs care'
-  waterDue: string
-}
-
 export type NurseryKind = 'nursery' | 'public_garden'
 
 export interface Nursery {
@@ -40,13 +35,4 @@ export interface Nursery {
   rating?: number
   organic?: boolean
   lowInvasiveFocus?: boolean
-}
-
-export interface CommunityPost {
-  id: string
-  image: string
-  author: string
-  location: string
-  likes: number
-  comments: number
 }
