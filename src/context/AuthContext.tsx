@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   OAuthProvider,
   onAuthStateChanged,
@@ -6,22 +6,10 @@ import {
   signInWithPopup,
   signOut,
   createUserWithEmailAndPassword,
-  type User,
 } from 'firebase/auth'
 import { getFirebaseAuth, googleProvider, isFirebaseAuthConfigured } from '../auth/firebase'
-
-export type AuthState =
-  | { configured: false; loading: false; user: null; error: null }
-  | { configured: true; loading: boolean; user: User | null; error: string | null }
-
-const AuthContext = createContext<{
-  state: AuthState
-  loginWithGoogle: () => Promise<void>
-  loginWithApple: () => Promise<void>
-  loginWithEmail: (email: string, password: string) => Promise<void>
-  signUpWithEmail: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
-} | null>(null)
+import type { AuthState } from './authTypes'
+import { AuthContext } from './AuthContextInternal'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(() =>
@@ -32,7 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isFirebaseAuthConfigured()) {
-      setState({ configured: false, loading: false, user: null, error: null })
+      queueMicrotask(() => {
+        setState({ configured: false, loading: false, user: null, error: null })
+      })
       return
     }
 
@@ -133,9 +123,5 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
-}
+// Note: useAuth is exported from a separate file to satisfy react-refresh/only-export-components.
 

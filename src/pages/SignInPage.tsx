@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 
 export function SignInPage() {
   const { state, loginWithApple, loginWithEmail, loginWithGoogle, signUpWithEmail } = useAuth()
