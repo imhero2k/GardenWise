@@ -32,6 +32,7 @@ jobs:
       - name: Install, check, and build
         env:
           VITE_BASE_PATH: /GardenWise/
+          VITE_API_BASE_URL: https://tcal5txtn8.execute-api.ap-southeast-2.amazonaws.com
         run: npm ci && npm run typecheck && npm run lint && npm run build
 
       - uses: actions/upload-pages-artifact@v4

@@ -1,10 +1,14 @@
 import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { IconBin, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
+import { IconSearch } from '../components/Icons'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
 import { predictPlantFromBase64 } from '../lib/predict'
+import { fetchTopWeeds, type RegionWeed } from '../lib/weedsApi'
+import { useRecommendedPlantEnrichment } from '../hooks/useRecommendedPlantEnrichment'
+import { ImageLightbox } from '../components/ImageLightbox'
 
 type AnalysisState = 'idle' | 'analyzing' | 'done' | 'error'
 
@@ -401,6 +405,25 @@ export function WeedPage() {
   const [imageInfo, setImageInfo] = useState<{ bytes: number; base64Chars: number } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
 
+  const [topWeeds, setTopWeeds] = useState<RegionWeed[]>([])
+  const [topWeedsLoading, setTopWeedsLoading] = useState(false)
+  const [topWeedsError, setTopWeedsError] = useState<string | null>(null)
+  const [topWeedsSearch, setTopWeedsSearch] = useState('')
+  const [topWeedsOffset, setTopWeedsOffset] = useState(0)
+  const [topWeedsHasMore, setTopWeedsHasMore] = useState(false)
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+
+  const topWeedsEnriched = useRecommendedPlantEnrichment(
+    topWeeds.map((w) => ({
+      id: `top-${w.id}`,
+      scientificName: w.scientificName,
+      commonName: w.commonName,
+      family: null,
+      description: null,
+      imageUrl: null,
+    })),
+  )
+
   useLayoutEffect(() => {
     const raw = location.hash.replace(/^#/, '')
     if (!raw) return
@@ -409,6 +432,32 @@ export function WeedPage() {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [location.hash, location.pathname])
+
+  useEffect(() => {
+    queueMicrotask(() => setTopWeedsOffset(0))
+  }, [topWeedsSearch])
+
+  useEffect(() => {
+    const ac = new AbortController()
+    setTopWeedsLoading(true)
+    setTopWeedsError(null)
+    fetchTopWeeds(ac.signal, { pageSize: 12, offset: topWeedsOffset, q: topWeedsSearch })
+      .then((res) => {
+        if (ac.signal.aborted) return
+        setTopWeeds(res.weeds)
+        setTopWeedsHasMore(res.hasMore)
+      })
+      .catch((e) => {
+        if (ac.signal.aborted) return
+        setTopWeedsError(e instanceof Error ? e.message : 'Could not load top weeds')
+        setTopWeeds([])
+        setTopWeedsHasMore(false)
+      })
+      .finally(() => {
+        if (!ac.signal.aborted) setTopWeedsLoading(false)
+      })
+    return () => ac.abort()
+  }, [topWeedsOffset, topWeedsSearch])
 
   const handleFile: ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0]
@@ -496,6 +545,150 @@ export function WeedPage() {
           </a>
         </div>
       </div>
+
+      <WeedSection id="top-weeds" title="Top weeds (Victoria)" eyebrow="Statewide">
+        <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
+          This is a statewide list from your database (<code>weed_info</code>) sorted by WoNS and risk score. Use the local
+          region-linked weeds for postcode-level accuracy once your database contains those links.
+        </p>
+
+        <div className="search-field" style={{ marginBottom: 'var(--space-md)' }}>
+          <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
+            <IconSearch />
+          </span>
+          <label htmlFor="top-weeds-search" className="sr-only">
+            Search top weeds
+          </label>
+          <input
+            id="top-weeds-search"
+            type="search"
+            placeholder="Search statewide weeds…"
+            value={topWeedsSearch}
+            onChange={(e) => setTopWeedsSearch(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
+
+        {topWeedsError && (
+          <div className="card card-body" style={{ borderColor: 'var(--color-danger)' }}>
+            <p style={{ margin: 0 }}>{topWeedsError}</p>
+          </div>
+        )}
+        {topWeedsLoading && <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Loading top weeds…</p>}
+
+        {!topWeedsLoading && !topWeedsError && topWeeds.length === 0 && (
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>No weeds found.</p>
+        )}
+
+        {topWeeds.length > 0 && (
+          <div className="plant-grid" style={{ marginTop: 'var(--space-md)' }}>
+            {topWeeds.map((w) => {
+              const extra = topWeedsEnriched[`top-${w.id}`]
+              const meta = typeof extra === 'object' && extra ? extra : undefined
+              const img = meta?.imageUrl
+              const blurb = meta?.description
+              return (
+                <div key={w.id} className="card card-interactive card-media-top" style={{ textAlign: 'left' }}>
+                  <div className="card-media-top__imgwrap">
+                    {img ? (
+                      <>
+                        <img src={img} alt="" loading="lazy" referrerPolicy="no-referrer" />
+                        <button
+                          type="button"
+                          className="img-expand-btn"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setLightboxSrc(img)
+                          }}
+                        >
+                          Expand
+                        </button>
+                      </>
+                    ) : (
+                      <div className="vicflora-card__image-placeholder" aria-hidden />
+                    )}
+                  </div>
+                  <div className="card-body">
+                    <h3 style={{ margin: 0, fontSize: '1.05rem' }}>{w.commonName || w.scientificName}</h3>
+                    {w.commonName && (
+                      <p style={{ margin: '0.25rem 0 0', fontSize: '0.86rem', color: 'var(--color-text-muted)' }}>
+                        {w.scientificName}
+                      </p>
+                    )}
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '0.35rem 0.6rem',
+                        marginTop: '0.55rem',
+                        alignItems: 'center',
+                        fontSize: '0.82rem',
+                      }}
+                    >
+                      <span>
+                        <strong>Risk:</strong> {w.riskRating ?? 'Unknown'}
+                      </span>
+                      {w.isWons && <span style={{ color: 'var(--color-danger)', fontWeight: 800 }}>WoNS</span>}
+                      {w.riskScore != null && <span style={{ color: 'var(--color-text-muted)' }}>score {w.riskScore}</span>}
+                    </div>
+                    {w.weedStatusVic && (
+                      <p style={{ margin: '0.35rem 0 0', fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+                        {w.weedStatusVic}
+                      </p>
+                    )}
+                    {blurb && (
+                      <p
+                        style={{
+                          margin: '0.6rem 0 0',
+                          fontSize: '0.82rem',
+                          color: 'var(--color-text-muted)',
+                          lineHeight: 1.35,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {blurb}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {topWeeds.length > 0 && (
+          <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={topWeedsOffset <= 0 || topWeedsLoading}
+                onClick={() => setTopWeedsOffset((o) => Math.max(0, o - 12))}
+              >
+                Previous page
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={!topWeedsHasMore || topWeedsLoading}
+                onClick={() => setTopWeedsOffset((o) => o + 12)}
+              >
+                Next page
+              </button>
+            </div>
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
+              Page {Math.floor(topWeedsOffset / 12) + 1}
+              {topWeedsSearch.trim() ? ` · filtering “${topWeedsSearch.trim()}”` : ''}
+            </p>
+          </div>
+        )}
+      </WeedSection>
+
+      <ImageLightbox src={lightboxSrc} open={Boolean(lightboxSrc)} onClose={() => setLightboxSrc(null)} />
 
       <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>

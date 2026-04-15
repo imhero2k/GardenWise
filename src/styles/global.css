@@ -440,8 +440,55 @@ img {
 /* Plant card grid */
 .plant-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-md);
+}
+
+@media (min-width: 720px) {
+  .plant-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+.card-media-top {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-media-top__imgwrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.card-media-top__imgwrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.card:hover .card-media-top__imgwrap img {
+  transform: scale(1.04);
+}
+
+.img-expand-btn {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-text);
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.img-expand-btn:hover {
+  background: #fff;
 }
 
 .plant-card-image-wrap {
