@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
@@ -9,14 +9,6 @@ export function SignInPage() {
   const [mode, setMode] = useState<'providers' | 'email-signin' | 'email-signup'>('providers')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
-  const hostLabel = useMemo(() => {
-    try {
-      return new URL(window.location.href).host
-    } catch {
-      return 'GardenWise'
-    }
-  }, [])
 
   useEffect(() => {
     if (!state.loading && state.configured && state.user) {
