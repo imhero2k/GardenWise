@@ -404,6 +404,7 @@ type DisposalSpecies = {
   emoji: string; name: string; latin: string
   statusTag: 'prohibited' | 'restricted'; statusLabel: string
   ariTag: 'veryhigh' | 'high'; ariLabel: string; impact: string
+  imgUrl?: string
 }
 type DisposalEntry = {
   title: string; species: DisposalSpecies[]
@@ -414,9 +415,9 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   aquatic: {
     title: 'Aquatic & Wetland Herbaceous — Disposal Guide',
     species: [
-      { emoji: '🌿', name: 'Alligator Weed', latin: 'Alternanthera philoxeroides', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Invades both land and water. Stem fragments carried downstream root and form new colonies. Can block entire waterways within one growing season. Do NOT attempt removal — report immediately.' },
-      { emoji: '🌱', name: 'Salvinia (Giant Salvinia)', latin: 'Salvinia molesta', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'A single plant can cover an entire dam in one season. Blocks light and depletes oxygen, causing fish kills. Illegal to buy, sell, or move in Victoria.' },
-      { emoji: '🦆', name: 'Lagarosiphon', latin: 'Lagarosiphon major', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: '"Chokes" slow-moving water bodies, causing anoxia and fish death. Boat propellers and fishing gear carry stem fragments between water bodies.' },
+      { emoji: '🌿', name: 'Alligator Weed', latin: 'Alternanthera philoxeroides', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg', impact: 'Invades both land and water. Stem fragments carried downstream root and form new colonies. Can block entire waterways within one growing season. Do NOT attempt removal — report immediately.' },
+      { emoji: '🌱', name: 'Salvinia (Giant Salvinia)', latin: 'Salvinia molesta', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', impact: 'A single plant can cover an entire dam in one season. Blocks light and depletes oxygen, causing fish kills. Illegal to buy, sell, or move in Victoria.' },
+      { emoji: '🦆', name: 'Lagarosiphon', latin: 'Lagarosiphon major', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', impact: '"Chokes" slow-moving water bodies, causing anoxia and fish death. Boat propellers and fishing gear carry stem fragments between water bodies.' },
     ],
     risk: ['Spreads through tiny plant fragments — any broken piece can root and establish downstream', 'Transported rapidly by waterways, floods, contaminated boats, trailers, and fishing gear', 'State Prohibited — do not attempt removal yourself; report to authorities immediately', 'Can cover an entire water body within a single growing season', 'Survives in damp soil for extended periods away from open water'],
     dos: ['Report to the relevant authority immediately (government removes at no cost to landowner)', 'While awaiting professionals: isolate the area with temporary barriers at outflow points', 'Record GPS coordinates, photographs, and estimated coverage area for the report', 'Clean all equipment, waders, boats, and vehicles thoroughly before leaving the site', 'Keep unauthorised people and machinery out of the affected area'],
@@ -424,7 +425,7 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   },
   riparian: {
     title: 'Riparian Woody Plants — Disposal Guide',
-    species: [{ emoji: '🌳', name: 'Willows', latin: 'Salix spp.', statusTag: 'restricted', statusLabel: 'Restricted Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Branches dropped into waterways root downstream, spreading infestation along river corridors. Dense stands alter water flow and destabilise banks when removed without a revegetation plan.' }],
+    species: [{ emoji: '🌳', name: 'Willows', latin: 'Salix spp.', statusTag: 'restricted', statusLabel: 'Restricted Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg', impact: 'Branches dropped into waterways root downstream, spreading infestation along river corridors. Dense stands alter water flow and destabilise banks when removed without a revegetation plan.' }],
     risk: ['Branches and cuttings in waterways root downstream — infestation spreads along entire river corridors', 'Removing large trees from steep banks without revegetation risks severe bank erosion', 'Regrowth from cut stumps is vigorous unless treated with herbicide within minutes of cutting'],
     dos: ['Treat cut stumps with registered herbicide immediately (within minutes) to prevent resprouting', 'Stage removal by river section — never clear entire banks at once', 'Revegetate cleared banks with local native species to stabilise soil'],
     donts: ["Don't leave cut stumps untreated — willows resprout vigorously", "Don't stack branches near the water's edge — they wash in and re-establish", "Don't apply herbicide in or near water without a registered aquatic-use product and permit"],
@@ -432,8 +433,8 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   woody: {
     title: 'Terrestrial Woody Shrubs & Trees — Disposal Guide',
     species: [
-      { emoji: '🍇', name: 'Blackberry', latin: 'Rubus fruticosus agg.', statusTag: 'restricted', statusLabel: 'Regionally Controlled / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Birds and mammals disperse berries widely; canes tip-root wherever they touch the ground. Seed bank persists for years after parent plants are removed.' },
-      { emoji: '🌿', name: 'Sweet Pittosporum', latin: 'Pittosporum undulatum', statusTag: 'restricted', statusLabel: 'Environmental Weed (outside its natural range)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Dense canopy and allelopathic leaf litter suppress native understorey regeneration. Expands aggressively via bird-dispersed fruit.' },
+      { emoji: '🍇', name: 'Blackberry', latin: 'Rubus fruticosus agg.', statusTag: 'restricted', statusLabel: 'Regionally Controlled / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Blackberry_%28Rubus_fruticosus%29.jpg/330px-Blackberry_%28Rubus_fruticosus%29.jpg', impact: 'Birds and mammals disperse berries widely; canes tip-root wherever they touch the ground. Seed bank persists for years after parent plants are removed.' },
+      { emoji: '🌿', name: 'Sweet Pittosporum', latin: 'Pittosporum undulatum', statusTag: 'restricted', statusLabel: 'Environmental Weed (outside its natural range)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg', impact: 'Dense canopy and allelopathic leaf litter suppress native understorey regeneration. Expands aggressively via bird-dispersed fruit.' },
     ],
     risk: ['Birds and mammals disperse berries widely, creating new infestations far from the source', 'Blackberry canes tip-root wherever they touch the ground', 'Seed bank persists in soil; seedlings emerge for years after parent plants are removed'],
     dos: ['Cut stumps and immediately treat with registered herbicide (within minutes, before callusing)', 'Target seed-bearing "mother plants" first to cut off the primary dispersal source', 'Bag and dispose of all fruiting material as general waste — not green waste'],
@@ -442,8 +443,8 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   climbers: {
     title: 'Climbers & Creeping Groundcovers — Disposal Guide',
     species: [
-      { emoji: '🪴', name: 'English Ivy', latin: 'Hedera helix', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Roots at every stem node; climbs tree trunks and weakens large trees. Bird-dispersed berries and garden dumping create distant infestations.' },
-      { emoji: '🌸', name: 'Wandering Trad', latin: 'Tradescantia fluminensis', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Every stem node roots on contact with moist soil. Brush cutters and mowers scatter stem fragments, massively expanding the infestation.' },
+      { emoji: '🪴', name: 'English Ivy', latin: 'Hedera helix', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg', impact: 'Roots at every stem node; climbs tree trunks and weakens large trees. Bird-dispersed berries and garden dumping create distant infestations.' },
+      { emoji: '🌸', name: 'Wandering Trad', latin: 'Tradescantia fluminensis', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tradescantia_fluminensis_%28Flowers%29.jpg/330px-Tradescantia_fluminensis_%28Flowers%29.jpg', impact: 'Every stem node roots on contact with moist soil. Brush cutters and mowers scatter stem fragments, massively expanding the infestation.' },
     ],
     risk: ['Every stem node roots on contact with moist soil — even tiny discarded fragments establish rapidly', 'Brush cutters and mowers fragment stems and scatter propagules over a far wider area', 'Dense mats completely suppress native seedling regeneration in forest understorey'],
     dos: ['For ivy: cut climbing stems at the base first to halt ongoing tree damage, then clear the ground layer', 'Collect all removed material immediately into sealed bags', 'Treat cut stem bases with herbicide to prevent resprouting'],
@@ -452,7 +453,7 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   grasses: {
     title: 'Grasses & Grass-like — Disposal Guide',
     species: [
-      { emoji: '🌾', name: 'Serrated Tussock', latin: 'Nassella trichotoma', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Seeds dormant in soil for up to 15+ years. Wind-dispersed seeds spread along roads, fence lines, and stock routes. Can dominate a paddock within 7 years.' },
+      { emoji: '🌾', name: 'Serrated Tussock', latin: 'Nassella trichotoma', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg', impact: 'Seeds dormant in soil for up to 15+ years. Wind-dispersed seeds spread along roads, fence lines, and stock routes. Can dominate a paddock within 7 years.' },
       { emoji: '🌿', name: 'Chilean Needle Grass', latin: 'Nassella neesiana', statusTag: 'restricted', statusLabel: 'Restricted Weed — all Victorian catchments', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Produces both normal seeds AND stem-node seeds — suppressing flowering alone does not stop reproduction. Sharp awns injure livestock and wildlife.' },
     ],
     risk: ["Serrated tussock seed viable in soil for 15+ years — a single season's seed set creates a decade-long problem", 'Chilean needle grass produces "stem seeds" at leaf nodes — removing flowers does not prevent seed spread', 'Seeds travel on clothing, animal fur, vehicles, and feed hay'],
@@ -462,8 +463,8 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   broadleaf: {
     title: 'Non-woody Broadleaf Herbs — Disposal Guide',
     species: [
-      { emoji: '🌼', name: 'Hawkweeds', latin: 'Pilosella spp.', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Release allelopathic chemicals that suppress surrounding plants; form dense mats in alpine zones. Wind-dispersed seeds and creeping stolons. Early detection is critical.' },
-      { emoji: '🌡', name: 'Tutsan', latin: 'Hypericum androsaemum', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'high', ariLabel: 'ARI: High', impact: 'Forms dense shade-tolerant thickets in moist forest, suppressing native understorey for years. Berries are toxic to livestock and spread via birds.' },
+      { emoji: '🌼', name: 'Hawkweeds', latin: 'Pilosella spp.', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', impact: 'Release allelopathic chemicals that suppress surrounding plants; form dense mats in alpine zones. Wind-dispersed seeds and creeping stolons. Early detection is critical.' },
+      { emoji: '🌡', name: 'Tutsan', latin: 'Hypericum androsaemum', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', impact: 'Forms dense shade-tolerant thickets in moist forest, suppressing native understorey for years. Berries are toxic to livestock and spread via birds.' },
     ],
     risk: ['Hawkweeds: State Prohibited — allelopathic chemicals suppress all surrounding plants', 'Hawkweed seeds are wind-dispersed; creeping stolons expand patch size rapidly', 'Tutsan berries are toxic to livestock; birds spread seeds widely to new sites'],
     dos: ['Hawkweeds: report to authorities immediately — government removes at no cost to landowner', 'Tutsan: use cut-and-paint (cut stem, immediately apply herbicide to cut surface)', 'Small tutsan seedlings can be hand-pulled including full root on moist soil'],
@@ -473,7 +474,7 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
     title: 'Underground Storage Perennials — Disposal Guide',
     species: [
       { emoji: '🌸', name: 'Bulbil Watsonia', latin: 'Watsonia meriana var. bulbillifera', statusTag: 'restricted', statusLabel: 'Declared Noxious Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Produces aerial bulbils at leaf axils — mowing or slashing scatters these propagules widely. Corms and bulbils persist in soil for years after top growth is removed.' },
-      { emoji: '🌷', name: 'Cape Tulip — One Leaf', latin: 'Moraea flaccida', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled (Vic)', ariTag: 'high', ariLabel: 'ARI: High', impact: 'Dense infestations can exceed 7,000 corms per square metre. Foliage disappears for 5–6 months per year — underground density is easily underestimated.' },
+      { emoji: '🌷', name: 'Cape Tulip — One Leaf', latin: 'Moraea flaccida', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG', impact: 'Dense infestations can exceed 7,000 corms per square metre. Foliage disappears for 5–6 months per year — underground density is easily underestimated.' },
     ],
     risk: ['Dense corms, bulbils, and daughter corms persist in soil for years after above-ground removal', 'Watsonia produces aerial bulbils at leaf axils — mowing scatters thousands of propagules', 'Foliage is absent 5–6 months per year — underground density is consistently underestimated'],
     dos: ['Treat during the active leaf stage (above-ground and visible) for best herbicide uptake', 'Carefully excavate the entire corm cluster; sieve soil to recover small bulbils', 'Bag all underground material immediately — dispose via general waste, not green waste'],
@@ -481,40 +482,40 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
   },
   succulents: {
     title: 'Succulents & Cacti — Disposal Guide',
-    species: [{ emoji: '🌵', name: 'Wheel Cactus', latin: 'Opuntia robusta', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled / Restricted (Vic)', ariTag: 'high', ariLabel: 'ARI: High', impact: 'Detached pads root readily on contact with soil. Glochids (barbed micro-spines) penetrate skin and are nearly impossible to remove without medical assistance.' }],
+    species: [{ emoji: '🌵', name: 'Wheel Cactus', latin: 'Opuntia robusta', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled / Restricted (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg', impact: 'Detached pads root readily on contact with soil. Glochids (barbed micro-spines) penetrate skin and are nearly impossible to remove without medical assistance.' }],
     risk: ['Detached pads root readily on contact with soil within weeks', 'Glochids (fine barbed spines) penetrate skin and are extremely difficult to remove — injury risk is high', 'Brush cutters shred pads into multiple propagules scattered across a wide area'],
     dos: ['Wear heavy puncture-resistant gloves, long sleeves, and eye protection', 'Use tongs or a stick to handle pads and fallen fruit — never touch with bare skin', 'Dispose of all material as general waste in sealed bags — never in green waste'],
     donts: ["Don't leave detached pads on bare soil — they root and form new plants within weeks", "Don't use a brush cutter or slasher — shreds pads into propagules scattered over a wide area", "Don't attempt removal without appropriate PPE — glochid injuries may require medical treatment"],
   },
 }
 
-const WEED_TYPES: { type: WeedCategory; icon: string; label: string }[] = [
-  { type: 'aquatic',      icon: '💧', label: 'Aquatic & Wetland Herbaceous' },
-  { type: 'riparian',    icon: '🌊', label: 'Riparian Woody Plants' },
-  { type: 'woody',       icon: '🌳', label: 'Terrestrial Woody Shrubs & Trees' },
-  { type: 'climbers',    icon: '🪴', label: 'Climbers & Creeping Groundcovers' },
-  { type: 'grasses',     icon: '🌾', label: 'Grasses & Grass-like' },
-  { type: 'broadleaf',   icon: '🍃', label: 'Non-woody Broadleaf Herbs' },
-  { type: 'underground', icon: '🥕', label: 'Underground Storage Perennials' },
-  { type: 'succulents',  icon: '🌵', label: 'Succulents & Cacti' },
+const WEED_TYPES: { type: WeedCategory; icon: string; label: string; imgUrl: string }[] = [
+  { type: 'aquatic',      icon: '💧', label: 'Aquatic & Wetland Herbaceous',    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg' },
+  { type: 'riparian',    icon: '🌊', label: 'Riparian Woody Plants',            imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg' },
+  { type: 'woody',       icon: '🌳', label: 'Terrestrial Woody Shrubs & Trees', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Blackberry_%28Rubus_fruticosus%29.jpg/330px-Blackberry_%28Rubus_fruticosus%29.jpg' },
+  { type: 'climbers',    icon: '🪴', label: 'Climbers & Creeping Groundcovers', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg' },
+  { type: 'grasses',     icon: '🌾', label: 'Grasses & Grass-like',             imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg' },
+  { type: 'broadleaf',   icon: '🍃', label: 'Non-woody Broadleaf Herbs',        imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg' },
+  { type: 'underground', icon: '🥕', label: 'Underground Storage Perennials',   imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG' },
+  { type: 'succulents',  icon: '🌵', label: 'Succulents & Cacti',               imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg' },
 ]
 
 const PROHIBITED_WEEDS: { name: string; chinese: string; emoji: string; imgUrl: string; desc: string }[] = [
-  { name: 'Alligator Weed', chinese: '鳄鱼草', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg', desc: 'Alternanthera philoxeroides. Dense floating mats block waterways and farmland; stem fragments root readily, enabling rapid spread downstream. State Prohibited — do not attempt removal yourself.' },
-  { name: 'Salvinia', chinese: '水蕨', emoji: '🌱', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', desc: 'Salvinia molesta. Can double in area every 2–3 days. Dense mats deplete oxygen, cause fish kills, and can cover an entire dam in one season. Illegal to buy, sell, or move in Victoria.' },
-  { name: 'Water Hyacinth', chinese: '水葫芦', emoji: '💜', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Eichhornia_crassipes_C.jpg/330px-Eichhornia_crassipes_C.jpg', desc: "Eichhornia crassipes. One of the world's most damaging aquatic weeds. Forms dense floating mats that block light, deplete oxygen, and impede watercraft and irrigation infrastructure." },
-  { name: 'Hawkweed', chinese: '鹰草类', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', desc: 'Pilosella spp. Releases allelopathic chemicals suppressing surrounding plants. Spreads via wind-dispersed seeds and creeping stolons; threatens alpine and sub-alpine native grasslands.' },
-  { name: 'Lagarosiphon', chinese: '水草类', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
-  { name: 'Knotweed', chinese: '虎杖类', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
-  { name: 'Mesquite', chinese: '牧豆树', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
-  { name: 'Mexican Feather Grass', chinese: '墨西哥羽毛草', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but extremely invasive grass. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
-  { name: 'Parthenium Weed', chinese: '豚草', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
-  { name: 'Branched Broomrape', chinese: '寄生草', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
-  { name: 'Horsetails', chinese: '木贼类', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient invasive; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
-  { name: 'Camel Thorn', chinese: '刺槐类', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
-  { name: 'Karoo & Giraffe Thorn', chinese: '刺槐类', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
-  { name: 'Poverty Weed', chinese: '贫草', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
-  { name: 'Tangled Hypericum', chinese: '缠绕金丝桃', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', desc: 'Hypericum androsaemum. Shade-tolerant woody shrub forming impenetrable thickets in moist forest and riparian zones. Berries are toxic to livestock and spread by birds into new sites.' },
+  { name: 'Alligator Weed', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg', desc: 'Alternanthera philoxeroides. Dense floating mats block waterways and farmland; stem fragments root readily, enabling rapid spread downstream. State Prohibited — do not attempt removal yourself.' },
+  { name: 'Salvinia', chinese: '', emoji: '🌱', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', desc: 'Salvinia molesta. Can double in area every 2–3 days. Dense mats deplete oxygen, cause fish kills, and can cover an entire dam in one season. Illegal to buy, sell, or move in Victoria.' },
+  { name: 'Water Hyacinth', chinese: '', emoji: '💜', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Eichhornia_crassipes_C.jpg/330px-Eichhornia_crassipes_C.jpg', desc: "Eichhornia crassipes. One of the world's most damaging aquatic weeds. Forms dense floating mats that block light, deplete oxygen, and impede watercraft and irrigation infrastructure." },
+  { name: 'Hawkweed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', desc: 'Pilosella spp. Releases allelopathic chemicals suppressing surrounding plants. Spreads via wind-dispersed seeds and creeping stolons; threatens alpine and sub-alpine native grasslands.' },
+  { name: 'Lagarosiphon', chinese: '', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
+  { name: 'Knotweed', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
+  { name: 'Mesquite', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
+  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but extremely invasive grass. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
+  { name: 'Parthenium Weed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
+  { name: 'Branched Broomrape', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
+  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient invasive; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
+  { name: 'Camel Thorn', chinese: '', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
+  { name: 'Karoo & Giraffe Thorn', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
+  { name: 'Poverty Weed', chinese: '', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
+  { name: 'Tangled Hypericum', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', desc: 'Hypericum androsaemum. Shade-tolerant woody shrub forming impenetrable thickets in moist forest and riparian zones. Berries are toxic to livestock and spread by birds into new sites.' },
 ]
 
 const GENERAL_RULES = [
@@ -965,14 +966,22 @@ export function WeedPage() {
           Select the category that best matches your weed to see tailored disposal instructions.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-sm)' }}>
-          {WEED_TYPES.map(({ type, icon, label }) => {
+          {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
             const active = selectedType === type
             return (
               <button key={type} onClick={() => handleTypeSelect(type)}
-                style={{ border: `2px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', padding: 'var(--space-md) var(--space-sm)', background: active ? 'rgba(46,125,50,0.08)' : 'var(--color-surface)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-sm)', transition: 'all var(--transition)', boxShadow: active ? '0 0 0 3px rgba(46,125,50,0.15)' : 'none', textAlign: 'center' }}
+                style={{ border: `2px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', padding: 0, background: active ? 'rgba(46,125,50,0.08)' : 'var(--color-surface)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'stretch', transition: 'all var(--transition)', boxShadow: active ? '0 0 0 3px rgba(46,125,50,0.15)' : 'none', textAlign: 'center', overflow: 'hidden' }}
               >
-                <span style={{ fontSize: '1.75rem' }}>{icon}</span>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: active ? 'var(--color-primary-dark)' : 'var(--color-text-muted)', lineHeight: 1.35 }}>{label}</span>
+                <div style={{ position: 'relative', height: 80, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
+                  <img src={imgUrl} alt="" loading="lazy" referrerPolicy="no-referrer"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                  />
+                  <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem' }}>{icon}</div>
+                </div>
+                <div style={{ padding: 'var(--space-sm)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: active ? 'var(--color-primary-dark)' : 'var(--color-text-muted)', lineHeight: 1.35 }}>{label}</span>
+                </div>
               </button>
             )
           })}
@@ -985,19 +994,31 @@ export function WeedPage() {
               <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>Representative Species</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-md)', marginBottom: 'var(--space-xl)' }}>
                 {d.species.map((s) => (
-                  <div key={s.name} className="card card-body">
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)', marginBottom: 'var(--space-sm)' }}>
-                      <span style={{ fontSize: '1.65rem', flexShrink: 0, marginTop: 2 }}>{s.emoji}</span>
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', lineHeight: 1.3 }}>{s.name}</div>
-                        <div style={{ fontSize: '0.78rem', fontStyle: 'italic', color: 'var(--color-primary)', marginTop: 2 }}>{s.latin}</div>
+                  <div key={s.name} className="card" style={{ overflow: 'hidden' }}>
+                    {/* Species photo */}
+                    <div style={{ position: 'relative', height: 140, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
+                      {s.imgUrl ? (
+                        <>
+                          <img src={s.imgUrl} alt={s.name} loading="lazy" referrerPolicy="no-referrer"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                          />
+                          <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>{s.emoji}</div>
+                        </>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '2.5rem' }}>{s.emoji}</div>
+                      )}
+                    </div>
+                    {/* Species info */}
+                    <div style={{ padding: 'var(--space-md)' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', lineHeight: 1.3, marginBottom: 2 }}>{s.name}</div>
+                      <div style={{ fontSize: '0.78rem', fontStyle: 'italic', color: 'var(--color-primary)', marginBottom: 'var(--space-sm)' }}>{s.latin}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-xs)', marginBottom: 'var(--space-sm)' }}>
+                        <span className={`badge ${s.statusTag === 'prohibited' ? 'badge-high' : 'badge-medium'}`}>{s.statusLabel}</span>
+                        <span className={`badge ${s.ariTag === 'veryhigh' ? 'badge-high' : 'badge-medium'}`}>{s.ariLabel}</span>
                       </div>
+                      <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--color-text-muted)', lineHeight: 1.65, borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-sm)' }}>{s.impact}</p>
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-xs)', marginBottom: 'var(--space-sm)' }}>
-                      <span className={`badge ${s.statusTag === 'prohibited' ? 'badge-high' : 'badge-medium'}`}>{s.statusLabel}</span>
-                      <span className={`badge ${s.ariTag === 'veryhigh' ? 'badge-high' : 'badge-medium'}`}>{s.ariLabel}</span>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--color-text-muted)', lineHeight: 1.65, borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-sm)' }}>{s.impact}</p>
                   </div>
                 ))}
               </div>
