@@ -395,6 +395,139 @@ function WeedSection({
   )
 }
 
+// ── Disposal data types ────────────────────────────────────────────────────
+type WeedCategory =
+  | 'aquatic' | 'riparian' | 'woody' | 'climbers'
+  | 'grasses' | 'broadleaf' | 'underground' | 'succulents'
+
+type DisposalSpecies = {
+  emoji: string; name: string; latin: string
+  statusTag: 'prohibited' | 'restricted'; statusLabel: string
+  ariTag: 'veryhigh' | 'high'; ariLabel: string; impact: string
+  imgUrl?: string
+}
+type DisposalEntry = {
+  title: string; species: DisposalSpecies[]
+  risk: string[]; dos: string[]; donts: string[]
+  prohibitedNote?: string
+}
+
+const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
+  aquatic: {
+    title: 'Aquatic & Wetland Herbaceous — Disposal Guide',
+    species: [
+      { emoji: '🌿', name: 'Alligator Weed', latin: 'Alternanthera philoxeroides', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg', impact: 'Invades both land and water. Stem fragments carried downstream root and form new colonies. Can block entire waterways within one growing season. Do NOT attempt removal — report immediately.' },
+      { emoji: '🌱', name: 'Salvinia (Giant Salvinia)', latin: 'Salvinia molesta', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', impact: 'A single plant can cover an entire dam in one season. Blocks light and depletes oxygen, causing fish kills. Illegal to buy, sell, or move in Victoria.' },
+      { emoji: '🦆', name: 'Lagarosiphon', latin: 'Lagarosiphon major', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', impact: '"Chokes" slow-moving water bodies, causing anoxia and fish death. Boat propellers and fishing gear carry stem fragments between water bodies.' },
+    ],
+    risk: ['Even tiny plant fragments can root and establish new colonies downstream', 'Spreads rapidly through waterways, floods, boats, and fishing equipment', 'Removing plants in water can disturb fragments and worsen spread', 'Some species can cover an entire water body within a single growing season'],
+    dos: ['Avoid disturbing the water and surrounding vegetation', 'Isolate the affected area where possible to prevent further spread', 'Clean all equipment, boots, and tools thoroughly before leaving the site', 'Monitor nearby drains and waterways for new growth', 'Report any suspected high-risk species to authorities promptly'],
+    donts: ['Do not pull, cut, or break plants while they are in the water', 'Do not transport any plant material away from the site', 'Do not dump removed material near drains, waterways, or moist soil'],
+    prohibitedNote: 'If you suspect a State Prohibited species such as Salvinia or Alligator Weed — report it immediately. Do not attempt to handle or remove it yourself.',
+  },
+  riparian: {
+    title: 'Riparian Woody Plants — Disposal Guide',
+    species: [{ emoji: '🌳', name: 'Willows', latin: 'Salix spp.', statusTag: 'restricted', statusLabel: 'Restricted Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg', impact: 'Branches dropped into waterways root downstream, spreading infestation along river corridors. Dense stands alter water flow and destabilise banks when removed without a revegetation plan.' }],
+    risk: ['Branches and fragments falling into water can root and spread downstream', 'Dense stands alter riverbank stability, water flow, and erosion patterns', 'Cut stumps readily resprout if not treated immediately', 'Large-scale removal without revegetation can destabilise banks'],
+    dos: ['Remove in stages — never clear entire riverbanks in a single operation', 'Keep all cut material well away from the water\'s edge', 'Use targeted cut-and-treat methods to minimise regrowth', 'Replant with native vegetation to restore bank stability after clearing', 'Monitor regrowth and signs of erosion regularly'],
+    donts: ['Do not drop branches or cuttings into the waterway', 'Do not clear entire riverbanks at once — work in sections', 'Do not leave cut material piled near the water where it can wash in'],
+  },
+  woody: {
+    title: 'Terrestrial Woody Shrubs & Trees — Disposal Guide',
+    species: [
+      { emoji: '🍇', name: 'Blackberry', latin: 'Rubus fruticosus agg.', statusTag: 'restricted', statusLabel: 'Regionally Controlled / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Blackberry_%28Rubus_fruticosus%29.jpg/330px-Blackberry_%28Rubus_fruticosus%29.jpg', impact: 'Birds and mammals disperse berries widely; canes tip-root wherever they touch the ground. Seed bank persists for years after parent plants are removed.' },
+      { emoji: '🌿', name: 'Sweet Pittosporum', latin: 'Pittosporum undulatum', statusTag: 'restricted', statusLabel: 'Environmental Weed (outside its natural range)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg', impact: 'Dense canopy and allelopathic leaf litter suppress native understorey regeneration. Expands aggressively via bird-dispersed fruit.' },
+    ],
+    risk: ['Seeds spread widely via birds and animals, creating new infestations at a distance', 'Dense thickets can completely exclude native understorey vegetation', 'Plants readily regrow from cut stumps or remaining root material', 'Seed banks in the soil can persist and germinate for many years'],
+    dos: ['Prioritise fruiting or seed-bearing plants first to reduce further spread', 'Use targeted removal methods suited to the species', 'Bag and dispose of all seeds and fruiting material as general waste — not green waste', 'Restore native vegetation after clearing to suppress re-establishment', 'Revisit the site regularly to address any regrowth'],
+    donts: ['Do not leave fruiting branches or canes on the ground — they will establish', 'Do not assume cutting alone is sufficient — roots and stumps must also be treated', 'Do not ignore early regrowth — small plants are far easier to remove'],
+  },
+  climbers: {
+    title: 'Climbers & Creeping Groundcovers — Disposal Guide',
+    species: [
+      { emoji: '🪴', name: 'English Ivy', latin: 'Hedera helix', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg', impact: 'Roots at every stem node; climbs tree trunks and weakens large trees. Bird-dispersed berries and garden dumping create distant infestations.' },
+      { emoji: '🌸', name: 'Wandering Trad', latin: 'Tradescantia fluminensis', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tradescantia_fluminensis_%28Flowers%29.jpg/330px-Tradescantia_fluminensis_%28Flowers%29.jpg', impact: 'Every stem node roots on contact with moist soil. Brush cutters and mowers scatter stem fragments, massively expanding the infestation.' },
+    ],
+    risk: ['Even very small stem fragments can root rapidly in moist soil', 'Dense mats or climbing growth can smother native ground cover and damage trees', 'Cutting or mowing often increases spread by creating more fragments', 'Complete removal is difficult — infestations typically require repeated treatment'],
+    dos: ['Remove small patches carefully by hand to avoid creating fragments', 'Collect all plant material and seal it in bags immediately', 'Use controlled, targeted treatment rather than broad mechanical removal', 'Revisit frequently — regrowth is common and early intervention is more effective'],
+    donts: ['Do not mow or slash — this creates fragments and significantly widens the infestation', 'Do not leave any plant fragments behind on moist soil', 'Do not dispose of material in green waste bins or compost — stems can regenerate'],
+  },
+  grasses: {
+    title: 'Grasses & Grass-like — Disposal Guide',
+    species: [
+      { emoji: '🌾', name: 'Serrated Tussock', latin: 'Nassella trichotoma', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg', impact: 'Seeds dormant in soil for up to 15+ years. Wind-dispersed seeds spread along roads, fence lines, and stock routes. Can dominate a paddock within 7 years.' },
+    ],
+    risk: ['Grasses can produce thousands of seeds per season, many remaining viable in soil for years', 'Seeds travel easily via wind, animals, clothing, machinery, and contaminated feed or hay', 'Large infestations develop quickly and can dominate entire paddocks or grasslands', 'Flammable dry material significantly increases fire risk in affected areas'],
+    dos: ['Act before flowering and seed set — early intervention is far more effective', 'Clean all clothing, footwear, and machinery before leaving any infested area', 'Always work from clean areas into infested areas to avoid spreading seed', 'Restore competitive native or pasture vegetation after treatment', 'Identify and monitor high-risk spread corridors such as roadsides and fence lines'],
+    donts: ['Do not work in infested areas during active seed drop periods', 'Do not move soil, hay, or machinery from infested areas without thorough cleaning', 'Do not ignore even small infestations — early action prevents large-scale spread'],
+    prohibitedNote: 'If the species is State Prohibited, such as Mexican Feather Grass — report it to the relevant authority. Do not attempt removal yourself.',
+  },
+  broadleaf: {
+    title: 'Non-woody Broadleaf Herbs — Disposal Guide',
+    species: [
+      { emoji: '🌼', name: 'Hawkweeds', latin: 'Pilosella spp.', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', impact: 'Release allelopathic chemicals that suppress surrounding plants; form dense mats in alpine zones. Wind-dispersed seeds and creeping stolons. Early detection is critical.' },
+      { emoji: '🌡', name: 'Tutsan', latin: 'Hypericum androsaemum', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', impact: 'Forms dense shade-tolerant thickets in moist forest, suppressing native understorey for years. Berries are toxic to livestock and spread via birds.' },
+    ],
+    risk: ['Seeds and stolons spread quickly, allowing infestations to escalate from small patches', 'Dense ground cover can develop fast, outcompeting native vegetation', 'Some species release chemicals into the soil that suppress surrounding plants', 'Early-stage invasions can become difficult to control if not addressed promptly'],
+    dos: ['Address infestations early while they are still small and manageable', 'Minimise soil disturbance during removal — disturbed soil encourages new germination', 'Monitor treated areas regularly and remove any new seedlings promptly', 'Restore native ground cover after clearing to prevent re-establishment'],
+    donts: ['Do not delay removal — small infestations are significantly easier to manage', 'Do not disturb the soil more than necessary during removal', 'Do not leave flowering plants in place — remove before seeds are set and dispersed'],
+    prohibitedNote: 'If you suspect a State Prohibited species such as Hawkweed — report it immediately to the relevant authority. Do not attempt to handle or remove it yourself.',
+  },
+  underground: {
+    title: 'Underground Storage Perennials — Disposal Guide',
+    species: [
+      { emoji: '🌷', name: 'Cape Tulip — One Leaf', latin: 'Moraea flaccida', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG', impact: 'Dense infestations can exceed 7,000 corms per square metre. Foliage disappears for 5–6 months per year — underground density is easily underestimated.' },
+    ],
+    risk: ['Underground bulbs, corms, or rhizomes persist in soil long after above-ground removal', 'Soil movement — including digging, mowing, or machinery — can spread underground parts', 'Plants are often invisible during dormant periods, making it easy to underestimate the infestation', 'Effective control requires repeated treatment over multiple growing seasons'],
+    dos: ['Treat during the active growth phase when plants are visible and uptake is optimal', 'Avoid unnecessary digging — soil disturbance can spread underground parts', 'Bag and secure all excavated plant material before disposing as general waste', 'Monitor the site across multiple seasons to confirm full eradication'],
+    donts: ['Do not move soil from infested areas — it may contain bulbs or corm fragments', 'Do not rely on a single treatment — underground structures require long-term management', 'Do not ignore dormant periods — underground parts remain viable even when foliage is absent'],
+  },
+  succulents: {
+    title: 'Succulents & Cacti — Disposal Guide',
+    species: [{ emoji: '🌵', name: 'Wheel Cactus', latin: 'Opuntia robusta', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled / Restricted (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg', impact: 'Detached pads root readily on contact with soil. Glochids (barbed micro-spines) penetrate skin and are nearly impossible to remove without medical assistance.' }],
+    risk: ['Detached pads and fragments can root and form new plants within weeks', 'Seeds spread via animals that consume the fruit, potentially over long distances', 'Spines and barbs pose a serious physical injury risk during removal', 'Infestations can persist for decades on rocky or otherwise inaccessible terrain'],
+    dos: ['Always wear appropriate protective equipment — gloves, long sleeves, and eye protection', 'Handle all plant parts using tongs or tools — never with bare hands', 'Collect all pads, fragments, and fruit carefully before secure disposal as general waste', 'Check the surrounding area for any dropped fragments after removal', 'Monitor the site over the long term — reinfestation from seed is common'],
+    donts: ['Do not leave any pads or fruit on the ground — even small pieces can re-establish', 'Do not handle plants without full protective equipment — injuries may require medical attention', 'Do not transport plant material loosely — all parts must be securely contained'],
+  },
+}
+
+const WEED_TYPES: { type: WeedCategory; icon: string; label: string; imgUrl: string }[] = [
+  { type: 'aquatic',      icon: '💧', label: 'Aquatic & Wetland Herbaceous',    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg' },
+  { type: 'riparian',    icon: '🌊', label: 'Riparian Woody Plants',            imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg' },
+  { type: 'woody',       icon: '🌳', label: 'Terrestrial Woody Shrubs & Trees', imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg' },
+  { type: 'climbers',    icon: '🪴', label: 'Climbers & Creeping Groundcovers', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg' },
+  { type: 'grasses',     icon: '🌾', label: 'Grasses & Grass-like',             imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg' },
+  { type: 'broadleaf',   icon: '🍃', label: 'Non-woody Broadleaf Herbs',        imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg' },
+  { type: 'underground', icon: '🥕', label: 'Underground Storage Perennials',   imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG' },
+  { type: 'succulents',  icon: '🌵', label: 'Succulents & Cacti',               imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg' },
+]
+
+const PROHIBITED_WEEDS: { name: string; chinese: string; emoji: string; imgUrl: string; desc: string }[] = [
+  { name: 'Alligator Weed', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg', desc: 'Alternanthera philoxeroides. Dense floating mats block waterways and farmland; stem fragments root readily, enabling rapid spread downstream. State Prohibited — do not attempt removal yourself.' },
+  { name: 'Salvinia', chinese: '', emoji: '🌱', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', desc: 'Salvinia molesta. Can double in area every 2–3 days. Dense mats deplete oxygen, cause fish kills, and can cover an entire dam in one season. Illegal to buy, sell, or move in Victoria.' },
+  { name: 'Water Hyacinth', chinese: '', emoji: '💜', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Eichhornia_crassipes_C.jpg/330px-Eichhornia_crassipes_C.jpg', desc: "Eichhornia crassipes. One of the world's most damaging aquatic weeds. Forms dense floating mats that block light, deplete oxygen, and impede watercraft and irrigation infrastructure." },
+  { name: 'Hawkweed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', desc: 'Pilosella spp. Releases allelopathic chemicals suppressing surrounding plants. Spreads via wind-dispersed seeds and creeping stolons; threatens alpine and sub-alpine native grasslands.' },
+  { name: 'Lagarosiphon', chinese: '', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
+  { name: 'Knotweed', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
+  { name: 'Mesquite', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
+  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but extremely invasive grass. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
+  { name: 'Parthenium Weed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
+  { name: 'Branched Broomrape', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
+  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient invasive; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
+  { name: 'Camel Thorn', chinese: '', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
+  { name: 'Karoo & Giraffe Thorn', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
+  { name: 'Poverty Weed', chinese: '', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
+  { name: 'Tangled Hypericum', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', desc: 'Hypericum androsaemum. Shade-tolerant woody shrub forming impenetrable thickets in moist forest and riparian zones. Berries are toxic to livestock and spread by birds into new sites.' },
+]
+
+const GENERAL_RULES = [
+  { emoji: '🧩', title: "Don't break into pieces", body: 'Breaking plant material can spread seeds, fragments, and root sections that each have the potential to establish new plants. Keep the weed as intact as possible during removal.' },
+  { emoji: '📦', title: 'Contain all plant material', body: 'All removed plant material — roots, stems, leaves, seeds — must be placed in sealed heavy-duty bags immediately after removal. Never leave removed material on the ground.' },
+  { emoji: '🧼', title: 'Clean tools & shoes', body: 'Seeds and plant fragments can hitch a ride on boots, gloves, and tools. Clean thoroughly before leaving the site to prevent spreading to new areas.' },
+  { emoji: '🌱', title: 'Avoid disturbing soil', body: 'Soil disturbance creates open ground ideal for weed germination. Minimise digging and disturbed areas, and consider covering exposed soil with mulch after removal.' },
+  { emoji: '📅', title: 'Check again later', body: 'A single treatment is rarely enough. Return to the site after 4–6 weeks to remove any regrowth from missed roots or newly germinated seeds before they set seed.' },
+]
+
 export function WeedPage() {
   const location = useLocation()
   const inputId = useId()
@@ -412,6 +545,14 @@ export function WeedPage() {
   const [topWeedsOffset, setTopWeedsOffset] = useState(0)
   const [topWeedsHasMore, setTopWeedsHasMore] = useState(false)
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+
+  // Prohibited weeds modal
+  const [modalWeed, setModalWeed] = useState<{ name: string; desc: string } | null>(null)
+  // General rules accordion
+  const [openRules, setOpenRules] = useState<Set<number>>(new Set())
+  // Disposal type selector
+  const [selectedType, setSelectedType] = useState<WeedCategory | null>(null)
+  const disposalContentRef = useRef<HTMLDivElement>(null)
 
   const topWeedsEnriched = useRecommendedPlantEnrichment(
     topWeeds.map((w) => ({
@@ -458,6 +599,26 @@ export function WeedPage() {
       })
     return () => ac.abort()
   }, [topWeedsOffset, topWeedsSearch])
+
+  useEffect(() => {
+    if (!modalWeed) return
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalWeed(null) }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [modalWeed])
+
+  const toggleRule = (i: number) => {
+    setOpenRules((prev) => {
+      const next = new Set(prev)
+      if (next.has(i)) next.delete(i); else next.add(i)
+      return next
+    })
+  }
+
+  const handleTypeSelect = (type: WeedCategory) => {
+    setSelectedType(type)
+    setTimeout(() => disposalContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+  }
 
   const handleFile: ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0]
@@ -516,22 +677,22 @@ export function WeedPage() {
               <p>Scan or upload a plant to check invasive risk — same as Plant Safety Check on Home.</p>
             </div>
           </a>
-          <a href="#prevention" className="feature-tile">
+          <a href="#prohibited" className="feature-tile">
             <div className="feature-tile__icon">
               <IconPrevent />
             </div>
             <div>
-              <h3>Weed prevention</h3>
-              <p>General tips to stop weeds taking hold in your garden.</p>
+              <h3>Prohibited weeds</h3>
+              <p>State prohibited weeds in Victoria you must not remove — report them immediately.</p>
             </div>
           </a>
-          <a href="#hygiene" className="feature-tile">
+          <a href="#rules" className="feature-tile">
             <div className="feature-tile__icon">
               <IconDroplet />
             </div>
             <div>
-              <h3>Weed hygiene</h3>
-              <p>Stop weeds moving between vehicles, tools, and bushland.</p>
+              <h3>General rules</h3>
+              <p>Key rules to follow whenever removing any weed from your garden or land.</p>
             </div>
           </a>
           <a href="#disposal" className="feature-tile">
@@ -539,8 +700,8 @@ export function WeedPage() {
               <IconBin />
             </div>
             <div>
-              <h3>Safe disposal</h3>
-              <p>How to discard weeds and garden waste without spreading them.</p>
+              <h3>Disposal guide</h3>
+              <p>Select your weed type for tailored safe removal and disposal instructions.</p>
             </div>
           </a>
         </div>
@@ -730,7 +891,7 @@ export function WeedPage() {
 
         {state === 'error' && error && (
           <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
-            <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn’t analyse that image</h3>
+            <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn't analyse that image</h3>
             <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
           </div>
         )}
@@ -738,47 +899,162 @@ export function WeedPage() {
         {state === 'done' && result && <PredictionResultCard key={result.label} result={result} />}
       </WeedSection>
 
-      <WeedSection id="prevention" title="General weed prevention tips" eyebrow="Stop weeds early">
-        <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
-          <li>Choose plants that are unlikely to become weeds in your area.</li>
-          <li>Check existing garden plants are safe.</li>
-          <li>Remove potentially weedy plants.</li>
-          <li>Dispose of garden waste carefully.</li>
-          <li>Be careful not to spread weeds.</li>
-          <li>Place mulch on soil surfaces in the garden to reduce weed growth.</li>
-        </ul>
+      {/* ── Prohibited weeds ── */}
+      <WeedSection id="prohibited" title="State prohibited weeds" eyebrow="Do not remove yourself">
+        <div style={{ background: 'rgba(230,81,0,0.07)', border: '1px solid rgba(230,81,0,0.22)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md) var(--space-lg)', marginBottom: 'var(--space-lg)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)' }}>
+          <span style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: 2 }}>⚠️</span>
+          <div>
+            <h3 style={{ color: '#92400e', marginBottom: 'var(--space-xs)', fontSize: '1rem' }}>Can I remove this weed myself?</h3>
+            <p style={{ fontSize: '0.88rem', color: '#78350f', margin: 0 }}>
+              The following weeds are <strong>State Prohibited Weeds</strong> in Victoria. You must <strong>not</strong> attempt to remove them yourself — report them to the Department of Energy, Environment and Climate Action immediately.
+            </p>
+            <a href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-xs)', marginTop: 'var(--space-sm)', background: 'var(--color-warning)', color: '#fff', padding: '0.45rem 1rem', borderRadius: 999, fontSize: '0.83rem', fontWeight: 600, textDecoration: 'none' }}>
+              Report a State Prohibited Weed →
+            </a>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 'var(--space-md)' }}>
+          {PROHIBITED_WEEDS.map((w) => (
+            <button key={w.name} onClick={() => setModalWeed({ name: w.name, desc: w.desc })}
+              style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface)', cursor: 'pointer', padding: 0, overflow: 'hidden', transition: 'transform var(--transition), box-shadow var(--transition), border-color var(--transition)', textAlign: 'left' }}
+              onMouseEnter={(e) => { const el = e.currentTarget; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = 'var(--shadow-hover)'; el.style.borderColor = 'var(--color-accent)' }}
+              onMouseLeave={(e) => { const el = e.currentTarget; el.style.transform = ''; el.style.boxShadow = ''; el.style.borderColor = 'var(--color-border)' }}
+            >
+              <div style={{ position: 'relative', height: 90, overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
+                <img src={w.imgUrl} alt={w.name} loading="lazy" referrerPolicy="no-referrer"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                />
+                <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>{w.emoji}</div>
+              </div>
+              <div style={{ padding: '0.5rem 0.75rem' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3 }}>{w.name}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{w.chinese}</div>
+              </div>
+            </button>
+          ))}
+        </div>
       </WeedSection>
 
-      <WeedSection id="hygiene" title="General weed hygiene tips" eyebrow="Limit spread">
-        <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
-          <li>
-            Inspect vehicles thoroughly — e.g. tyres, mud in wheel arches, guards and mudguards (check panels and
-            fairings where relevant).
-          </li>
-          <li>Carry a brush or broom; simple tools are often the best.</li>
-          <li>Carry a sealable bag for weeds and plant material; dispose of it thoroughly according to local rules.</li>
-          <li>
-            If wash-down is necessary, do it on a tarp in an area that is already weed-infested where possible, and
-            watch for runoff.
-          </li>
-          <li>Be careful with livestock and stock feed (weeds and seeds can hitchhike).</li>
-          <li>Check your socks and trouser cuffs for seeds and fragments.</li>
-        </ul>
-      </WeedSection>
-
-      <WeedSection id="disposal" title="General safe weed disposal tips" eyebrow="Dispose responsibly">
-        <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
-          <li>
-            Use council green-waste bins or drop-off days where allowed — follow your council’s rules for weeds.
-          </li>
-          <li>Avoid home compost for weeds with persistent roots, bulbs, or abundant seed.</li>
-          <li>Bag and landfill (as local rules require) species that reproduce easily from fragments.</li>
-          <li>Check state and council lists for <strong>declared</strong> or <strong>noxious</strong> species — disposal may be mandatory.</li>
-          <li>Never burn weeds without knowing fire regulations and smoke impacts in your area.</li>
-        </ul>
-        <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>
-          For authoritative rules, use your state agriculture or biosecurity website and local council.
+      {/* ── General rules ── */}
+      <WeedSection id="rules" title="General rules" eyebrow="Always apply">
+        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)', fontSize: '0.88rem' }}>
+          Follow these rules whenever removing any weed. Tap each rule to expand details.
         </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+          {GENERAL_RULES.map((rule, i) => {
+            const open = openRules.has(i)
+            return (
+              <div key={i} style={{ border: `1px solid ${open ? 'var(--color-accent)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', overflow: 'hidden', transition: 'border-color var(--transition)' }}>
+                <button onClick={() => toggleRule(i)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-md)', padding: 'var(--space-md)', background: 'var(--color-surface)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                  <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{rule.emoji}</span>
+                  <span style={{ flex: 1, fontWeight: 600, fontSize: '0.95rem', color: 'var(--color-text)' }}>{rule.title}</span>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--transition)' }}>▼</span>
+                </button>
+                {open && (
+                  <div style={{ padding: 'var(--space-md) var(--space-md) var(--space-md) calc(1.25rem + var(--space-md) + var(--space-md))', fontSize: '0.875rem', color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border)', background: 'var(--color-bg)', lineHeight: 1.7 }}>
+                    {rule.body}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </WeedSection>
+
+      {/* ── Disposal guide ── */}
+      <WeedSection id="disposal" title="Disposal guide by weed type" eyebrow="Dispose responsibly">
+        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)', fontSize: '0.88rem' }}>
+          Select the category that best matches your weed to see tailored disposal instructions.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-sm)' }}>
+          {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
+            const active = selectedType === type
+            return (
+              <button key={type} onClick={() => handleTypeSelect(type)}
+                style={{ border: `2px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', padding: 0, background: active ? 'rgba(46,125,50,0.08)' : 'var(--color-surface)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'stretch', transition: 'all var(--transition)', boxShadow: active ? '0 0 0 3px rgba(46,125,50,0.15)' : 'none', textAlign: 'center', overflow: 'hidden' }}
+              >
+                <div style={{ position: 'relative', height: 80, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
+                  <img src={imgUrl} alt="" loading="lazy" referrerPolicy="no-referrer"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                  />
+                  <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem' }}>{icon}</div>
+                </div>
+                <div style={{ padding: 'var(--space-sm)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: active ? 'var(--color-primary-dark)' : 'var(--color-text-muted)', lineHeight: 1.35 }}>{label}</span>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+        {selectedType && (() => {
+          const d = DISPOSAL_DATA[selectedType]
+          return (
+            <div ref={disposalContentRef} style={{ marginTop: 'var(--space-xl)', scrollMarginTop: 'var(--space-xl)' }}>
+              <h3 style={{ color: 'var(--color-primary-dark)', marginBottom: 'var(--space-lg)', fontSize: '1.1rem' }}>{d.title}</h3>
+              <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>Representative Species</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-md)', marginBottom: 'var(--space-xl)' }}>
+                {d.species.map((s) => (
+                  <div key={s.name} className="card" style={{ overflow: 'hidden' }}>
+                    {/* Species photo */}
+                    <div style={{ position: 'relative', height: 140, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
+                      {s.imgUrl ? (
+                        <>
+                          <img src={s.imgUrl} alt={s.name} loading="lazy" referrerPolicy="no-referrer"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                          />
+                          <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>{s.emoji}</div>
+                        </>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '2.5rem' }}>{s.emoji}</div>
+                      )}
+                    </div>
+                    {/* Species info */}
+                    <div style={{ padding: 'var(--space-md)' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', lineHeight: 1.3, marginBottom: 2 }}>{s.name}</div>
+                      <div style={{ fontSize: '0.78rem', fontStyle: 'italic', color: 'var(--color-primary)', marginBottom: 'var(--space-sm)' }}>{s.latin}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-xs)', marginBottom: 'var(--space-sm)' }}>
+                        <span className={`badge ${s.statusTag === 'prohibited' ? 'badge-high' : 'badge-medium'}`}>{s.statusLabel}</span>
+                        <span className={`badge ${s.ariTag === 'veryhigh' ? 'badge-high' : 'badge-medium'}`}>{s.ariLabel}</span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--color-text-muted)', lineHeight: 1.65, borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-sm)' }}>{s.impact}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-md)' }}>
+                <div style={{ background: 'rgba(230,81,0,0.06)', border: '1px solid rgba(230,81,0,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-warning)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>⚡ What makes it risky</h4>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {d.risk.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-warning)', fontWeight: 700, marginTop: 1 }}>•</span>{item}</li>)}
+                  </ul>
+                </div>
+                <div style={{ background: 'rgba(46,125,50,0.06)', border: '1px solid rgba(46,125,50,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>✓ What to do</h4>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {d.dos.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-success)', marginTop: 1 }}>✓</span>{item}</li>)}
+                  </ul>
+                </div>
+                <div style={{ background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-danger)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>✗ What NOT to do</h4>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {d.donts.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-danger)', fontWeight: 700, marginTop: 1 }}>✗</span>{item}</li>)}
+                  </ul>
+                </div>
+              </div>
+              {d.prohibitedNote && (
+                <div style={{ marginTop: 'var(--space-md)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)', background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>🚫</span>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-danger)', lineHeight: 1.6 }}>
+                    <strong>{d.prohibitedNote}</strong>
+                  </p>
+                </div>
+              )}
+            </div>
+          )
+        })()}
       </WeedSection>
 
       <footer
@@ -791,12 +1067,28 @@ export function WeedPage() {
           textAlign: 'center',
         }}
       >
-        Content on this page adapted from{' '}
-        <a href="https://weeds.org.au/" target="_blank" rel="noreferrer">
-          Weeds Australia
-        </a>
-        .
+        Content adapted from{' '}
+        <a href="https://weeds.org.au/" target="_blank" rel="noreferrer">Weeds Australia</a>
+        {' '}and{' '}
+        <a href="https://agriculture.vic.gov.au/biosecurity/weeds" target="_blank" rel="noreferrer">Agriculture Victoria</a>.
       </footer>
+
+      {/* ── Prohibited weed modal ── */}
+      {modalWeed && (
+        <div role="dialog" aria-modal="true"
+          onClick={(e) => { if (e.target === e.currentTarget) setModalWeed(null) }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-lg)' }}
+        >
+          <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-hover)', maxWidth: 520, width: '100%', padding: 'var(--space-xl)', position: 'relative', animation: 'fade-up 0.2s ease forwards' }}>
+            <button onClick={() => setModalWeed(null)} aria-label="Close"
+              style={{ position: 'absolute', top: 'var(--space-md)', right: 'var(--space-md)', background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: 'var(--color-text-muted)', lineHeight: 1, padding: '0.25rem' }}
+            >×</button>
+            <span className="badge badge-high" style={{ marginBottom: 'var(--space-sm)' }}>State Prohibited Weed</span>
+            <h3 style={{ color: 'var(--color-primary-dark)', marginBottom: 'var(--space-sm)' }}>{modalWeed.name}</h3>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.7 }}>{modalWeed.desc}</p>
+          </div>
+        </div>
+      )}
     </>
   )
 }
