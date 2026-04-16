@@ -490,9 +490,9 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
 }
 
 const WEED_TYPES: { type: WeedCategory; icon: string; label: string; imgUrl: string }[] = [
-  { type: 'aquatic',      icon: '💧', label: 'Aquatic & Wetland Herbaceous',    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg' },
+  { type: 'aquatic',      icon: '💧', label: 'Aquatic & Wetland Herbaceous',    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg' },
   { type: 'riparian',    icon: '🌊', label: 'Riparian Woody Plants',            imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg' },
-  { type: 'woody',       icon: '🌳', label: 'Terrestrial Woody Shrubs & Trees', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Blackberry_%28Rubus_fruticosus%29.jpg/330px-Blackberry_%28Rubus_fruticosus%29.jpg' },
+  { type: 'woody',       icon: '🌳', label: 'Terrestrial Woody Shrubs & Trees', imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg' },
   { type: 'climbers',    icon: '🪴', label: 'Climbers & Creeping Groundcovers', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg' },
   { type: 'grasses',     icon: '🌾', label: 'Grasses & Grass-like',             imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg' },
   { type: 'broadleaf',   icon: '🍃', label: 'Non-woody Broadleaf Herbs',        imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg' },
