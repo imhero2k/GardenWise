@@ -409,6 +409,7 @@ type DisposalSpecies = {
 type DisposalEntry = {
   title: string; species: DisposalSpecies[]
   risk: string[]; dos: string[]; donts: string[]
+  prohibitedNote?: string
 }
 
 const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
@@ -419,16 +420,17 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
       { emoji: '🌱', name: 'Salvinia (Giant Salvinia)', latin: 'Salvinia molesta', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', impact: 'A single plant can cover an entire dam in one season. Blocks light and depletes oxygen, causing fish kills. Illegal to buy, sell, or move in Victoria.' },
       { emoji: '🦆', name: 'Lagarosiphon', latin: 'Lagarosiphon major', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', impact: '"Chokes" slow-moving water bodies, causing anoxia and fish death. Boat propellers and fishing gear carry stem fragments between water bodies.' },
     ],
-    risk: ['Spreads through tiny plant fragments — any broken piece can root and establish downstream', 'Transported rapidly by waterways, floods, contaminated boats, trailers, and fishing gear', 'State Prohibited — do not attempt removal yourself; report to authorities immediately', 'Can cover an entire water body within a single growing season', 'Survives in damp soil for extended periods away from open water'],
-    dos: ['Report to the relevant authority immediately (government removes at no cost to landowner)', 'While awaiting professionals: isolate the area with temporary barriers at outflow points', 'Record GPS coordinates, photographs, and estimated coverage area for the report', 'Clean all equipment, waders, boats, and vehicles thoroughly before leaving the site', 'Keep unauthorised people and machinery out of the affected area'],
-    donts: ["Don't cut, pull, or disturb the plant — any fragment establishes a new infestation downstream", "Don't move plant material across or between waterways under any circumstances", "Don't dump removed aquatic material near drains, waterways, or moist soil", "Don't compost — aquatic weed fragments remain viable for extended periods", "Don't apply herbicide near water unless using a product with a registered aquatic-use label"],
+    risk: ['Even tiny plant fragments can root and establish new colonies downstream', 'Spreads rapidly through waterways, floods, boats, and fishing equipment', 'Removing plants in water can disturb fragments and worsen spread', 'Some species can cover an entire water body within a single growing season'],
+    dos: ['Avoid disturbing the water and surrounding vegetation', 'Isolate the affected area where possible to prevent further spread', 'Clean all equipment, boots, and tools thoroughly before leaving the site', 'Monitor nearby drains and waterways for new growth', 'Report any suspected high-risk species to authorities promptly'],
+    donts: ['Do not pull, cut, or break plants while they are in the water', 'Do not transport any plant material away from the site', 'Do not dump removed material near drains, waterways, or moist soil'],
+    prohibitedNote: 'If you suspect a State Prohibited species such as Salvinia or Alligator Weed — report it immediately. Do not attempt to handle or remove it yourself.',
   },
   riparian: {
     title: 'Riparian Woody Plants — Disposal Guide',
     species: [{ emoji: '🌳', name: 'Willows', latin: 'Salix spp.', statusTag: 'restricted', statusLabel: 'Restricted Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg', impact: 'Branches dropped into waterways root downstream, spreading infestation along river corridors. Dense stands alter water flow and destabilise banks when removed without a revegetation plan.' }],
-    risk: ['Branches and cuttings in waterways root downstream — infestation spreads along entire river corridors', 'Removing large trees from steep banks without revegetation risks severe bank erosion', 'Regrowth from cut stumps is vigorous unless treated with herbicide within minutes of cutting'],
-    dos: ['Treat cut stumps with registered herbicide immediately (within minutes) to prevent resprouting', 'Stage removal by river section — never clear entire banks at once', 'Revegetate cleared banks with local native species to stabilise soil'],
-    donts: ["Don't leave cut stumps untreated — willows resprout vigorously", "Don't stack branches near the water's edge — they wash in and re-establish", "Don't apply herbicide in or near water without a registered aquatic-use product and permit"],
+    risk: ['Branches and fragments falling into water can root and spread downstream', 'Dense stands alter riverbank stability, water flow, and erosion patterns', 'Cut stumps readily resprout if not treated immediately', 'Large-scale removal without revegetation can destabilise banks'],
+    dos: ['Remove in stages — never clear entire riverbanks in a single operation', 'Keep all cut material well away from the water\'s edge', 'Use targeted cut-and-treat methods to minimise regrowth', 'Replant with native vegetation to restore bank stability after clearing', 'Monitor regrowth and signs of erosion regularly'],
+    donts: ['Do not drop branches or cuttings into the waterway', 'Do not clear entire riverbanks at once — work in sections', 'Do not leave cut material piled near the water where it can wash in'],
   },
   woody: {
     title: 'Terrestrial Woody Shrubs & Trees — Disposal Guide',
@@ -436,9 +438,9 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
       { emoji: '🍇', name: 'Blackberry', latin: 'Rubus fruticosus agg.', statusTag: 'restricted', statusLabel: 'Regionally Controlled / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Blackberry_%28Rubus_fruticosus%29.jpg/330px-Blackberry_%28Rubus_fruticosus%29.jpg', impact: 'Birds and mammals disperse berries widely; canes tip-root wherever they touch the ground. Seed bank persists for years after parent plants are removed.' },
       { emoji: '🌿', name: 'Sweet Pittosporum', latin: 'Pittosporum undulatum', statusTag: 'restricted', statusLabel: 'Environmental Weed (outside its natural range)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg', impact: 'Dense canopy and allelopathic leaf litter suppress native understorey regeneration. Expands aggressively via bird-dispersed fruit.' },
     ],
-    risk: ['Birds and mammals disperse berries widely, creating new infestations far from the source', 'Blackberry canes tip-root wherever they touch the ground', 'Seed bank persists in soil; seedlings emerge for years after parent plants are removed'],
-    dos: ['Cut stumps and immediately treat with registered herbicide (within minutes, before callusing)', 'Target seed-bearing "mother plants" first to cut off the primary dispersal source', 'Bag and dispose of all fruiting material as general waste — not green waste'],
-    donts: ["Don't leave seed-bearing canes on bare soil — they will establish", "Don't chip or mulch fruiting material — seeds pass through unharmed", "Don't compost berries or canes — viable seeds survive standard composting"],
+    risk: ['Seeds spread widely via birds and animals, creating new infestations at a distance', 'Dense thickets can completely exclude native understorey vegetation', 'Plants readily regrow from cut stumps or remaining root material', 'Seed banks in the soil can persist and germinate for many years'],
+    dos: ['Prioritise fruiting or seed-bearing plants first to reduce further spread', 'Use targeted removal methods suited to the species', 'Bag and dispose of all seeds and fruiting material as general waste — not green waste', 'Restore native vegetation after clearing to suppress re-establishment', 'Revisit the site regularly to address any regrowth'],
+    donts: ['Do not leave fruiting branches or canes on the ground — they will establish', 'Do not assume cutting alone is sufficient — roots and stumps must also be treated', 'Do not ignore early regrowth — small plants are far easier to remove'],
   },
   climbers: {
     title: 'Climbers & Creeping Groundcovers — Disposal Guide',
@@ -446,9 +448,9 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
       { emoji: '🪴', name: 'English Ivy', latin: 'Hedera helix', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg', impact: 'Roots at every stem node; climbs tree trunks and weakens large trees. Bird-dispersed berries and garden dumping create distant infestations.' },
       { emoji: '🌸', name: 'Wandering Trad', latin: 'Tradescantia fluminensis', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tradescantia_fluminensis_%28Flowers%29.jpg/330px-Tradescantia_fluminensis_%28Flowers%29.jpg', impact: 'Every stem node roots on contact with moist soil. Brush cutters and mowers scatter stem fragments, massively expanding the infestation.' },
     ],
-    risk: ['Every stem node roots on contact with moist soil — even tiny discarded fragments establish rapidly', 'Brush cutters and mowers fragment stems and scatter propagules over a far wider area', 'Dense mats completely suppress native seedling regeneration in forest understorey'],
-    dos: ['For ivy: cut climbing stems at the base first to halt ongoing tree damage, then clear the ground layer', 'Collect all removed material immediately into sealed bags', 'Treat cut stem bases with herbicide to prevent resprouting'],
-    donts: ["Don't use a brush cutter or mower on wandering trad — multiplies propagules", "Don't leave detached stems on moist soil — short segments root within days", "Don't add material to green waste bins or compost — stems regenerate in mulch"],
+    risk: ['Even very small stem fragments can root rapidly in moist soil', 'Dense mats or climbing growth can smother native ground cover and damage trees', 'Cutting or mowing often increases spread by creating more fragments', 'Complete removal is difficult — infestations typically require repeated treatment'],
+    dos: ['Remove small patches carefully by hand to avoid creating fragments', 'Collect all plant material and seal it in bags immediately', 'Use controlled, targeted treatment rather than broad mechanical removal', 'Revisit frequently — regrowth is common and early intervention is more effective'],
+    donts: ['Do not mow or slash — this creates fragments and significantly widens the infestation', 'Do not leave any plant fragments behind on moist soil', 'Do not dispose of material in green waste bins or compost — stems can regenerate'],
   },
   grasses: {
     title: 'Grasses & Grass-like — Disposal Guide',
@@ -456,9 +458,10 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
       { emoji: '🌾', name: 'Serrated Tussock', latin: 'Nassella trichotoma', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Restricted (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg', impact: 'Seeds dormant in soil for up to 15+ years. Wind-dispersed seeds spread along roads, fence lines, and stock routes. Can dominate a paddock within 7 years.' },
       { emoji: '🌿', name: 'Chilean Needle Grass', latin: 'Nassella neesiana', statusTag: 'restricted', statusLabel: 'Restricted Weed — all Victorian catchments', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Produces both normal seeds AND stem-node seeds — suppressing flowering alone does not stop reproduction. Sharp awns injure livestock and wildlife.' },
     ],
-    risk: ["Serrated tussock seed viable in soil for 15+ years — a single season's seed set creates a decade-long problem", 'Chilean needle grass produces "stem seeds" at leaf nodes — removing flowers does not prevent seed spread', 'Seeds travel on clothing, animal fur, vehicles, and feed hay'],
-    dos: ['Plan work from "clean" areas into infested areas — always clean up before moving to the next site', 'Treat during the optimal control window (before seed set)', 'Set up a wash-down station: clean all clothing, footwear, and machinery before leaving'],
-    donts: ["Don't enter infested areas during seed drop — you will carry seed to clean paddocks", "Don't slash or use machinery that disperses seeds without containment during seeding", "For Chilean needle grass: don't rely on cutting alone — stem seeds will still mature and disperse"],
+    risk: ['Grasses can produce thousands of seeds per season, many remaining viable in soil for years', 'Seeds travel easily via wind, animals, clothing, machinery, and contaminated feed or hay', 'Large infestations develop quickly and can dominate entire paddocks or grasslands', 'Flammable dry material significantly increases fire risk in affected areas'],
+    dos: ['Act before flowering and seed set — early intervention is far more effective', 'Clean all clothing, footwear, and machinery before leaving any infested area', 'Always work from clean areas into infested areas to avoid spreading seed', 'Restore competitive native or pasture vegetation after treatment', 'Identify and monitor high-risk spread corridors such as roadsides and fence lines'],
+    donts: ['Do not work in infested areas during active seed drop periods', 'Do not move soil, hay, or machinery from infested areas without thorough cleaning', 'Do not ignore even small infestations — early action prevents large-scale spread'],
+    prohibitedNote: 'If the species is State Prohibited, such as Mexican Feather Grass — report it to the relevant authority. Do not attempt removal yourself.',
   },
   broadleaf: {
     title: 'Non-woody Broadleaf Herbs — Disposal Guide',
@@ -466,9 +469,10 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
       { emoji: '🌼', name: 'Hawkweeds', latin: 'Pilosella spp.', statusTag: 'prohibited', statusLabel: 'State Prohibited Weed', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', impact: 'Release allelopathic chemicals that suppress surrounding plants; form dense mats in alpine zones. Wind-dispersed seeds and creeping stolons. Early detection is critical.' },
       { emoji: '🌡', name: 'Tutsan', latin: 'Hypericum androsaemum', statusTag: 'restricted', statusLabel: 'Environmental Weed (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', impact: 'Forms dense shade-tolerant thickets in moist forest, suppressing native understorey for years. Berries are toxic to livestock and spread via birds.' },
     ],
-    risk: ['Hawkweeds: State Prohibited — allelopathic chemicals suppress all surrounding plants', 'Hawkweed seeds are wind-dispersed; creeping stolons expand patch size rapidly', 'Tutsan berries are toxic to livestock; birds spread seeds widely to new sites'],
-    dos: ['Hawkweeds: report to authorities immediately — government removes at no cost to landowner', 'Tutsan: use cut-and-paint (cut stem, immediately apply herbicide to cut surface)', 'Small tutsan seedlings can be hand-pulled including full root on moist soil'],
-    donts: ["Don't attempt to remove hawkweeds yourself — incorrect handling risks spreading stolons and seeds", "Don't slash or mow tutsan during fruiting — disperses berries across a wider area", "Don't compost fruiting material — seeds pass through viable"],
+    risk: ['Seeds and stolons spread quickly, allowing infestations to escalate from small patches', 'Dense ground cover can develop fast, outcompeting native vegetation', 'Some species release chemicals into the soil that suppress surrounding plants', 'Early-stage invasions can become difficult to control if not addressed promptly'],
+    dos: ['Address infestations early while they are still small and manageable', 'Minimise soil disturbance during removal — disturbed soil encourages new germination', 'Monitor treated areas regularly and remove any new seedlings promptly', 'Restore native ground cover after clearing to prevent re-establishment'],
+    donts: ['Do not delay removal — small infestations are significantly easier to manage', 'Do not disturb the soil more than necessary during removal', 'Do not leave flowering plants in place — remove before seeds are set and dispersed'],
+    prohibitedNote: 'If you suspect a State Prohibited species such as Hawkweed — report it immediately to the relevant authority. Do not attempt to handle or remove it yourself.',
   },
   underground: {
     title: 'Underground Storage Perennials — Disposal Guide',
@@ -476,16 +480,16 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
       { emoji: '🌸', name: 'Bulbil Watsonia', latin: 'Watsonia meriana var. bulbillifera', statusTag: 'restricted', statusLabel: 'Declared Noxious Weed (Vic)', ariTag: 'veryhigh', ariLabel: 'ARI: Very High', impact: 'Produces aerial bulbils at leaf axils — mowing or slashing scatters these propagules widely. Corms and bulbils persist in soil for years after top growth is removed.' },
       { emoji: '🌷', name: 'Cape Tulip — One Leaf', latin: 'Moraea flaccida', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG', impact: 'Dense infestations can exceed 7,000 corms per square metre. Foliage disappears for 5–6 months per year — underground density is easily underestimated.' },
     ],
-    risk: ['Dense corms, bulbils, and daughter corms persist in soil for years after above-ground removal', 'Watsonia produces aerial bulbils at leaf axils — mowing scatters thousands of propagules', 'Foliage is absent 5–6 months per year — underground density is consistently underestimated'],
-    dos: ['Treat during the active leaf stage (above-ground and visible) for best herbicide uptake', 'Carefully excavate the entire corm cluster; sieve soil to recover small bulbils', 'Bag all underground material immediately — dispose via general waste, not green waste'],
-    donts: ["Don't rototill or cultivate — fragments corms and distributes bulbils across the entire area", "Don't mow or slash watsonia during bulbil formation — scatters aerial propagules widely", "Don't compost corms or bulbs — they survive the composting process intact"],
+    risk: ['Underground bulbs, corms, or rhizomes persist in soil long after above-ground removal', 'Soil movement — including digging, mowing, or machinery — can spread underground parts', 'Plants are often invisible during dormant periods, making it easy to underestimate the infestation', 'Effective control requires repeated treatment over multiple growing seasons'],
+    dos: ['Treat during the active growth phase when plants are visible and uptake is optimal', 'Avoid unnecessary digging — soil disturbance can spread underground parts', 'Bag and secure all excavated plant material before disposing as general waste', 'Monitor the site across multiple seasons to confirm full eradication'],
+    donts: ['Do not move soil from infested areas — it may contain bulbs or corm fragments', 'Do not rely on a single treatment — underground structures require long-term management', 'Do not ignore dormant periods — underground parts remain viable even when foliage is absent'],
   },
   succulents: {
     title: 'Succulents & Cacti — Disposal Guide',
     species: [{ emoji: '🌵', name: 'Wheel Cactus', latin: 'Opuntia robusta', statusTag: 'restricted', statusLabel: 'Regionally Prohibited / Controlled / Restricted (Vic)', ariTag: 'high', ariLabel: 'ARI: High', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg', impact: 'Detached pads root readily on contact with soil. Glochids (barbed micro-spines) penetrate skin and are nearly impossible to remove without medical assistance.' }],
-    risk: ['Detached pads root readily on contact with soil within weeks', 'Glochids (fine barbed spines) penetrate skin and are extremely difficult to remove — injury risk is high', 'Brush cutters shred pads into multiple propagules scattered across a wide area'],
-    dos: ['Wear heavy puncture-resistant gloves, long sleeves, and eye protection', 'Use tongs or a stick to handle pads and fallen fruit — never touch with bare skin', 'Dispose of all material as general waste in sealed bags — never in green waste'],
-    donts: ["Don't leave detached pads on bare soil — they root and form new plants within weeks", "Don't use a brush cutter or slasher — shreds pads into propagules scattered over a wide area", "Don't attempt removal without appropriate PPE — glochid injuries may require medical treatment"],
+    risk: ['Detached pads and fragments can root and form new plants within weeks', 'Seeds spread via animals that consume the fruit, potentially over long distances', 'Spines and barbs pose a serious physical injury risk during removal', 'Infestations can persist for decades on rocky or otherwise inaccessible terrain'],
+    dos: ['Always wear appropriate protective equipment — gloves, long sleeves, and eye protection', 'Handle all plant parts using tongs or tools — never with bare hands', 'Collect all pads, fragments, and fruit carefully before secure disposal as general waste', 'Check the surrounding area for any dropped fragments after removal', 'Monitor the site over the long term — reinfestation from seed is common'],
+    donts: ['Do not leave any pads or fruit on the ground — even small pieces can re-establish', 'Do not handle plants without full protective equipment — injuries may require medical attention', 'Do not transport plant material loosely — all parts must be securely contained'],
   },
 }
 
@@ -1042,6 +1046,14 @@ export function WeedPage() {
                   </ul>
                 </div>
               </div>
+              {d.prohibitedNote && (
+                <div style={{ marginTop: 'var(--space-md)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)', background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>🚫</span>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-danger)', lineHeight: 1.6 }}>
+                    <strong>{d.prohibitedNote}</strong>
+                  </p>
+                </div>
+              )}
             </div>
           )
         })()}
