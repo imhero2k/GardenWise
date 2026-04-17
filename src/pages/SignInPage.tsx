@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLocationArea } from '../context/LocationContext'
 import { useAuth } from '../context/useAuth'
 
 export function SignInPage() {
   const { state, loginWithApple, loginWithEmail, loginWithGoogle, signUpWithEmail } = useAuth()
+  const { requestOpenLocationDialog } = useLocationArea()
   const navigate = useNavigate()
   const [localError, setLocalError] = useState<string | null>(null)
   const [mode, setMode] = useState<'providers' | 'email-signin' | 'email-signup'>('providers')
@@ -29,10 +31,11 @@ export function SignInPage() {
     setLocalError(null)
     try {
       await loginWithApple()
+      requestOpenLocationDialog()
     } catch (e) {
       setLocalError(e instanceof Error ? e.message : 'Sign-in failed')
     }
-  }, [loginWithApple])
+  }, [loginWithApple, requestOpenLocationDialog])
 
   const handleEmail = useCallback(async () => {
     setLocalError(null)
@@ -45,10 +48,11 @@ export function SignInPage() {
       } else {
         await loginWithEmail(e, password)
       }
+      requestOpenLocationDialog()
     } catch (err) {
       setLocalError(err instanceof Error ? err.message : 'Sign-in failed')
     }
-  }, [email, loginWithEmail, mode, password, signUpWithEmail])
+  }, [email, loginWithEmail, mode, password, signUpWithEmail, requestOpenLocationDialog])
 
   return (
     <section className="auth-wrap auth-in">

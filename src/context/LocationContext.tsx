@@ -3,9 +3,11 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { reverseGeocodeAustralia } from '../lib/geocodeAu'
 import { isLikelyAustraliaRegion, nearestAustralianRegion } from '../lib/nearestRegion'
 import type { AURegionCode, GeoCoords, StoredLocationV1 } from '../types/location'
 import { AU_REGIONS } from '../types/location'
@@ -35,19 +37,22 @@ interface LocationContextValue {
   regionCode: AURegionCode | null
   source: 'manual' | 'gps' | 'place' | null
   coords: GeoCoords | null
-  /** Set when source === 'place' (postcode / suburb look-up) */
+  /** Suburb/postcode label from place look-up or reverse geocode after GPS */
   placeLabel: string | null
   geoError: string | null
   isDetecting: boolean
-  /** Primary line for UI, e.g. "Queensland" or "Near you · Queensland" */
+  /** Primary line for UI, e.g. suburb label or "Near you · Victoria" */
   areaLabel: string
-  /** Short badge, e.g. "QLD" */
+  /** Short badge, e.g. "VIC" */
   areaShort: string
-  setManualRegion: (code: AURegionCode) => void
   /** Postcode or suburb resolved via geocoder; sets region + coords for local tips / bioregion */
   setLocationFromPlace: (regionCode: AURegionCode, coords: GeoCoords, placeLabel: string) => void
   requestGeolocation: () => void
   clearGeoError: () => void
+  /** Open the location dialog (e.g. after sign-in). Works even before LocationBar mounts. */
+  requestOpenLocationDialog: () => void
+  locationDialogRequestPending: boolean
+  acknowledgeLocationDialogRequest: () => void
 }
 
 const LocationContext = createContext<LocationContextValue | null>(null)
@@ -62,6 +67,8 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [placeLabel, setPlaceLabel] = useState<string | null>(initial?.placeLabel ?? null)
   const [geoError, setGeoError] = useState<string | null>(null)
   const [isDetecting, setIsDetecting] = useState(false)
+  const [locationDialogRequestPending, setLocationDialogRequestPending] = useState(false)
+  const reverseGeocodeGeneration = useRef(0)
 
   const persist = useCallback(
     (next: {
@@ -77,7 +84,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         updatedAt: Date.now(),
       }
       if (next.coords) payload.coords = next.coords
-      if (next.source === 'place' && next.placeLabel) payload.placeLabel = next.placeLabel
+      if (next.placeLabel && (next.source === 'place' || next.source === 'gps')) {
+        payload.placeLabel = next.placeLabel
+      }
       saveStored(payload)
     },
     [],
@@ -91,18 +100,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setPlaceLabel(label)
       setGeoError(null)
       persist({ source: 'place', regionCode: code, coords: nextCoords, placeLabel: label })
-    },
-    [persist],
-  )
-
-  const setManualRegion = useCallback(
-    (code: AURegionCode) => {
-      setRegionCode(code)
-      setSource('manual')
-      setCoords(null)
-      setPlaceLabel(null)
-      setGeoError(null)
-      persist({ source: 'manual', regionCode: code, coords: null })
     },
     [persist],
   )
@@ -173,6 +170,22 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setPlaceLabel(null)
       persist({ source: 'gps', regionCode: inferred, coords: nextCoords })
       setIsDetecting(false)
+
+      const gen = ++reverseGeocodeGeneration.current
+      void reverseGeocodeAustralia(lat, lng)
+        .then((rev) => {
+          if (reverseGeocodeGeneration.current !== gen || !rev) return
+          setPlaceLabel(rev.label)
+          persist({
+            source: 'gps',
+            regionCode: inferred,
+            coords: nextCoords,
+            placeLabel: rev.label,
+          })
+        })
+        .catch(() => {
+          /* optional; keep "Near you" style label until next fix */
+        })
     }
 
     // 1) Fast / Wi‑Fi–style fix (often enough for the permission prompt + a reading)
@@ -211,11 +224,22 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
   const clearGeoError = useCallback(() => setGeoError(null), [])
 
+  const requestOpenLocationDialog = useCallback(() => {
+    setLocationDialogRequestPending(true)
+  }, [])
+
+  const acknowledgeLocationDialogRequest = useCallback(() => {
+    setLocationDialogRequestPending(false)
+  }, [])
+
   const { areaLabel, areaShort } = useMemo(() => {
     if (!regionCode) {
-      return { areaLabel: 'Australia', areaShort: 'AU' }
+      return { areaLabel: 'Victoria', areaShort: 'VIC' }
     }
     const r = AU_REGIONS[regionCode]
+    if (source === 'gps' && coords && placeLabel) {
+      return { areaLabel: placeLabel, areaShort: r.short }
+    }
     if (source === 'gps' && coords) {
       return {
         areaLabel: `Near you · ${r.label}`,
@@ -241,10 +265,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       isDetecting,
       areaLabel,
       areaShort,
-      setManualRegion,
       setLocationFromPlace,
       requestGeolocation,
       clearGeoError,
+      requestOpenLocationDialog,
+      locationDialogRequestPending,
+      acknowledgeLocationDialogRequest,
     }),
     [
       regionCode,
@@ -255,10 +281,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       isDetecting,
       areaLabel,
       areaShort,
-      setManualRegion,
       setLocationFromPlace,
       requestGeolocation,
       clearGeoError,
+      requestOpenLocationDialog,
+      locationDialogRequestPending,
+      acknowledgeLocationDialogRequest,
     ],
   )
 
