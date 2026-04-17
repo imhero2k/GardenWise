@@ -3,6 +3,14 @@ import type { AURegionCode } from '../types/location'
 import { AU_REGIONS } from '../types/location'
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search'
+const NOMINATIM_REVERSE = 'https://nominatim.openstreetmap.org/reverse'
+
+/** https://operations.osmfoundation.org/policies/nominatim/ — identify the app */
+const NOMINATIM_HEADERS: HeadersInit = {
+  Accept: 'application/json',
+  'Accept-Language': 'en-AU',
+  'User-Agent': 'GardenWise/1.0 (https://github.com/imhero2k/GardenWise)',
+}
 
 /** Nominatim address.state values → app region codes */
 const STATE_TO_CODE: Record<string, AURegionCode> = {
@@ -41,8 +49,10 @@ function regionFromHit(hit: NominatimHit, lat: number, lng: number): AURegionCod
 function labelFromHit(hit: NominatimHit, regionCode: AURegionCode): string {
   const a = hit.address
   const short = AU_REGIONS[regionCode].short
-  const place =
-    a?.suburb || a?.town || a?.city || a?.village || (a?.postcode ? String(a.postcode) : null)
+  const suburb = a?.suburb || a?.town || a?.city || a?.village
+  const pc = a?.postcode ? String(a.postcode).trim() : ''
+  if (suburb && pc) return `${suburb} ${pc}, ${short}`
+  const place = suburb || (pc || null)
   if (place) return `${place}, ${short}`
   const dn = hit.display_name
   if (dn) {
@@ -50,6 +60,43 @@ function labelFromHit(hit: NominatimHit, regionCode: AURegionCode): string {
     return `${parts[0]}, ${short}`
   }
   return AU_REGIONS[regionCode].label
+}
+
+export interface ReverseGeocodeAustraliaResult {
+  label: string
+}
+
+/**
+ * Resolve coordinates to a suburb/postcode label via Nominatim reverse.
+ * Victoria-only for GardenWise — returns null if the resolved state is not VIC.
+ * Use sparingly (rate limits); call after a deliberate GPS fix.
+ */
+export async function reverseGeocodeAustralia(
+  lat: number,
+  lng: number,
+  options?: { signal?: AbortSignal },
+): Promise<ReverseGeocodeAustraliaResult | null> {
+  const url = new URL(NOMINATIM_REVERSE)
+  url.searchParams.set('lat', String(lat))
+  url.searchParams.set('lon', String(lng))
+  url.searchParams.set('format', 'json')
+  url.searchParams.set('addressdetails', '1')
+  url.searchParams.set('zoom', '18')
+
+  const r = await fetch(url.toString(), {
+    signal: options?.signal,
+    headers: NOMINATIM_HEADERS,
+  })
+
+  if (!r.ok) return null
+
+  const hit = (await r.json()) as NominatimHit & { error?: string }
+  if (hit.error || !hit?.address) return null
+
+  const regionCode = regionFromHit(hit, lat, lng)
+  if (regionCode !== 'VIC') return null
+
+  return { label: labelFromHit(hit, 'VIC') }
 }
 
 /** Always bias to Victoria so Nominatim prefers VIC matches (GardenWise is VIC-only). */
@@ -87,10 +134,7 @@ export async function geocodeAustralia(
 
   const r = await fetch(url.toString(), {
     signal: options?.signal,
-    headers: {
-      Accept: 'application/json',
-      'Accept-Language': 'en-AU',
-    },
+    headers: NOMINATIM_HEADERS,
   })
 
   if (!r.ok) throw new Error(`Look-up failed (${r.status})`)

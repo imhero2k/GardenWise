@@ -1,9 +1,8 @@
-import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useLocationArea } from '../context/LocationContext'
 import { useWeather } from '../hooks/useWeather'
 import { geocodeAustralia } from '../lib/geocodeAu'
 import { getRegionCentroid } from '../lib/nearestRegion'
-import { AU_REGIONS, type AURegionCode } from '../types/location'
 import { IconPin } from './Icons'
 import { WeatherMini } from './WeatherMini'
 
@@ -26,11 +25,11 @@ export function LocationBar() {
     isDetecting,
     areaLabel,
     areaShort,
-    setManualRegion,
     setLocationFromPlace,
-    placeLabel,
     requestGeolocation,
     clearGeoError,
+    locationDialogRequestPending,
+    acknowledgeLocationDialogRequest,
   } = useLocationArea()
 
   const { lat: weatherLat, lng: weatherLng } = useMemo(() => {
@@ -46,7 +45,6 @@ export function LocationBar() {
 
   const dialogRef = useRef<HTMLDialogElement>(null)
   const prevDetecting = useRef(false)
-  const selectId = useId()
   const placeInputId = useId()
   const titleId = useId()
 
@@ -54,11 +52,11 @@ export function LocationBar() {
   const [placeLoading, setPlaceLoading] = useState(false)
   const [placeError, setPlaceError] = useState<string | null>(null)
 
-  const openDialog = () => {
+  const openDialog = useCallback(() => {
     clearGeoError()
     setPlaceError(null)
     dialogRef.current?.showModal()
-  }
+  }, [clearGeoError])
 
   const closeDialog = () => {
     dialogRef.current?.close()
@@ -82,16 +80,17 @@ export function LocationBar() {
   }, [clearGeoError])
 
   useEffect(() => {
+    if (!locationDialogRequestPending) return
+    openDialog()
+    acknowledgeLocationDialogRequest()
+  }, [locationDialogRequestPending, openDialog, acknowledgeLocationDialogRequest])
+
+  useEffect(() => {
     if (prevDetecting.current && !isDetecting && !geoError && source === 'gps') {
       dialogRef.current?.close()
     }
     prevDetecting.current = isDetecting
   }, [isDetecting, geoError, source])
-
-  const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const v = e.target.value as AURegionCode
-    setManualRegion(v)
-  }
 
   const applyPostcodeOrSuburb = async () => {
     const q = placeQuery.trim()
@@ -136,13 +135,7 @@ export function LocationBar() {
           {regionCode ? (
             <span className="location-bar__summary" title={areaLabel}>
               <span className="location-bar__badge">{areaShort}</span>
-              <span className="location-bar__truncate">
-                {source === 'gps'
-                  ? 'Near you'
-                  : source === 'place' && placeLabel
-                    ? placeLabel
-                    : AU_REGIONS[regionCode].label}
-              </span>
+              <span className="location-bar__truncate">{areaLabel}</span>
             </span>
           ) : showNudge ? (
             <span className="location-bar__hint">Set once for local tips</span>
@@ -228,21 +221,6 @@ export function LocationBar() {
                 {placeError}
               </p>
             )}
-          </div>
-
-          <div className="location-dialog__field">
-            <label htmlFor={selectId}>Region</label>
-            <select
-              id={selectId}
-              className="location-dialog__select"
-              value={regionCode ?? ''}
-              onChange={onSelectChange}
-            >
-              <option value="" disabled>
-                Select…
-              </option>
-              <option value="VIC">{AU_REGIONS.VIC.label}</option>
-            </select>
           </div>
 
           <div className="location-dialog__or">or</div>
