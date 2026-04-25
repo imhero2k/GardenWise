@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { IconCamera, IconLeaf, IconMap, IconSearch } from '../components/Icons'
+import { IconBook, IconCamera, IconLeaf, IconMap, IconSearch } from '../components/Icons'
 
 export function HomePage() {
   return (
@@ -45,6 +45,18 @@ export function HomePage() {
             <div>
               <h3>PlantMe</h3>
               <p>Search and discover recommended plants for your area.</p>
+            </div>
+          </Link>
+          <Link to="/learn" className="feature-tile">
+            <div className="feature-tile__icon">
+              <IconBook />
+            </div>
+            <div>
+              <h3>Native plants 101</h3>
+              <p>
+                Why native plants matter for Victoria — and how your garden helps. Based on
+                Biodiversity 2037.
+              </p>
             </div>
           </Link>
         </div>
