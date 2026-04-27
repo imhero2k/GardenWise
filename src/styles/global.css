@@ -1515,3 +1515,160 @@ button.vicflora-card {
     animation: none;
   }
 }
+
+/* Garden planner */
+.garden-planner-dims {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.garden-planner-dims label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.garden-planner-dims input {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  font-size: 0.95rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.garden-planner-dims__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+}
+
+.garden-planner-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: var(--space-md);
+  align-items: stretch;
+}
+
+@media (max-width: 760px) {
+  .garden-planner-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.garden-planner-sidebar {
+  max-height: 620px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.garden-planner-catalog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-right: 0.25rem;
+}
+
+.garden-planner-catalog__item {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.garden-planner-catalog__item:hover {
+  background: var(--color-bg);
+}
+
+.garden-planner-catalog__item.active {
+  border-color: var(--color-primary);
+  background: rgba(46, 125, 50, 0.08);
+}
+
+.garden-planner-catalog__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75) inset;
+}
+
+.garden-planner-catalog__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.garden-planner-catalog__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.garden-planner-catalog__sci {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.garden-planner-catalog__meta {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.garden-planner-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.garden-planner-scene {
+  touch-action: none;
+  box-shadow: var(--shadow-soft);
+}
+
+.garden-planner-hint {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.garden-planner-viewbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.garden-planner-viewbar__group {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
