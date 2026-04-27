@@ -1721,6 +1721,274 @@ button.vicflora-card {
   text-decoration: underline;
 }
 
+/* Learn page · chapter dividers (native plants & weeds) */
+.learn-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: calc(var(--space-xl) * 1.5) 0 var(--space-lg);
+  --divider-color: var(--color-primary-dark);
+  --divider-bg-from: rgba(232, 245, 233, 0.95);
+  --divider-bg-to: rgba(200, 230, 201, 0.95);
+  --divider-shadow: rgba(46, 125, 50, 0.18);
+  --divider-border: rgba(46, 125, 50, 0.22);
+  --divider-rule: rgba(46, 125, 50, 0.35);
+}
+
+.learn-divider--invasive {
+  --divider-color: #b71c1c;
+  --divider-bg-from: #fff5f2;
+  --divider-bg-to: #ffe6dd;
+  --divider-shadow: rgba(183, 28, 28, 0.12);
+  --divider-border: rgba(183, 28, 28, 0.18);
+  --divider-rule: rgba(183, 28, 28, 0.35);
+}
+
+.learn-divider__rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--divider-rule) 30%,
+    var(--divider-rule) 70%,
+    transparent
+  );
+}
+
+.learn-divider__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--divider-bg-from), var(--divider-bg-to));
+  border: 1px solid var(--divider-border);
+  box-shadow: 0 6px 18px var(--divider-shadow);
+}
+
+.learn-divider__eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--divider-color);
+  text-align: center;
+}
+
+.learn-divider__brand {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--divider-color);
+  line-height: 1;
+  text-align: center;
+}
+
+.learn-hero--invasive {
+  margin-top: 0;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(135deg, #b71c1c 0%, #d84315 55%, #ef6c00 100%);
+}
+
+.learn-stat--alt {
+  border-left-color: var(--color-warning);
+}
+
+.learn-stat--alt .learn-stat__value {
+  color: #b71c1c;
+}
+
+.learn-section-heading {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-primary-dark);
+}
+
+.learn-section-lead {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.learn-topic--wide {
+  grid-column: 1 / -1;
+}
+
+.learn-topic h3 {
+  margin: 0 0 var(--space-sm);
+  font-size: 1rem;
+  color: var(--color-primary-dark);
+}
+
+.learn-topic__footer {
+  margin: var(--space-md) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  font-size: 0.88rem;
+}
+
+.learn-topic__footer a {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+
+.learn-topic__footer a:hover {
+  color: var(--color-primary);
+}
+
+.learn-topic__list a {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.learn-topic__list a:hover {
+  color: var(--color-primary);
+}
+
+.learn-tiers {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.learn-tier-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 720px) {
+  .learn-tier-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.learn-tier {
+  position: relative;
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  border-left: 6px solid var(--color-primary);
+}
+
+.learn-tier--t1 {
+  border-left-color: #b71c1c;
+}
+
+.learn-tier--t2 {
+  border-left-color: #e65100;
+}
+
+.learn-tier--t3 {
+  border-left-color: #f9a825;
+}
+
+.learn-tier--t4 {
+  border-left-color: var(--color-primary);
+}
+
+.learn-tier__tag {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.learn-tier__summary {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  line-height: 1.3;
+}
+
+.learn-tier--t1 .learn-tier__summary {
+  color: #b71c1c;
+}
+
+.learn-tier--t2 .learn-tier__summary {
+  color: #e65100;
+}
+
+.learn-tier--t3 .learn-tier__summary {
+  color: #b06000;
+}
+
+.learn-tier__body {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+/* Weed page · cross-link back to Learn */
+.weed-learn-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  margin: var(--space-md) 0 var(--space-lg);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.08), rgba(165, 214, 167, 0.18));
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.weed-learn-link:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.weed-learn-link__icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weed-learn-link__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.weed-learn-link__text {
+  flex: 1;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+.weed-learn-link__text em {
+  color: var(--color-primary-dark);
+  font-style: italic;
+}
+
+.weed-learn-link__chev {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
 /* Garden planner */
 .garden-planner-dims {
   display: grid;

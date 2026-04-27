@@ -1,6 +1,6 @@
 import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { IconBin, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
+import { Link, useLocation } from 'react-router-dom'
+import { IconBin, IconBook, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import { IconSearch } from '../components/Icons'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
@@ -664,6 +664,15 @@ export function WeedPage() {
           Identify risky plants, reduce spread, and dispose of material responsibly.
         </p>
       </header>
+
+      <Link to="/learn#invasive" className="weed-learn-link">
+        <span className="weed-learn-link__icon"><IconBook /></span>
+        <span className="weed-learn-link__text">
+          <strong>Why does this matter?</strong> Read{' '}
+          <em>Invasive plants in your garden</em> in Native plants 101.
+        </span>
+        <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
+      </Link>
 
       <div className="section-block" style={{ marginBottom: 0 }}>
         <h2 className="sr-only">Quick links</h2>
