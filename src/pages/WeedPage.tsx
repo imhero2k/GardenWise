@@ -1,4 +1,4 @@
-import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { type ChangeEventHandler, type ReactNode, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { IconBin, IconBook, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import { IconSearch } from '../components/Icons'
@@ -7,7 +7,10 @@ import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
 import { predictPlantFromBase64 } from '../lib/predict'
 import { fetchTopWeeds, type RegionWeed } from '../lib/weedsApi'
-import { useRecommendedPlantEnrichment } from '../hooks/useRecommendedPlantEnrichment'
+import {
+  useRecommendedPlantEnrichment,
+  type EnrichmentState,
+} from '../hooks/useRecommendedPlantEnrichment'
 import { ImageLightbox } from '../components/ImageLightbox'
 
 type AnalysisState = 'idle' | 'analyzing' | 'done' | 'error'
@@ -395,6 +398,79 @@ function WeedSection({
   )
 }
 
+function TopWeedDetailContent({
+  weed,
+  enrichment,
+}: {
+  weed: RegionWeed
+  enrichment?: EnrichmentState
+}) {
+  const common = weed.commonName?.trim()
+  const sci = weed.scientificName
+  const primaryTitle = common || sci || 'Weed'
+  const extra =
+    typeof enrichment === 'object' && enrichment !== null ? enrichment : undefined
+  const hero = extra?.imageUrl
+  const summary = extra?.description
+  const link = extra?.linkUrl
+
+  const showSci = Boolean(common && sci && common.toLowerCase() !== sci.toLowerCase())
+
+  return (
+    <>
+      {hero && (
+        <div className="plant-detail-dialog__hero">
+          <img src={hero} alt="" loading="lazy" referrerPolicy="no-referrer" />
+        </div>
+      )}
+      <div className="plant-detail-dialog__intro">
+        <p className="plant-detail-dialog__primary">{primaryTitle}</p>
+        {showSci && <p className="plant-detail-dialog__sci">{sci}</p>}
+        <ul className="plant-detail-dialog__meta">
+          <li>
+            <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
+          </li>
+          {weed.riskScore != null && (
+            <li>
+              <strong>Risk score:</strong> {weed.riskScore}
+            </li>
+          )}
+          {weed.isWons && (
+            <li>
+              <strong style={{ color: 'var(--color-danger)' }}>WoNS</strong> — Weed of National Significance
+            </li>
+          )}
+          {weed.weedStatusVic && (
+            <li>
+              <strong>Status (Vic):</strong> {weed.weedStatusVic}
+            </li>
+          )}
+        </ul>
+      </div>
+      {summary ? (
+        <p className="plant-detail-dialog__summary">{summary}</p>
+      ) : enrichment === 'loading' ? (
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading description…</p>
+      ) : (
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+          No public description found for this species yet.
+        </p>
+      )}
+      {link && (
+        <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
+          <a href={link} target="_blank" rel="noreferrer">
+            Learn more (Wikipedia / species database) →
+          </a>
+        </p>
+      )}
+      <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
+        Risk metadata is from your weeds database. Photos and short descriptions may come from
+        Wikipedia and iNaturalist.
+      </p>
+    </>
+  )
+}
+
 // ── Disposal data types ────────────────────────────────────────────────────
 type WeedCategory =
   | 'aquatic' | 'riparian' | 'woody' | 'climbers'
@@ -553,6 +629,14 @@ export function WeedPage() {
   // Disposal type selector
   const [selectedType, setSelectedType] = useState<WeedCategory | null>(null)
   const disposalContentRef = useRef<HTMLDivElement>(null)
+  // Top-weed detail dialog (mirrors the PlantMe popup)
+  const topWeedDialogRef = useRef<HTMLDialogElement>(null)
+  const topWeedTitleId = useId()
+  const [topWeedDetail, setTopWeedDetail] = useState<RegionWeed | null>(null)
+  const openTopWeedDetail = useCallback((w: RegionWeed) => {
+    setTopWeedDetail(w)
+    topWeedDialogRef.current?.showModal()
+  }, [])
 
   const topWeedsEnriched = useRecommendedPlantEnrichment(
     topWeeds.map((w) => ({
@@ -753,7 +837,22 @@ export function WeedPage() {
               const img = meta?.imageUrl
               const blurb = meta?.description
               return (
-                <div key={w.id} className="card card-interactive card-media-top" style={{ textAlign: 'left' }}>
+                <button
+                  type="button"
+                  key={w.id}
+                  className="card card-interactive card-media-top"
+                  onClick={() => openTopWeedDetail(w)}
+                  style={{
+                    textAlign: 'left',
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    padding: 0,
+                    background: 'var(--color-surface)',
+                    cursor: 'pointer',
+                  }}
+                >
                   <div className="card-media-top__imgwrap">
                     {img ? (
                       <>
@@ -774,7 +873,7 @@ export function WeedPage() {
                       <div className="vicflora-card__image-placeholder" aria-hidden />
                     )}
                   </div>
-                  <div className="card-body">
+                  <div className="card-body" style={{ flex: 1 }}>
                     <h3 style={{ margin: 0, fontSize: '1.05rem' }}>{w.commonName || w.scientificName}</h3>
                     {w.commonName && (
                       <p style={{ margin: '0.25rem 0 0', fontSize: '0.86rem', color: 'var(--color-text-muted)' }}>
@@ -818,8 +917,11 @@ export function WeedPage() {
                         {blurb}
                       </p>
                     )}
+                    <p style={{ fontSize: '0.78rem', color: 'var(--color-primary)', margin: 'var(--space-sm) 0 0' }}>
+                      View details
+                    </p>
                   </div>
-                </div>
+                </button>
               )
             })}
           </div>
@@ -1081,6 +1183,38 @@ export function WeedPage() {
         {' '}and{' '}
         <a href="https://agriculture.vic.gov.au/biosecurity/weeds" target="_blank" rel="noreferrer">Agriculture Victoria</a>.
       </footer>
+
+      {/* ── Top-weed detail dialog (mirrors PlantMe) ── */}
+      <dialog
+        ref={topWeedDialogRef}
+        className="plant-detail-dialog"
+        aria-labelledby={topWeedTitleId}
+        onClose={() => setTopWeedDetail(null)}
+      >
+        <div className="plant-detail-dialog__inner">
+          <header className="plant-detail-dialog__header">
+            <h2 id={topWeedTitleId} className="plant-detail-dialog__title">
+              {topWeedDetail?.commonName || topWeedDetail?.scientificName || 'Weed details'}
+            </h2>
+            <button
+              type="button"
+              className="plant-detail-dialog__close"
+              aria-label="Close"
+              onClick={() => topWeedDialogRef.current?.close()}
+            >
+              ×
+            </button>
+          </header>
+          <div className="plant-detail-dialog__body">
+            {topWeedDetail && (
+              <TopWeedDetailContent
+                weed={topWeedDetail}
+                enrichment={topWeedsEnriched[`top-${topWeedDetail.id}`]}
+              />
+            )}
+          </div>
+        </div>
+      </dialog>
 
       {/* ── Prohibited weed modal ── */}
       {modalWeed && (
