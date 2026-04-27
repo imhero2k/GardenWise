@@ -340,6 +340,38 @@ export function IconWeatherCloudy({ className }: { className?: string }) {
   )
 }
 
+export function IconPlanner({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <rect
+        x="3.5"
+        y="5"
+        width="17"
+        height="14"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M3.5 10h17M8.5 5v14M14.5 5v14"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeOpacity="0.6"
+      />
+      <circle cx="6" cy="7.5" r="0.9" fill="currentColor" />
+      <circle cx="11.5" cy="14" r="1.4" fill="currentColor" />
+      <circle cx="17" cy="7.5" r="1.1" fill="currentColor" />
+    </svg>
+  )
+}
+
 export function IconWeatherRainy({ className }: { className?: string }) {
   return (
     <svg
