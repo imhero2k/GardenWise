@@ -1,15 +1,36 @@
 import { Link } from 'react-router-dom'
 import { IconBook, IconCamera, IconLeaf, IconMap, IconPlanner, IconSearch } from '../components/Icons'
+import waratahImg from '../assets/hero/waratah.png'
+import wattleImg from '../assets/hero/wattle.png'
+import bottlebrushImg from '../assets/hero/bottlebrush.png'
+import logoImg from '../assets/logo.png'
+
+const HERO_SLIDES: { src: string; alt: string }[] = [
+  { src: waratahImg, alt: 'Waratah in bloom against native bushland' },
+  { src: wattleImg, alt: 'Golden wattle flowers on a dark background' },
+  { src: bottlebrushImg, alt: 'Red bottlebrush flowers and foliage' },
+]
 
 export function HomePage() {
   return (
     <>
-      <header className="top-bar">
-        <span className="app-brand">GardenWise</span>
-      </header>
-
       <section className="hero fade-up">
+        <div className="hero-slideshow" aria-hidden="true">
+          {HERO_SLIDES.map((slide, i) => (
+            <div
+              key={slide.src}
+              className={`hero-slide hero-slide--${i + 1}`}
+              style={{ backgroundImage: `url(${slide.src})` }}
+              role="img"
+              aria-label={slide.alt}
+            />
+          ))}
+        </div>
         <div className="hero-inner">
+          <div className="hero-brand">
+            <img src={logoImg} alt="" className="hero-brand__logo" aria-hidden="true" />
+            <span className="hero-brand__text">GardenWise</span>
+          </div>
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.85)' }}>
             Sustainable gardening
           </p>

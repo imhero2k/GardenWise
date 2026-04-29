@@ -200,7 +200,11 @@ export function LearnPage() {
 
   return (
     <>
-      <div className="learn-divider learn-divider--native" style={{ marginTop: 'var(--space-md)' }}>
+      <div
+        id="native"
+        className="learn-divider learn-divider--native"
+        style={{ marginTop: 'var(--space-md)' }}
+      >
         <span className="learn-divider__rule" aria-hidden />
         <div className="learn-divider__label">
           <span className="learn-divider__eyebrow">Victorian Government · Biodiversity 2037</span>
