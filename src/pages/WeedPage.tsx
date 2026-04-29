@@ -20,7 +20,6 @@ import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
 } from '../hooks/useRecommendedPlantEnrichment'
-import { ImageLightbox } from '../components/ImageLightbox'
 
 type AnalysisState = 'idle' | 'analyzing' | 'done' | 'error'
 
@@ -683,7 +682,6 @@ export function WeedPage() {
   const [topWeedsSearch, setTopWeedsSearch] = useState('')
   const [topWeedsOffset, setTopWeedsOffset] = useState(0)
   const [topWeedsHasMore, setTopWeedsHasMore] = useState(false)
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
 
   // Prohibited weeds modal
   const [modalWeed, setModalWeed] = useState<{ name: string; desc: string } | null>(null)
@@ -951,20 +949,7 @@ export function WeedPage() {
                 >
                   <div className="card-media-top__imgwrap">
                     {img ? (
-                      <>
-                        <img src={img} alt="" loading="lazy" referrerPolicy="no-referrer" />
-                        <button
-                          type="button"
-                          className="img-expand-btn"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setLightboxSrc(img)
-                          }}
-                        >
-                          Expand
-                        </button>
-                      </>
+                      <img src={img} alt="" loading="lazy" referrerPolicy="no-referrer" />
                     ) : (
                       <div className="vicflora-card__image-placeholder" aria-hidden />
                     )}
@@ -1026,8 +1011,6 @@ export function WeedPage() {
           </div>
         )}
       </WeedSection>
-
-      <ImageLightbox src={lightboxSrc} open={Boolean(lightboxSrc)} onClose={() => setLightboxSrc(null)} />
 
       <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>

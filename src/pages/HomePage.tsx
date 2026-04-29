@@ -34,7 +34,10 @@ export function HomePage() {
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.85)' }}>
             Sustainable gardening
           </p>
-          <h1>Grow Smart. Garden Responsibly.</h1>
+          <h1 className="hero-title">
+            <span className="hero-title__line">Grow smart.</span>
+            <span className="hero-title__line">Garden responsibly.</span>
+          </h1>
           <p>
             Plan with native-friendly choices, spot invasive species early, and build a garden that
             supports local biodiversity.
@@ -42,6 +45,9 @@ export function HomePage() {
           <div className="hero-cta-row">
             <Link to="/plants" className="btn btn-primary">
               Start Gardening
+            </Link>
+            <Link to="/weed#weed-checker" className="btn btn-secondary">
+              Weed checker
             </Link>
           </div>
         </div>
