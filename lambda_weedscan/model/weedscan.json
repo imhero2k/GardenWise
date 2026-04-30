@@ -1,0 +1,22 @@
+{
+    "CustomVision.Metadata.AdditionalModelInfo": "",
+    "CustomVision.Metadata.Version": "1.2",
+    "CustomVision.Postprocess.Method": "ClassificationMultiClass",
+    "CustomVision.Postprocess.Yolo.Biases": "[]",
+    "CustomVision.Postprocess.Yolo.NmsThreshold": "0.0",
+    "CustomVision.Preprocess.CropHeight": "480",
+    "CustomVision.Preprocess.CropMethod": "OneCropCenter",
+    "CustomVision.Preprocess.CropWidth": "480",
+    "CustomVision.Preprocess.MaxDimension": "0",
+    "CustomVision.Preprocess.MaxScale": "0.0",
+    "CustomVision.Preprocess.MinDimension": "0",
+    "CustomVision.Preprocess.MinScale": "0.0",
+    "CustomVision.Preprocess.NormalizeMean": "[123.675, 116.28, 103.53]",
+    "CustomVision.Preprocess.NormalizeStd": "[58.395, 57.12, 57.375]",
+    "CustomVision.Preprocess.ResizeMethod": "ByShorterSide",
+    "CustomVision.Preprocess.TargetHeight": "480",
+    "CustomVision.Preprocess.TargetWidth": "480",
+    "Image.BitmapPixelFormat": "Rgb8",
+    "Image.ColorSpaceGamma": "SRGB",
+    "Image.NominalPixelRange": "Normalized_0_1"
+}

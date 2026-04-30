@@ -1,0 +1,1 @@
+# WeedScan Lambda inference package

@@ -1,0 +1,189 @@
+import express from 'express'
+import cors from 'cors'
+import { Pool } from 'pg'
+import { parseWildlifeCategories } from './db.mjs'
+import { queryRecommendations } from './recommendations.mjs'
+import { queryRegionWeeds } from './weeds.mjs'
+import { queryTopWeeds } from './topWeeds.mjs'
+import { queryPlantDetails } from './plantDetails.mjs'
+import { queryPlannerRecommendations } from './plannerRecommendations.mjs'
+
+/**
+ * pg parses sslmode=require as verify-full (strict CA check). RDS uses Amazon's CA; Node
+ * then errors unless you bundle it. For local/dev we strip sslmode and rely on encrypted
+ * TLS + rejectUnauthorized:false unless DATABASE_SSL_REJECT_UNAUTH=1.
+ */
+function stripSslModeFromUrl(url) {
+  if (!url) return url
+  try {
+    const normalized = url.replace(/^postgresql:\/\//i, 'postgres://')
+    const u = new URL(normalized)
+    u.searchParams.delete('sslmode')
+    let out = u.toString()
+    if (url.startsWith('postgresql://')) out = out.replace(/^postgres:\/\//, 'postgresql://')
+    return out
+  } catch {
+    return url.replace(/([?&])sslmode=[^&]*&?/g, '$1').replace(/\?$/, '')
+  }
+}
+
+/** @type {Pool | null} */
+let pool = null
+
+function isDatabaseConfigured() {
+  return Boolean(String(process.env.DATABASE_URL ?? '').trim())
+}
+
+function getPool() {
+  if (pool) return pool
+  const raw = process.env.DATABASE_URL
+  const connectionString = raw ? stripSslModeFromUrl(raw) : undefined
+  pool = new Pool({
+    connectionString,
+    ssl:
+      process.env.DATABASE_SSL === '0'
+        ? false
+        : connectionString
+          ? { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTH === '1' }
+          : undefined,
+  })
+  return pool
+}
+
+function parsePageSize(raw, fallback = 12) {
+  return Math.min(50, Math.max(1, parseInt(String(raw ?? fallback), 10) || fallback))
+}
+
+function parseOffset(raw) {
+  return Math.max(0, parseInt(String(raw ?? '0'), 10) || 0)
+}
+
+function parseQ(raw) {
+  return typeof raw === 'string' ? raw.trim() : ''
+}
+
+function parseLatLng(req, res) {
+  const lat = Number(req.query.lat)
+  const lng = Number(req.query.lng)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    res.status(400).json({ error: 'Query parameters lat and lng are required (numbers)' })
+    return null
+  }
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    res.status(400).json({ error: 'Coordinates out of range' })
+    return null
+  }
+  return { lat, lng }
+}
+
+/** Wrap a handler so DB-config and runtime errors return consistent JSON. */
+function wrap(label, handler) {
+  return async (req, res) => {
+    if (!isDatabaseConfigured()) {
+      return res.status(503).json({ error: 'Server is not configured with DATABASE_URL' })
+    }
+    try {
+      await handler(req, res)
+    } catch (err) {
+      console.error(`[${label}]`, err)
+      const message = err instanceof Error ? err.message : 'Query failed'
+      res.status(500).json({ error: message })
+    }
+  }
+}
+
+export const app = express()
+
+// CORS: set CORS_ORIGIN to your frontend origin(s), comma-separated. Local Vite dev origins
+// are merged in automatically when CORS_ORIGIN is non-empty so you can hit Lambda from localhost.
+const LOCAL_VITE_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
+const fromEnv = (process.env.CORS_ORIGIN ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+const allowList = fromEnv.length ? [...new Set([...fromEnv, ...LOCAL_VITE_ORIGINS])] : []
+app.use(
+  cors({
+    origin: allowList.length ? allowList : true,
+    methods: ['GET', 'OPTIONS'],
+  }),
+)
+
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, database: isDatabaseConfigured() })
+})
+
+app.get(
+  '/api/recommendations',
+  wrap('recommendations', async (req, res) => {
+    const ll = parseLatLng(req, res)
+    if (!ll) return
+    const data = await queryRecommendations(getPool(), ll.lng, ll.lat, {
+      limit: parsePageSize(req.query.pageSize),
+      offset: parseOffset(req.query.offset),
+      q: parseQ(req.query.q),
+      wildlife: parseWildlifeCategories(req.query.wildlife),
+    })
+    res.json(data)
+  }),
+)
+
+app.get(
+  '/api/plants/:id',
+  wrap('plant-detail', async (req, res) => {
+    const id = parseInt(String(req.params.id ?? ''), 10)
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ error: 'Plant id must be a positive integer' })
+    }
+    const detail = await queryPlantDetails(getPool(), id)
+    if (!detail) return res.status(404).json({ error: 'Plant not found' })
+    res.json(detail)
+  }),
+)
+
+app.get(
+  '/api/weeds',
+  wrap('weeds', async (req, res) => {
+    const ll = parseLatLng(req, res)
+    if (!ll) return
+    const data = await queryRegionWeeds(getPool(), ll.lng, ll.lat, {
+      limit: parsePageSize(req.query.pageSize),
+      offset: parseOffset(req.query.offset),
+      q: parseQ(req.query.q),
+    })
+    res.json(data)
+  }),
+)
+
+app.get(
+  '/api/weeds/top',
+  wrap('weeds/top', async (req, res) => {
+    const data = await queryTopWeeds(getPool(), {
+      limit: parsePageSize(req.query.pageSize),
+      offset: parseOffset(req.query.offset),
+      q: parseQ(req.query.q),
+    })
+    res.json(data)
+  }),
+)
+
+app.get(
+  '/api/planner/recommendations',
+  wrap('planner/recommendations', async (req, res) => {
+    const ll = parseLatLng(req, res)
+    if (!ll) return
+    const goal =
+      req.query.goal === 'pollinator'
+        ? 'pollinator'
+        : req.query.goal === 'bird'
+          ? 'bird'
+          : null
+    if (!goal) {
+      return res
+        .status(400)
+        .json({ error: 'Query parameter goal must be bird or pollinator' })
+    }
+    const data = await queryPlannerRecommendations(getPool(), goal, ll.lng, ll.lat)
+    res.json(data)
+  }),
+)
