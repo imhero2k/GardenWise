@@ -1,15 +1,37 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { IconSearch } from '../components/Icons'
+import { WildlifeFilter } from '../components/WildlifeFilter'
 import { useLocationArea } from '../context/LocationContext'
 import {
   fetchRecommendations,
+  WILDLIFE_CATEGORY_OPTIONS,
   type RecommendedPlant,
+  type WildlifeCategory,
 } from '../lib/recommendationsApi'
+import { fetchPlantDetail, type PlantDetail } from '../lib/plantDetailsApi'
 import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
 } from '../hooks/useRecommendedPlantEnrichment'
 const RDS_PAGE_SIZE = 12
+
+const WILDLIFE_CATEGORY_IDS = WILDLIFE_CATEGORY_OPTIONS.map((o) => o.id)
+
+function parseWildlifeParam(raw: string | null): WildlifeCategory[] {
+  if (!raw) return []
+  const known = new Set<WildlifeCategory>(WILDLIFE_CATEGORY_IDS)
+  const seen = new Set<WildlifeCategory>()
+  const out: WildlifeCategory[] = []
+  for (const piece of raw.split(',')) {
+    const v = piece.trim().toLowerCase() as WildlifeCategory
+    if (!known.has(v) || seen.has(v)) continue
+    seen.add(v)
+    out.push(v)
+  }
+  return out
+}
+
 
 function RdsPlantCard({
   plant,
@@ -83,12 +105,77 @@ function RdsPlantCard({
   )
 }
 
+type DetailFetchState =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'ready'; detail: PlantDetail }
+  | { status: 'error'; message: string }
+
+function WildlifeSection({ state }: { state: DetailFetchState }) {
+  if (state.status === 'loading') {
+    return (
+      <section
+        className="plant-detail-dialog__wildlife"
+        aria-labelledby="plant-detail-wildlife-heading"
+        style={{ marginTop: 'var(--space-md)' }}
+      >
+        <h3
+          id="plant-detail-wildlife-heading"
+          style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)' }}
+        >
+          Attracts wildlife
+        </h3>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+          Loading wildlife info…
+        </p>
+      </section>
+    )
+  }
+  if (state.status !== 'ready') return null
+  const groups = state.detail.wildlifeAttracted
+  if (groups.length === 0) return null
+  return (
+    <section
+      className="plant-detail-dialog__wildlife"
+      aria-labelledby="plant-detail-wildlife-heading"
+      style={{ marginTop: 'var(--space-md)' }}
+    >
+      <h3
+        id="plant-detail-wildlife-heading"
+        style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)' }}
+      >
+        Attracts wildlife
+      </h3>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-sm)' }}>
+        {groups.map((g) => (
+          <li key={g.type}>
+            <p style={{ fontWeight: 600, fontSize: '0.88rem', margin: 0 }}>{g.type}</p>
+            {g.species.length > 0 && (
+              <p
+                style={{
+                  fontSize: '0.82rem',
+                  color: 'var(--color-text-muted)',
+                  margin: '0.1rem 0 0',
+                }}
+              >
+                {g.species.join(' · ')}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 function DbPlantDetailContent({
   plant,
   enrichment,
+  detail,
 }: {
   plant: RecommendedPlant
   enrichment?: EnrichmentState
+  detail: DetailFetchState
 }) {
   const common = plant.commonName?.trim()
   const sci = plant.scientificName
@@ -133,6 +220,7 @@ function DbPlantDetailContent({
           </a>
         </p>
       )}
+      <WildlifeSection state={detail} />
       <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
         Short descriptions and photos may come from Wikipedia and iNaturalist when not stored in your database.
       </p>
@@ -142,6 +230,11 @@ function DbPlantDetailContent({
 
 export function PlantSearchPage() {
   const { coords } = useLocationArea()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const wildlife = useMemo(
+    () => parseWildlifeParam(searchParams.get('wildlife')),
+    [searchParams],
+  )
   const [rdsPlants, setRdsPlants] = useState<RecommendedPlant[]>([])
   const [rdsRegionName, setRdsRegionName] = useState<string | null>(null)
   const [rdsSearch, setRdsSearch] = useState('')
@@ -154,11 +247,27 @@ export function PlantSearchPage() {
   const plantDetailDialogRef = useRef<HTMLDialogElement>(null)
   const plantDetailTitleId = useId()
   const [dbPlantDetail, setDbPlantDetail] = useState<RecommendedPlant | null>(null)
+  const [detailState, setDetailState] = useState<DetailFetchState>({ status: 'idle' })
 
   const openDbPlantDetail = useCallback((plant: RecommendedPlant) => {
     setDbPlantDetail(plant)
     plantDetailDialogRef.current?.showModal()
   }, [])
+
+  const handleWildlifeChange = useCallback(
+    (next: WildlifeCategory[]) => {
+      setSearchParams(
+        (prev) => {
+          const sp = new URLSearchParams(prev)
+          if (next.length === 0) sp.delete('wildlife')
+          else sp.set('wildlife', next.join(','))
+          return sp
+        },
+        { replace: false },
+      )
+    },
+    [setSearchParams],
+  )
 
   useEffect(() => {
     if (!coords) {
@@ -178,7 +287,12 @@ export function PlantSearchPage() {
       if (ac.signal.aborted) return
       setRdsLoading(true)
       setRdsError(null)
-      fetchRecommendations(lat, lng, ac.signal, { pageSize: RDS_PAGE_SIZE, offset: rdsOffset, q: rdsSearch })
+      fetchRecommendations(lat, lng, ac.signal, {
+        pageSize: RDS_PAGE_SIZE,
+        offset: rdsOffset,
+        q: rdsSearch,
+        wildlife,
+      })
         .then((res) => {
           if (ac.signal.aborted) return
           setRdsPlants(res.plants)
@@ -198,12 +312,51 @@ export function PlantSearchPage() {
         })
     })
     return () => ac.abort()
-  }, [coords, rdsOffset, rdsSearch])
+  }, [coords, rdsOffset, rdsSearch, wildlife])
 
-  // When search term changes, jump back to the first page.
+  // When search term or wildlife filter changes, jump back to the first page.
+  const lastResetKey = useRef<string>('')
   useEffect(() => {
+    const key = `${rdsSearch}::${wildlife.join(',')}`
+    if (lastResetKey.current === key) return
+    lastResetKey.current = key
     queueMicrotask(() => setRdsOffset(0))
-  }, [rdsSearch])
+  }, [rdsSearch, wildlife])
+
+  useEffect(() => {
+    if (!dbPlantDetail) return
+    const ac = new AbortController()
+    queueMicrotask(() => {
+      if (ac.signal.aborted) return
+      setDetailState({ status: 'loading' })
+      fetchPlantDetail(dbPlantDetail.id, ac.signal)
+        .then((detail) => {
+          if (ac.signal.aborted) return
+          if (!detail) {
+            setDetailState({
+              status: 'ready',
+              detail: {
+                id: dbPlantDetail.id,
+                scientificName: dbPlantDetail.scientificName,
+                commonName: dbPlantDetail.commonName,
+                wildlifeAttracted: [],
+              },
+            })
+          } else {
+            setDetailState({ status: 'ready', detail })
+          }
+        })
+        .catch((e) => {
+          if (ac.signal.aborted) return
+          setDetailState({
+            status: 'error',
+            message: e instanceof Error ? e.message : 'Could not load plant details',
+          })
+        })
+    })
+    return () => ac.abort()
+  }, [dbPlantDetail])
+
   const canPrevRds = rdsOffset > 0
   const canNextRds = rdsHasMore
 
@@ -243,7 +396,7 @@ export function PlantSearchPage() {
           </p>
         )}
 
-        <div className="search-field" style={{ marginBottom: 'var(--space-md)' }}>
+        <div className="search-field" style={{ marginBottom: 'var(--space-sm)' }}>
           <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
             <IconSearch />
           </span>
@@ -259,6 +412,15 @@ export function PlantSearchPage() {
             autoComplete="off"
           />
         </div>
+
+        <WildlifeFilter
+          value={wildlife}
+          onChange={handleWildlifeChange}
+          disabled={rdsLoading && rdsPlants.length === 0}
+          className="rds-wildlife-filter"
+          legend="Attracts wildlife"
+        />
+        <div style={{ marginBottom: 'var(--space-md)' }} />
 
         <div className="plant-grid">
           {rdsPlants.map((p) => (
@@ -294,13 +456,23 @@ export function PlantSearchPage() {
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
               Page {Math.floor(rdsOffset / RDS_PAGE_SIZE) + 1}
               {rdsSearch.trim() ? ` · filtering “${rdsSearch.trim()}”` : ''}
+              {wildlife.length
+                ? ` · attracts ${wildlife
+                    .map(
+                      (id) =>
+                        WILDLIFE_CATEGORY_OPTIONS.find((o) => o.id === id)?.label ?? id,
+                    )
+                    .join(', ')}`
+                : ''}
             </p>
           </div>
         )}
 
         {!rdsLoading && coords && !rdsError && rdsPlants.length === 0 && (
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--space-lg)' }}>
-            No plants returned for this point. Check bioregion–plant links in the database, or widen your dataset.
+            {wildlife.length || rdsSearch.trim()
+              ? 'No plants match your filters. Try clearing the wildlife filter or search term.'
+              : 'No plants returned for this point. Check bioregion–plant links in the database, or widen your dataset.'}
           </p>
         )}
       </section>
@@ -311,6 +483,7 @@ export function PlantSearchPage() {
         aria-labelledby={plantDetailTitleId}
         onClose={() => {
           setDbPlantDetail(null)
+          setDetailState({ status: 'idle' })
         }}
       >
         <div className="plant-detail-dialog__inner">
@@ -329,7 +502,11 @@ export function PlantSearchPage() {
           </header>
           <div className="plant-detail-dialog__body">
             {dbPlantDetail && (
-              <DbPlantDetailContent plant={dbPlantDetail} enrichment={rdsEnriched[dbPlantDetail.id]} />
+              <DbPlantDetailContent
+                plant={dbPlantDetail}
+                enrichment={rdsEnriched[dbPlantDetail.id]}
+                detail={detailState}
+              />
             )}
           </div>
         </div>

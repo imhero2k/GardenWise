@@ -11,6 +11,17 @@ export type RecommendedPlant = {
 
 export type RegionMatchKind = 'contained' | 'nearest'
 
+export type WildlifeCategory = 'birds' | 'insects' | 'mammals'
+
+export const WILDLIFE_CATEGORY_OPTIONS: ReadonlyArray<{
+  id: WildlifeCategory
+  label: string
+}> = [
+  { id: 'birds', label: 'Birds' },
+  { id: 'insects', label: 'Insects' },
+  { id: 'mammals', label: 'Mammals' },
+]
+
 export type RecommendationsResponse = {
   regionName: string | null
   /** `nearest` when the point was not inside any bioregion polygon (distance fallback). */
@@ -20,6 +31,7 @@ export type RecommendationsResponse = {
   offset: number
   hasMore: boolean
   q?: string | null
+  wildlife?: WildlifeCategory[]
 }
 
 function apiBase(): string {
@@ -35,11 +47,17 @@ export async function fetchRecommendations(
   lat: number,
   lng: number,
   signal?: AbortSignal,
-  options?: { pageSize?: number; offset?: number; q?: string },
+  options?: {
+    pageSize?: number
+    offset?: number
+    q?: string
+    wildlife?: ReadonlyArray<WildlifeCategory>
+  },
 ): Promise<RecommendationsResponse> {
   const pageSize = options?.pageSize ?? 12
   const offset = options?.offset ?? 0
   const q = (options?.q ?? '').trim()
+  const wildlife = options?.wildlife ?? []
   const base = apiBase()
   const qs = new URLSearchParams({
     lat: String(lat),
@@ -48,6 +66,7 @@ export async function fetchRecommendations(
     offset: String(offset),
   })
   if (q) qs.set('q', q)
+  if (wildlife.length) qs.set('wildlife', wildlife.join(','))
   const path = `/api/recommendations?${qs.toString()}`
   const url = base ? `${base}${path}` : path
   const r = await fetch(url, { signal })
@@ -70,5 +89,6 @@ export async function fetchRecommendations(
     offset: j.offset ?? 0,
     hasMore: j.hasMore ?? false,
     q: j.q ?? null,
+    wildlife: j.wildlife ?? [],
   }
 }

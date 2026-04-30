@@ -15,20 +15,24 @@ import { GardenPlannerPage } from './pages/GardenPlannerPage'
 const routerBasename =
   import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '')
 
+const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH === 'true'
+
 export default function App() {
+  const protectedLayout = BYPASS_AUTH ? (
+    <Layout />
+  ) : (
+    <RequireAuth>
+      <Layout />
+    </RequireAuth>
+  )
+
   return (
     <AuthProvider>
       <LocationProvider>
         <BrowserRouter basename={routerBasename}>
           <Routes>
             <Route path="signin" element={<SignInPage />} />
-            <Route
-              element={
-                <RequireAuth>
-                  <Layout />
-                </RequireAuth>
-              }
-            >
+            <Route element={protectedLayout}>
               <Route index element={<HomePage />} />
               <Route path="plants" element={<PlantSearchPage />} />
               <Route path="plants/:id" element={<PlantDetailPage />} />
