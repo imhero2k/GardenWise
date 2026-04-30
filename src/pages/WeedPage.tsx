@@ -1,18 +1,31 @@
-import { type ChangeEventHandler, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { IconBin, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
+import {
+  type ChangeEventHandler,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { IconBin, IconBook, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import { IconSearch } from '../components/Icons'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import type { PredictResponse } from '../lib/predict'
 import { predictPlantFromBase64 } from '../lib/predict'
 import { fetchTopWeeds, type RegionWeed } from '../lib/weedsApi'
-import { useRecommendedPlantEnrichment } from '../hooks/useRecommendedPlantEnrichment'
-import { ImageLightbox } from '../components/ImageLightbox'
+import {
+  useRecommendedPlantEnrichment,
+  type EnrichmentState,
+} from '../hooks/useRecommendedPlantEnrichment'
 
 type AnalysisState = 'idle' | 'analyzing' | 'done' | 'error'
 
 type ConfidenceTier = 'high' | 'medium' | 'low'
+
+const TOP_WEEDS_PAGE_SIZE = 12
 
 function getConfidenceTier(confidence: number): ConfidenceTier {
   if (confidence >= 0.8) return 'high'
@@ -367,6 +380,24 @@ function PredictionResultCard({ result }: { result: PredictResponse }) {
   )
 }
 
+function scrollElementWithFixedHeader(
+  el: HTMLElement,
+  behavior: ScrollBehavior = 'smooth',
+) {
+  const rawPad = getComputedStyle(document.documentElement).getPropertyValue('--anchor-scroll-padding').trim()
+  let pad = 0
+  if (rawPad.endsWith('px')) pad = parseFloat(rawPad) || 0
+  else if (rawPad) {
+    const probe = document.createElement('div')
+    probe.style.cssText = `position:absolute;left:0;top:0;width:0;height:calc(${rawPad});visibility:hidden;pointer-events:none`
+    document.documentElement.appendChild(probe)
+    pad = probe.getBoundingClientRect().height
+    probe.remove()
+  }
+  const y = el.getBoundingClientRect().top + window.scrollY - pad
+  window.scrollTo({ top: Math.max(0, y), behavior })
+}
+
 function WeedSection({
   id,
   title,
@@ -383,7 +414,6 @@ function WeedSection({
       id={id}
       className="weed-page__section card"
       style={{
-        scrollMarginTop: 'var(--space-xl)',
         padding: 'var(--space-lg)',
         marginTop: 'var(--space-lg)',
       }}
@@ -392,6 +422,114 @@ function WeedSection({
       <h2 style={{ marginTop: eyebrow ? 'var(--space-sm)' : 0, marginBottom: 'var(--space-md)' }}>{title}</h2>
       {children}
     </section>
+  )
+}
+
+function TopWeedPlaceholderSlot({ variant }: { variant: 'loading' | 'empty' }) {
+  const loading = variant === 'loading'
+  return (
+    <div
+      className={`card card-media-top top-weed-card top-weed-card--placeholder${loading ? ' top-weed-card--placeholder--loading' : ''}`}
+      aria-hidden="true"
+      style={{
+        textAlign: 'left',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: 0,
+        background: 'var(--color-surface)',
+        pointerEvents: 'none',
+      }}
+    >
+      <div className="card-media-top__imgwrap">
+        <div className="top-weed-card__ph-image" />
+      </div>
+      <div className="card-body top-weed-card__body">
+        <div className="top-weed-card__ph-line top-weed-card__ph-line--title" />
+        <div className="top-weed-card__ph-line top-weed-card__ph-line--sub" />
+        <div className="top-weed-card__ph-tags">
+          <span className="top-weed-card__ph-chip" />
+          <span className="top-weed-card__ph-chip top-weed-card__ph-chip--sm" />
+        </div>
+        <div className="top-weed-card__ph-status" />
+        <p className="top-weed-card__blurb top-weed-card__blurb--reserve" />
+        <div className="top-weed-card__ph-line top-weed-card__ph-line--link" />
+      </div>
+    </div>
+  )
+}
+
+function TopWeedDetailContent({
+  weed,
+  enrichment,
+}: {
+  weed: RegionWeed
+  enrichment?: EnrichmentState
+}) {
+  const common = weed.commonName?.trim()
+  const sci = weed.scientificName
+  const primaryTitle = common || sci || 'Weed'
+  const extra =
+    typeof enrichment === 'object' && enrichment !== null ? enrichment : undefined
+  const hero = extra?.imageUrl
+  const summary = extra?.description
+  const link = extra?.linkUrl
+
+  const showSci = Boolean(common && sci && common.toLowerCase() !== sci.toLowerCase())
+
+  return (
+    <>
+      {hero && (
+        <div className="plant-detail-dialog__hero">
+          <img src={hero} alt="" loading="lazy" referrerPolicy="no-referrer" />
+        </div>
+      )}
+      <div className="plant-detail-dialog__intro">
+        <p className="plant-detail-dialog__primary">{primaryTitle}</p>
+        {showSci && <p className="plant-detail-dialog__sci">{sci}</p>}
+        <ul className="plant-detail-dialog__meta">
+          <li>
+            <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
+          </li>
+          {weed.riskScore != null && (
+            <li>
+              <strong>Risk score:</strong> {weed.riskScore}
+            </li>
+          )}
+          {weed.isWons && (
+            <li>
+              <strong style={{ color: 'var(--color-danger)' }}>WoNS</strong> — Weed of National Significance
+            </li>
+          )}
+          {weed.weedStatusVic && (
+            <li>
+              <strong>Status (Vic):</strong> {weed.weedStatusVic}
+            </li>
+          )}
+        </ul>
+      </div>
+      {summary ? (
+        <p className="plant-detail-dialog__summary">{summary}</p>
+      ) : enrichment === 'loading' ? (
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading description…</p>
+      ) : (
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+          No public description found for this species yet.
+        </p>
+      )}
+      {link && (
+        <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
+          <a href={link} target="_blank" rel="noreferrer">
+            Learn more (Wikipedia / species database) →
+          </a>
+        </p>
+      )}
+      <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
+        Risk metadata is from your weeds database. Photos and short descriptions may come from
+        Wikipedia and iNaturalist.
+      </p>
+    </>
   )
 }
 
@@ -544,7 +682,6 @@ export function WeedPage() {
   const [topWeedsSearch, setTopWeedsSearch] = useState('')
   const [topWeedsOffset, setTopWeedsOffset] = useState(0)
   const [topWeedsHasMore, setTopWeedsHasMore] = useState(false)
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
 
   // Prohibited weeds modal
   const [modalWeed, setModalWeed] = useState<{ name: string; desc: string } | null>(null)
@@ -553,6 +690,14 @@ export function WeedPage() {
   // Disposal type selector
   const [selectedType, setSelectedType] = useState<WeedCategory | null>(null)
   const disposalContentRef = useRef<HTMLDivElement>(null)
+  // Top-weed detail dialog (mirrors the PlantMe popup)
+  const topWeedDialogRef = useRef<HTMLDialogElement>(null)
+  const topWeedTitleId = useId()
+  const [topWeedDetail, setTopWeedDetail] = useState<RegionWeed | null>(null)
+  const openTopWeedDetail = useCallback((w: RegionWeed) => {
+    setTopWeedDetail(w)
+    topWeedDialogRef.current?.showModal()
+  }, [])
 
   const topWeedsEnriched = useRecommendedPlantEnrichment(
     topWeeds.map((w) => ({
@@ -565,14 +710,35 @@ export function WeedPage() {
     })),
   )
 
-  useLayoutEffect(() => {
+  const topWeedsEnrichBusy = useMemo(
+    () => topWeeds.some((w) => topWeedsEnriched[`top-${w.id}`] === 'loading'),
+    [topWeeds, topWeedsEnriched],
+  )
+
+  useEffect(() => {
+    if (location.pathname !== '/weed') return
     const raw = location.hash.replace(/^#/, '')
     if (!raw) return
-    const el = document.getElementById(raw)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (raw === 'top-weeds' && (topWeedsLoading || topWeedsEnrichBusy)) return
+
+    let cancelled = false
+    let innerFrame = 0
+    const run = () => {
+      if (cancelled) return
+      const el = document.getElementById(raw)
+      if (el) scrollElementWithFixedHeader(el, 'smooth')
     }
-  }, [location.hash, location.pathname])
+    const t = window.setTimeout(run, 0)
+    const id0 = requestAnimationFrame(() => {
+      innerFrame = requestAnimationFrame(run)
+    })
+    return () => {
+      cancelled = true
+      window.clearTimeout(t)
+      cancelAnimationFrame(id0)
+      cancelAnimationFrame(innerFrame)
+    }
+  }, [location.hash, location.pathname, topWeedsLoading, topWeedsEnrichBusy])
 
   useEffect(() => {
     queueMicrotask(() => setTopWeedsOffset(0))
@@ -582,7 +748,7 @@ export function WeedPage() {
     const ac = new AbortController()
     setTopWeedsLoading(true)
     setTopWeedsError(null)
-    fetchTopWeeds(ac.signal, { pageSize: 12, offset: topWeedsOffset, q: topWeedsSearch })
+    fetchTopWeeds(ac.signal, { pageSize: TOP_WEEDS_PAGE_SIZE, offset: topWeedsOffset, q: topWeedsSearch })
       .then((res) => {
         if (ac.signal.aborted) return
         setTopWeeds(res.weeds)
@@ -655,6 +821,11 @@ export function WeedPage() {
     }
   }
 
+  const showTopWeedsGrid = !topWeedsError && (topWeedsLoading || topWeeds.length > 0)
+  const topWeedSlots: (RegionWeed | null)[] = showTopWeedsGrid
+    ? Array.from({ length: TOP_WEEDS_PAGE_SIZE }, (_, i) => topWeeds[i] ?? null)
+    : []
+
   return (
     <>
       <header className="page-header">
@@ -664,6 +835,15 @@ export function WeedPage() {
           Identify risky plants, reduce spread, and dispose of material responsibly.
         </p>
       </header>
+
+      <Link to="/learn#invasive" className="weed-learn-link">
+        <span className="weed-learn-link__icon"><IconBook /></span>
+        <span className="weed-learn-link__text">
+          <strong>Why does this matter?</strong> Read{' '}
+          <em>Invasive plants in your garden</em> in Native plants 101.
+        </span>
+        <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
+      </Link>
 
       <div className="section-block" style={{ marginBottom: 0 }}>
         <h2 className="sr-only">Quick links</h2>
@@ -730,100 +910,88 @@ export function WeedPage() {
             <p style={{ margin: 0 }}>{topWeedsError}</p>
           </div>
         )}
-        {topWeedsLoading && <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Loading top weeds…</p>}
 
         {!topWeedsLoading && !topWeedsError && topWeeds.length === 0 && (
           <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>No weeds found.</p>
         )}
 
-        {topWeeds.length > 0 && (
-          <div className="plant-grid" style={{ marginTop: 'var(--space-md)' }}>
-            {topWeeds.map((w) => {
+        {showTopWeedsGrid && (
+          <div className="plant-grid plant-grid--top-weeds" style={{ marginTop: 'var(--space-md)' }}>
+            {topWeedSlots.map((w, idx) => {
+              if (!w) {
+                return (
+                  <TopWeedPlaceholderSlot
+                    key={`tw-slot-${topWeedsOffset}-${idx}`}
+                    variant={topWeedsLoading ? 'loading' : 'empty'}
+                  />
+                )
+              }
               const extra = topWeedsEnriched[`top-${w.id}`]
               const meta = typeof extra === 'object' && extra ? extra : undefined
               const img = meta?.imageUrl
               const blurb = meta?.description
               return (
-                <div key={w.id} className="card card-interactive card-media-top" style={{ textAlign: 'left' }}>
+                <button
+                  type="button"
+                  key={w.id}
+                  className="card card-interactive card-media-top top-weed-card"
+                  onClick={() => openTopWeedDetail(w)}
+                  style={{
+                    textAlign: 'left',
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    padding: 0,
+                    background: 'var(--color-surface)',
+                    cursor: 'pointer',
+                  }}
+                >
                   <div className="card-media-top__imgwrap">
                     {img ? (
-                      <>
-                        <img src={img} alt="" loading="lazy" referrerPolicy="no-referrer" />
-                        <button
-                          type="button"
-                          className="img-expand-btn"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setLightboxSrc(img)
-                          }}
-                        >
-                          Expand
-                        </button>
-                      </>
+                      <img src={img} alt="" loading="lazy" referrerPolicy="no-referrer" />
                     ) : (
                       <div className="vicflora-card__image-placeholder" aria-hidden />
                     )}
                   </div>
-                  <div className="card-body">
-                    <h3 style={{ margin: 0, fontSize: '1.05rem' }}>{w.commonName || w.scientificName}</h3>
-                    {w.commonName && (
-                      <p style={{ margin: '0.25rem 0 0', fontSize: '0.86rem', color: 'var(--color-text-muted)' }}>
-                        {w.scientificName}
-                      </p>
+      <div className="card-body top-weed-card__body">
+                    <h3 className="top-weed-card__title">{w.commonName || w.scientificName}</h3>
+                    {w.commonName ? (
+                      <p className="top-weed-card__sci">{w.scientificName}</p>
+                    ) : (
+                      <p className="top-weed-card__sci top-weed-card__sci--empty" aria-hidden="true" />
                     )}
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '0.35rem 0.6rem',
-                        marginTop: '0.55rem',
-                        alignItems: 'center',
-                        fontSize: '0.82rem',
-                      }}
-                    >
+                    <div className="top-weed-card__meta">
                       <span>
                         <strong>Risk:</strong> {w.riskRating ?? 'Unknown'}
                       </span>
                       {w.isWons && <span style={{ color: 'var(--color-danger)', fontWeight: 800 }}>WoNS</span>}
                       {w.riskScore != null && <span style={{ color: 'var(--color-text-muted)' }}>score {w.riskScore}</span>}
                     </div>
-                    {w.weedStatusVic && (
-                      <p style={{ margin: '0.35rem 0 0', fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
-                        {w.weedStatusVic}
-                      </p>
+                    {w.weedStatusVic ? (
+                      <p className="top-weed-card__status">{w.weedStatusVic}</p>
+                    ) : (
+                      <p className="top-weed-card__status top-weed-card__status--empty" aria-hidden="true" />
                     )}
-                    {blurb && (
-                      <p
-                        style={{
-                          margin: '0.6rem 0 0',
-                          fontSize: '0.82rem',
-                          color: 'var(--color-text-muted)',
-                          lineHeight: 1.35,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {blurb}
-                      </p>
+                    {blurb ? <p className="top-weed-card__blurb top-weed-card__blurb--filled">{blurb}</p> : (
+                      <p className="top-weed-card__blurb top-weed-card__blurb--reserve" aria-hidden="true" />
                     )}
+                    <p className="top-weed-card__cta">View details</p>
                   </div>
-                </div>
+                </button>
               )
             })}
           </div>
         )}
 
-        {topWeeds.length > 0 && (
+        {showTopWeedsGrid && topWeeds.length > 0 && (
           <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="btn btn-ghost"
                 disabled={topWeedsOffset <= 0 || topWeedsLoading}
-                onClick={() => setTopWeedsOffset((o) => Math.max(0, o - 12))}
+                onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
               >
                 Previous page
               </button>
@@ -831,41 +999,39 @@ export function WeedPage() {
                 type="button"
                 className="btn btn-ghost"
                 disabled={!topWeedsHasMore || topWeedsLoading}
-                onClick={() => setTopWeedsOffset((o) => o + 12)}
+                onClick={() => setTopWeedsOffset((o) => o + TOP_WEEDS_PAGE_SIZE)}
               >
                 Next page
               </button>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
-              Page {Math.floor(topWeedsOffset / 12) + 1}
+              Page {Math.floor(topWeedsOffset / TOP_WEEDS_PAGE_SIZE) + 1}
               {topWeedsSearch.trim() ? ` · filtering “${topWeedsSearch.trim()}”` : ''}
             </p>
           </div>
         )}
       </WeedSection>
 
-      <ImageLightbox src={lightboxSrc} open={Boolean(lightboxSrc)} onClose={() => setLightboxSrc(null)} />
-
       <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
           Upload a photo or use your camera — we will identify the plant and return a confidence score.
         </p>
 
-        <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
-          <input
-            id={inputId}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="sr-only"
-            onChange={handleFile}
-          />
-          <IconCamera />
-          <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
-          <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+      <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          onChange={handleFile}
+        />
+        <IconCamera />
+        <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
+        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
             JPG or PNG — sent to the prediction API
-          </p>
-        </label>
+        </p>
+      </label>
 
         {previewUrl && (
           <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
@@ -883,14 +1049,14 @@ export function WeedPage() {
           </div>
         )}
 
-        {state === 'analyzing' && (
-          <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
+      {state === 'analyzing' && (
+        <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
             Analysing image…
-          </p>
-        )}
+        </p>
+      )}
 
         {state === 'error' && error && (
-          <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
+        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
             <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn't analyse that image</h3>
             <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
           </div>
@@ -1072,6 +1238,38 @@ export function WeedPage() {
         {' '}and{' '}
         <a href="https://agriculture.vic.gov.au/biosecurity/weeds" target="_blank" rel="noreferrer">Agriculture Victoria</a>.
       </footer>
+
+      {/* ── Top-weed detail dialog (mirrors PlantMe) ── */}
+      <dialog
+        ref={topWeedDialogRef}
+        className="plant-detail-dialog"
+        aria-labelledby={topWeedTitleId}
+        onClose={() => setTopWeedDetail(null)}
+      >
+        <div className="plant-detail-dialog__inner">
+          <header className="plant-detail-dialog__header">
+            <h2 id={topWeedTitleId} className="plant-detail-dialog__title">
+              {topWeedDetail?.commonName || topWeedDetail?.scientificName || 'Weed details'}
+            </h2>
+            <button
+              type="button"
+              className="plant-detail-dialog__close"
+              aria-label="Close"
+              onClick={() => topWeedDialogRef.current?.close()}
+            >
+              ×
+            </button>
+          </header>
+          <div className="plant-detail-dialog__body">
+            {topWeedDetail && (
+              <TopWeedDetailContent
+                weed={topWeedDetail}
+                enrichment={topWeedsEnriched[`top-${topWeedDetail.id}`]}
+              />
+            )}
+          </div>
+        </div>
+      </dialog>
 
       {/* ── Prohibited weed modal ── */}
       {modalWeed && (

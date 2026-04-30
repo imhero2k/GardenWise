@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { Layout } from './components/Layout'
 import { RequireAuth } from './components/RequireAuth'
 import { HomePage } from './pages/HomePage'
+import { LearnPage } from './pages/LearnPage'
 import { NurseryMapPage } from './pages/NurseryMapPage'
 import { PlantDetailPage } from './pages/PlantDetailPage'
 import { PlantSearchPage } from './pages/PlantSearchPage'
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="weed" element={<WeedPage />} />
               <Route path="planner" element={<GardenPlannerPage />} />
               <Route path="map" element={<NurseryMapPage />} />
+              <Route path="learn" element={<LearnPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

@@ -40,29 +40,80 @@ export type PlantEnrichment = {
   images: PlantEnrichmentImage[]
 }
 
-function wikiTitleFromScientificName(name: string): string {
+function wikiTitleFromName(name: string): string {
   return name.trim().replace(/\s+/g, '_')
 }
 
-async function fetchWikipediaSummary(scientificName: string, signal?: AbortSignal) {
-  const title = wikiTitleFromScientificName(scientificName)
-  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
+type WikipediaSummary = {
+  title: string
+  extract: string
+  pageUrl: string
+  thumbnailUrl?: string
+}
+
+/**
+ * Direct Wikipedia REST summary lookup for the given title. Returns undefined when the
+ * page does not exist, is a disambiguation/list page, or has no extract.
+ */
+async function fetchWikipediaSummaryByTitle(
+  title: string,
+  signal?: AbortSignal,
+): Promise<WikipediaSummary | undefined> {
+  const wikiTitle = wikiTitleFromName(title)
+  if (!wikiTitle) return undefined
+  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`
   const res = await fetch(url, { signal, headers: WIKI_HEADERS })
   if (!res.ok) return undefined
   const data = (await res.json()) as {
     title?: string
     extract?: string
+    type?: string
     content_urls?: { desktop?: { page?: string } }
     thumbnail?: { source?: string }
   }
+  if (data.type === 'disambiguation') return undefined
   const pageUrl = data.content_urls?.desktop?.page
   if (!data.extract || !pageUrl) return undefined
   return {
-    title: data.title ?? title.replace(/_/g, ' '),
+    title: data.title ?? wikiTitle.replace(/_/g, ' '),
     extract: data.extract,
     pageUrl,
     thumbnailUrl: data.thumbnail?.source,
   }
+}
+
+/**
+ * Wikipedia opensearch fallback for cases where the exact title doesn't resolve. Returns the
+ * best-matching article title we can then summarise.
+ */
+async function fetchWikipediaTitleByQuery(query: string, signal?: AbortSignal): Promise<string | undefined> {
+  const u = new URL('https://en.wikipedia.org/w/api.php')
+  u.searchParams.set('action', 'opensearch')
+  u.searchParams.set('search', query.trim())
+  u.searchParams.set('limit', '1')
+  u.searchParams.set('namespace', '0')
+  u.searchParams.set('format', 'json')
+  u.searchParams.set('origin', '*')
+  const res = await fetch(u.toString(), { signal, headers: WIKI_HEADERS })
+  if (!res.ok) return undefined
+  const data = (await res.json()) as [string, string[], string[], string[]] | unknown
+  if (!Array.isArray(data) || !Array.isArray(data[1]) || data[1].length === 0) return undefined
+  const title = data[1][0]
+  return typeof title === 'string' && title.trim() ? title : undefined
+}
+
+/**
+ * Try the title verbatim, then fall back to opensearch suggestions if the page doesn't exist.
+ */
+async function resolveWikipediaSummary(
+  query: string,
+  signal?: AbortSignal,
+): Promise<WikipediaSummary | undefined> {
+  const direct = await fetchWikipediaSummaryByTitle(query, signal).catch(() => undefined)
+  if (direct) return direct
+  const suggested = await fetchWikipediaTitleByQuery(query, signal).catch(() => undefined)
+  if (!suggested) return undefined
+  return fetchWikipediaSummaryByTitle(suggested, signal).catch(() => undefined)
 }
 
 async function fetchGbifMatch(scientificName: string, signal?: AbortSignal) {
@@ -134,6 +185,9 @@ async function fetchINaturalist(scientificName: string, signal?: AbortSignal) {
   return { images, meta }
 }
 
+/**
+ * Enrich a plant by scientific name using Wikipedia, GBIF, and iNaturalist.
+ */
 export async function enrichPlantByScientificName(
   scientificName: string,
   signal?: AbortSignal,
@@ -142,7 +196,7 @@ export async function enrichPlantByScientificName(
   const images: PlantEnrichmentImage[] = []
 
   const [wiki, gbif, inat] = await Promise.all([
-    fetchWikipediaSummary(q, signal).catch(() => undefined),
+    resolveWikipediaSummary(q, signal).catch(() => undefined),
     fetchGbifMatch(q, signal).catch(() => undefined),
     fetchINaturalist(q, signal).catch(() => ({ images: [], meta: undefined })),
   ])
