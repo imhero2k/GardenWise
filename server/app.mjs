@@ -4,6 +4,7 @@ import { Pool } from 'pg'
 import { queryRecommendations } from './recommendations.mjs'
 import { queryRegionWeeds } from './weeds.mjs'
 import { queryTopWeeds } from './topWeeds.mjs'
+import { queryPlannerRecommendations } from './plannerRecommendations.mjs'
 
 /**
  * pg parses sslmode=require as verify-full (strict CA check). RDS uses Amazon CA; Node then
@@ -152,3 +153,22 @@ app.get('/api/weeds/top', async (req, res) => {
   }
 })
 
+app.get('/api/planner/recommendations', async (req, res) => {
+  if (!configuredGuard(res)) return
+  const ll = parseLatLng(req, res)
+  if (!ll) return
+  const goal = req.query.goal === 'pollinator' ? 'pollinator' : req.query.goal === 'bird' ? 'bird' : null
+  if (!goal) {
+    res.status(400).json({ error: 'Query parameter goal must be bird or pollinator' })
+    return
+  }
+
+  try {
+    const data = await queryPlannerRecommendations(getPool(), goal, ll.lng, ll.lat)
+    res.json(data)
+  } catch (err) {
+    console.error('[planner/recommendations]', err)
+    const message = err instanceof Error ? err.message : 'Query failed'
+    res.status(500).json({ error: message })
+  }
+})
