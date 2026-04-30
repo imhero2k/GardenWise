@@ -16,6 +16,16 @@ dist-ssr
 
 # Lambda deployment package (rebuild locally; do not commit)
 gardenwise-lambda.zip
+lambda-server.zip
+lambda-build/
+
+# One-off DB exploration / smoke-test helper scripts (kept local; not part of build)
+scripts/db-explore.mjs
+scripts/db-samples.mjs
+scripts/db-wildlife.mjs
+scripts/smoke-server.mjs
+scripts/smoke-wildlife.mjs
+scripts/smoke-merged.mjs
 
 # Editor directories and files
 .vscode/*
