@@ -1518,10 +1518,7 @@ button.vicflora-card {
 
 /* Garden planner */
 .garden-planner-page {
-  position: relative;
-  left: 50%;
-  width: min(1240px, calc(100vw - 2rem));
-  transform: translateX(-50%);
+  width: 100%;
 }
 
 .garden-goal-panel {
@@ -1628,19 +1625,13 @@ button.vicflora-card {
 
 .garden-planner-layout {
   display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(420px, 1fr) minmax(260px, 300px);
+  grid-template-columns: minmax(240px, 300px) minmax(360px, 1fr);
   gap: var(--space-md);
   align-items: start;
 }
 
-@media (max-width: 1060px) {
-  .garden-planner-layout {
-    grid-template-columns: minmax(250px, 320px) minmax(420px, 1fr);
-  }
-
-  .garden-planner-insights {
-    grid-column: 1 / -1;
-  }
+.garden-planner-insights {
+  grid-column: 1 / -1;
 }
 
 .garden-planner-sidebar {
@@ -1896,6 +1887,31 @@ button.vicflora-card {
   color: var(--color-primary-dark);
 }
 
+.garden-goal-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px dashed rgba(46, 125, 50, 0.18);
+}
+
+.garden-goal-pagination .btn {
+  min-width: 60px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.garden-goal-pagination__status {
+  flex: 1;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .garden-planner-stage {
   display: flex;
   flex-direction: column;
@@ -2120,12 +2136,6 @@ button.vicflora-card {
 }
 
 @media (max-width: 760px) {
-  .garden-planner-page {
-    width: 100%;
-    left: auto;
-    transform: none;
-  }
-
   .garden-planner-layout {
     grid-template-columns: 1fr;
   }

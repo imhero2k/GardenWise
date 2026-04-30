@@ -294,6 +294,8 @@ const POLLINATOR_GROUPS: GoalCatalogGroup[] = [
 const LIMITED_DATA_MESSAGE =
   'No database plants available for this group yet. Due to current capability limits, the plant data we can access is limited; future partnerships with more comprehensive data sources may help fill this gap.'
 
+const PLANTS_PER_PAGE = 4
+
 function clampDim(raw: string, fallback: number): number {
   const n = Number(raw)
   if (!Number.isFinite(n)) return fallback
@@ -591,6 +593,7 @@ export function GardenPlannerPage() {
     useState<PlannerRecommendationsResponse | null>(null)
   const [plannerLoading, setPlannerLoading] = useState(false)
   const [plannerError, setPlannerError] = useState<string | null>(null)
+  const [groupPages, setGroupPages] = useState<Record<string, number>>({})
 
   const localSpecsById = useMemo(() => {
     const m: Record<string, PlantSpec> = {}
@@ -640,6 +643,7 @@ export function GardenPlannerPage() {
         setPlannerRecommendations(null)
         setPlannerLoading(false)
         setPlannerError(null)
+        setGroupPages({})
       })
       return
     }
@@ -649,6 +653,7 @@ export function GardenPlannerPage() {
         setPlannerRecommendations(null)
         setPlannerLoading(false)
         setPlannerError(null)
+        setGroupPages({})
       })
       return
     }
@@ -661,7 +666,10 @@ export function GardenPlannerPage() {
     })
     fetchPlannerRecommendations(currentApiGoal, coords.lat, coords.lng, ac.signal)
       .then((data) => {
-        if (!ac.signal.aborted) setPlannerRecommendations(data)
+        if (!ac.signal.aborted) {
+          setPlannerRecommendations(data)
+          setGroupPages({})
+        }
       })
       .catch((error) => {
         if (ac.signal.aborted) return
@@ -685,6 +693,10 @@ export function GardenPlannerPage() {
     const spec = recommendationSpec(plant, groupId)
     setDbSpecsById((current) => ({ ...current, [spec.id]: spec }))
     setPendingSpecId((current) => (current === spec.id ? null : spec.id))
+  }
+
+  const setGroupPage = (groupId: string, page: number) => {
+    setGroupPages((current) => ({ ...current, [groupId]: page }))
   }
 
   const handlePlace = (x: number, z: number) => {
@@ -849,7 +861,19 @@ export function GardenPlannerPage() {
                   const isActive = group.id === currentActiveGroupId
                   const dbGroup = recommendationGroups[group.id]
                   const plants = dbGroup?.plants ?? []
-                  const slotCount = Math.max(group.slots, plants.length, dbGroup?.requiredCount ?? 0)
+                  const pageSize = Math.max(PLANTS_PER_PAGE, group.slots)
+                  const totalPages = Math.max(1, Math.ceil(plants.length / pageSize))
+                  const currentPage = Math.min(
+                    Math.max(groupPages[group.id] ?? 0, 0),
+                    totalPages - 1,
+                  )
+                  const pageStart = currentPage * pageSize
+                  const pagePlants = plants.slice(pageStart, pageStart + pageSize)
+                  const isPaged = totalPages > 1
+                  const slotCount = isPaged
+                    ? pagePlants.length
+                    : Math.max(group.slots, plants.length, dbGroup?.requiredCount ?? 0)
+                  const renderedPlants = isPaged ? pagePlants : plants
                   return (
                     <li
                       key={group.id}
@@ -879,44 +903,72 @@ export function GardenPlannerPage() {
                           <p className="garden-goal-slots__limited">{LIMITED_DATA_MESSAGE}</p>
                         ) : (
                           Array.from({ length: slotCount }, (_, index) => {
-                          const plant = plants[index]
-                          if (!plant) {
+                            const plant = renderedPlants[index]
+                            if (!plant) {
+                              return (
+                                <span key={index} className="garden-goal-slots__empty">
+                                  {plannerLoading
+                                    ? 'Loading...'
+                                    : plannerError
+                                      ? 'Recommendation unavailable'
+                                      : coords
+                                        ? `Species slot ${index + 1}`
+                                        : 'Location needed'}
+                                </span>
+                              )
+                            }
+                            const active = pendingSpecId === recommendationSpecId(plant)
                             return (
-                              <span key={index} className="garden-goal-slots__empty">
-                                {plannerLoading
-                                  ? 'Loading...'
-                                  : plannerError
-                                    ? 'Recommendation unavailable'
-                                    : coords
-                                      ? `Species slot ${index + 1}`
-                                      : 'Location needed'}
-                              </span>
+                              <button
+                                key={plant.id}
+                                type="button"
+                                className={`garden-goal-slots__plant${active ? ' active' : ''}`}
+                                onClick={() => handleRecommendationSelect(plant, group.id)}
+                                aria-pressed={active}
+                              >
+                                <span className="garden-goal-slots__plant-name">
+                                  {plant.commonName || plant.scientificName}
+                                </span>
+                                {plant.commonName && (
+                                  <span className="garden-goal-slots__plant-sci">{plant.scientificName}</span>
+                                )}
+                                <span className="garden-goal-slots__plant-meta">
+                                  {recommendationMeta(plant) || 'Database recommendation'}
+                                </span>
+                                <span className="garden-goal-slots__plant-reason">{plant.reason}</span>
+                              </button>
                             )
-                          }
-                          const active = pendingSpecId === recommendationSpecId(plant)
-                          return (
-                            <button
-                              key={plant.id}
-                              type="button"
-                              className={`garden-goal-slots__plant${active ? ' active' : ''}`}
-                              onClick={() => handleRecommendationSelect(plant, group.id)}
-                              aria-pressed={active}
-                            >
-                              <span className="garden-goal-slots__plant-name">
-                                {plant.commonName || plant.scientificName}
-                              </span>
-                              {plant.commonName && (
-                                <span className="garden-goal-slots__plant-sci">{plant.scientificName}</span>
-                              )}
-                              <span className="garden-goal-slots__plant-meta">
-                                {recommendationMeta(plant) || 'Database recommendation'}
-                              </span>
-                              <span className="garden-goal-slots__plant-reason">{plant.reason}</span>
-                            </button>
-                          )
                           })
                         )}
                       </div>
+                      {isPaged && (
+                        <nav
+                          className="garden-goal-pagination"
+                          aria-label={`${group.title} pagination`}
+                        >
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-ghost"
+                            onClick={() => setGroupPage(group.id, currentPage - 1)}
+                            disabled={currentPage === 0}
+                            aria-label={`Previous ${group.title} page`}
+                          >
+                            Prev
+                          </button>
+                          <span className="garden-goal-pagination__status" aria-live="polite">
+                            Page {currentPage + 1} of {totalPages}
+                          </span>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-ghost"
+                            onClick={() => setGroupPage(group.id, currentPage + 1)}
+                            disabled={currentPage >= totalPages - 1}
+                            aria-label={`Next ${group.title} page`}
+                          >
+                            Next
+                          </button>
+                        </nav>
+                      )}
                     </li>
                   )
                 })}
