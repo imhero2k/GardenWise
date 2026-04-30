@@ -1517,6 +1517,85 @@ button.vicflora-card {
 }
 
 /* Garden planner */
+.garden-planner-page {
+  position: relative;
+  left: 50%;
+  width: min(1240px, calc(100vw - 2rem));
+  transform: translateX(-50%);
+}
+
+.garden-goal-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.garden-goal-panel__label {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+.garden-goal-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.garden-goal-chip {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(27, 45, 29, 0.14);
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.garden-goal-chip:active {
+  transform: scale(0.98);
+}
+
+.garden-goal-chip.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.garden-goal-chip__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #a9b0a3;
+  flex-shrink: 0;
+}
+
+.garden-goal-chip--bird .garden-goal-chip__dot {
+  background: #f0c36d;
+}
+
+.garden-goal-chip--pollinator .garden-goal-chip__dot {
+  background: #f29a82;
+}
+
+.garden-planner-state {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-primary-dark);
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .garden-planner-dims {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -1549,22 +1628,38 @@ button.vicflora-card {
 
 .garden-planner-layout {
   display: grid;
-  grid-template-columns: minmax(240px, 300px) 1fr;
+  grid-template-columns: minmax(250px, 300px) minmax(420px, 1fr) minmax(260px, 300px);
   gap: var(--space-md);
-  align-items: stretch;
+  align-items: start;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1060px) {
   .garden-planner-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(250px, 320px) minmax(420px, 1fr);
+  }
+
+  .garden-planner-insights {
+    grid-column: 1 / -1;
   }
 }
 
 .garden-planner-sidebar {
-  max-height: 620px;
+  max-height: 690px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.garden-planner-panel-title {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.garden-planner-sidebar-note {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .garden-planner-catalog {
@@ -1637,6 +1732,101 @@ button.vicflora-card {
   line-height: 1.2;
 }
 
+.garden-goal-catalog {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.25rem 0 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.garden-goal-catalog__group {
+  border: 1px solid rgba(46, 125, 50, 0.14);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.72);
+  padding: var(--space-sm);
+}
+
+.garden-goal-catalog__group.active {
+  border-color: rgba(230, 129, 0, 0.55);
+  background: rgba(255, 246, 232, 0.85);
+}
+
+.garden-goal-catalog__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.garden-goal-catalog__head h3 {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.94rem;
+  line-height: 1.25;
+}
+
+.garden-goal-catalog__head p {
+  margin: 0.1rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.garden-goal-catalog__head span {
+  border-radius: 999px;
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--color-primary-dark);
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.45rem;
+  white-space: nowrap;
+}
+
+.garden-goal-catalog__description {
+  margin: var(--space-xs) 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.garden-goal-catalog__criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: var(--space-xs);
+}
+
+.garden-goal-catalog__criteria span {
+  border-radius: 999px;
+  background: rgba(46, 125, 50, 0.08);
+  color: var(--color-primary-dark);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  padding: 0.22rem 0.45rem;
+}
+
+.garden-goal-slots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.3rem;
+}
+
+.garden-goal-slots span {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  border: 1px dashed rgba(46, 125, 50, 0.28);
+  border-radius: var(--radius-sm);
+  background: rgba(241, 248, 233, 0.58);
+  color: rgba(74, 99, 80, 0.72);
+  font-size: 0.76rem;
+  padding: 0.35rem 0.55rem;
+}
+
 .garden-planner-stage {
   display: flex;
   flex-direction: column;
@@ -1672,3 +1862,211 @@ button.vicflora-card {
   background: var(--color-surface);
 }
 
+.garden-planner-insights {
+  max-height: 690px;
+  overflow-y: auto;
+}
+
+.garden-goal-summary p {
+  margin: 0 0 0.2rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.garden-goal-summary h2 {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.08rem;
+  line-height: 1.25;
+}
+
+.garden-goal-progress {
+  height: 0.45rem;
+  margin-top: var(--space-sm);
+  border-radius: 999px;
+  background: rgba(27, 45, 29, 0.08);
+  overflow: hidden;
+}
+
+.garden-goal-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-primary), #8aa83f);
+  transition: width var(--transition);
+}
+
+.planner-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.planner-progress-item {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: var(--space-sm);
+  align-items: start;
+}
+
+.planner-progress-item__marker {
+  width: 1.65rem;
+  height: 1.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(27, 45, 29, 0.18);
+  color: var(--color-text-muted);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.planner-progress-item--complete .planner-progress-item__marker {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.planner-progress-item--active .planner-progress-item__marker {
+  border-color: rgba(230, 129, 0, 0.5);
+  background: rgba(230, 129, 0, 0.12);
+  color: #b15d00;
+}
+
+.planner-progress-item strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.planner-progress-item small {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin-top: 0.15rem;
+}
+
+.garden-goal-reasons {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: rgba(241, 248, 233, 0.9);
+}
+
+.garden-goal-reasons h3,
+.garden-current-setup h3 {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+}
+
+.garden-goal-reasons p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.garden-goal-reasons p + p {
+  margin-top: var(--space-xs);
+}
+
+.garden-current-setup {
+  margin-top: var(--space-md);
+}
+
+.garden-current-setup dl {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.garden-current-setup dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+}
+
+.garden-current-setup dt {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.garden-current-setup dd {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.garden-current-setup__empty {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+.garden-current-setup__plants {
+  list-style: none;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.garden-current-setup__plants li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+}
+
+.garden-current-setup__plants strong,
+.garden-current-setup__plants small {
+  display: block;
+}
+
+.garden-current-setup__plants strong {
+  color: var(--color-text);
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.garden-current-setup__plants small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  margin-top: 0.12rem;
+}
+
+@media (max-width: 760px) {
+  .garden-planner-page {
+    width: 100%;
+    left: auto;
+    transform: none;
+  }
+
+  .garden-planner-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .garden-planner-sidebar,
+  .garden-planner-insights {
+    max-height: none;
+  }
+
+  .garden-goal-chip {
+    flex: 1 1 150px;
+  }
+}
