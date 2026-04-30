@@ -1017,21 +1017,21 @@ export function WeedPage() {
           Upload a photo or use your camera — we will identify the plant and return a confidence score.
         </p>
 
-        <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
-          <input
-            id={inputId}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="sr-only"
-            onChange={handleFile}
-          />
-          <IconCamera />
-          <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
-          <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+      <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          onChange={handleFile}
+        />
+        <IconCamera />
+        <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
+        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
             JPG or PNG — sent to the prediction API
-          </p>
-        </label>
+        </p>
+      </label>
 
         {previewUrl && (
           <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
@@ -1049,14 +1049,14 @@ export function WeedPage() {
           </div>
         )}
 
-        {state === 'analyzing' && (
-          <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
+      {state === 'analyzing' && (
+        <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
             Analysing image…
-          </p>
-        )}
+        </p>
+      )}
 
         {state === 'error' && error && (
-          <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
+        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
             <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn't analyse that image</h3>
             <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
           </div>
