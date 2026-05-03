@@ -11,6 +11,7 @@ import { PlantSearchPage } from './pages/PlantSearchPage'
 import { WeedPage } from './pages/WeedPage'
 import { SignInPage } from './pages/SignInPage'
 import { GardenPlannerPage } from './pages/GardenPlannerPage'
+import { ProfilePage } from './pages/ProfilePage'
 
 const routerBasename =
   import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '')
@@ -40,6 +41,7 @@ export default function App() {
               <Route path="planner" element={<GardenPlannerPage />} />
               <Route path="map" element={<NurseryMapPage />} />
               <Route path="learn" element={<LearnPage />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

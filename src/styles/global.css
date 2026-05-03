@@ -2082,6 +2082,68 @@ img {
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.32);
 }
 
+.location-bar__profile-tab {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  margin-left: 0.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.location-bar__profile-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  background: rgba(46, 125, 50, 0.08);
+}
+
+.location-bar__profile-tab--active {
+  border-color: var(--color-primary);
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--color-primary-dark);
+}
+
+.location-bar__profile-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.location-bar__profile-label {
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .location-bar__profile-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .location-bar__profile-tab {
+    padding: 0.42rem;
+  }
+}
+
 .location-dialog {
   border: none;
   border-radius: var(--radius-md);
@@ -3524,4 +3586,44 @@ button.vicflora-card {
   .garden-goal-chip {
     flex: 1 1 150px;
   }
+}
+
+/* ── Profile page ── */
+
+.profile-page__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profile-page__avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+}
+
+.profile-page__avatar--placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(46, 125, 50, 0.15);
+  color: var(--color-primary-dark);
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.profile-page__name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.profile-page__email {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
 }

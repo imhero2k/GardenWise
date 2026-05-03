@@ -340,6 +340,27 @@ export function IconWeatherCloudy({ className }: { className?: string }) {
   )
 }
 
+/** User silhouette for profile tab / account. */
+export function IconProfile({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.65"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M20 21a8 8 0 10-16 0" />
+      <circle cx="12" cy="9" r="3.75" />
+    </svg>
+  )
+}
+
 export function IconBook({ className }: { className?: string }) {
   return (
     <svg

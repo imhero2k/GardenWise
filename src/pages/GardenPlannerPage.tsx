@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { IconSearch } from '../components/Icons'
 import {
   GardenPlannerScene,
   type PlacedPlant,
   type PlannerViewMode,
 } from '../components/GardenPlannerScene'
+import { isFirebaseAuthConfigured } from '../auth/firebase'
+import { useAuth } from '../context/useAuth'
 import { useLocationArea } from '../context/LocationContext'
 import { PLANT_SPECS, type PlantForm, type PlantSpec } from '../data/plantSpecs'
 import {
@@ -14,9 +16,30 @@ import {
   type PlannerRecommendationPlant,
   type PlannerRecommendationsResponse,
 } from '../lib/plannerRecommendationsApi'
+import {
+  fetchPlannerLayoutFromApi,
+  savePlannerLayoutToApi,
+  type PlannerLayoutPayloadV1,
+} from '../lib/plannerLayoutApi'
 
 const DEFAULT_WIDTH = 10
 const DEFAULT_DEPTH = 6
+
+const LOCAL_PLANNER_SPEC_IDS = new Set(PLANT_SPECS.map((p) => p.id))
+
+/** Persist full specs for placements not backed by bundled `PLANT_SPECS` (database picks). */
+function plannerSpecsPatchForSave(
+  placed: PlacedPlant[],
+  specsById: Record<string, PlantSpec>,
+): Record<string, PlantSpec> | undefined {
+  const out: Record<string, PlantSpec> = {}
+  for (const pid of [...new Set(placed.map((p) => p.specId))]) {
+    if (LOCAL_PLANNER_SPEC_IDS.has(pid)) continue
+    const s = specsById[pid]
+    if (s) out[pid] = s
+  }
+  return Object.keys(out).length > 0 ? out : undefined
+}
 
 type GardenGoal = 'free' | 'bird' | 'pollinator'
 type ProgressState = 'complete' | 'active' | 'waiting'
@@ -595,6 +618,12 @@ export function GardenPlannerPage() {
   const [plannerError, setPlannerError] = useState<string | null>(null)
   const [groupPages, setGroupPages] = useState<Record<string, number>>({})
 
+  const { state: authState } = useAuth()
+  const layoutHydratedRef = useRef(false)
+  const [layoutRemote, setLayoutRemote] = useState<
+    'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'skipped'
+  >('idle')
+
   const localSpecsById = useMemo(() => {
     const m: Record<string, PlantSpec> = {}
     PLANT_SPECS.forEach((p) => {
@@ -607,6 +636,24 @@ export function GardenPlannerPage() {
     () => ({ ...localSpecsById, ...dbSpecsById }),
     [localSpecsById, dbSpecsById],
   )
+
+  const specsPatchForSave = useMemo(
+    () => plannerSpecsPatchForSave(placed, specsById),
+    [placed, specsById],
+  )
+
+  const layoutPayloadForSave = useMemo((): PlannerLayoutPayloadV1 => {
+    const payload: PlannerLayoutPayloadV1 = {
+      version: 1,
+      widthStr,
+      depthStr,
+      goal,
+      viewMode,
+      placed,
+    }
+    if (specsPatchForSave) payload.specsPatch = specsPatchForSave
+    return payload
+  }, [widthStr, depthStr, goal, viewMode, placed, specsPatchForSave])
 
   const filteredSpecs = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -683,6 +730,86 @@ export function GardenPlannerPage() {
     return () => ac.abort()
   }, [currentApiGoal, coords])
 
+  useEffect(() => {
+    layoutHydratedRef.current = false
+    if (!isFirebaseAuthConfigured()) {
+      queueMicrotask(() => {
+        layoutHydratedRef.current = true
+        setLayoutRemote('skipped')
+      })
+      return
+    }
+    if (authState.loading) return
+    const user = authState.configured ? authState.user : null
+    if (!user) {
+      queueMicrotask(() => {
+        layoutHydratedRef.current = true
+      })
+      return
+    }
+
+    let cancelled = false
+    const ac = new AbortController()
+    queueMicrotask(() => {
+      if (cancelled) return
+      setLayoutRemote('loading')
+      void fetchPlannerLayoutFromApi(ac.signal)
+        .then(({ layout }) => {
+          if (cancelled || !layout) return
+          setWidthStr(layout.widthStr)
+          setDepthStr(layout.depthStr)
+          setGoal(layout.goal)
+          setViewMode(layout.viewMode)
+          setPlaced(layout.placed)
+          if (layout.specsPatch) {
+            setDbSpecsById((prev) => ({ ...prev, ...layout.specsPatch }))
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setLayoutRemote('error')
+        })
+        .finally(() => {
+          if (!cancelled) {
+            layoutHydratedRef.current = true
+            setLayoutRemote((prev) => (prev === 'error' ? prev : 'idle'))
+          }
+        })
+    })
+    return () => {
+      cancelled = true
+      ac.abort()
+    }
+  }, [authState.loading, authState.configured, authState.user])
+
+  useEffect(() => {
+    if (!isFirebaseAuthConfigured()) return
+    if (!authState.configured || !authState.user || !layoutHydratedRef.current) return
+
+    const ac = new AbortController()
+    const t = window.setTimeout(() => {
+      setLayoutRemote((prev) => (prev === 'loading' ? prev : 'saving'))
+      void savePlannerLayoutToApi(layoutPayloadForSave, ac.signal)
+        .then(() => {
+          if (ac.signal.aborted) return
+          setLayoutRemote('saved')
+          window.setTimeout(() => {
+            setLayoutRemote((prev) => (prev === 'saved' ? 'idle' : prev))
+          }, 2200)
+        })
+        .catch((err: unknown) => {
+          if (ac.signal.aborted) return
+          const name = err instanceof Error ? err.name : ''
+          if (name === 'AbortError') return
+          setLayoutRemote('error')
+        })
+    }, 1400)
+
+    return () => {
+      window.clearTimeout(t)
+      ac.abort()
+    }
+  }, [layoutPayloadForSave, authState.configured, authState.user])
+
   const handleGoalChange = (nextGoal: GardenGoal) => {
     setGoal(nextGoal)
     setSearch('')
@@ -724,6 +851,19 @@ export function GardenPlannerPage() {
   const warnings = useMemo(() => spacingWarnings(placed, specsById), [placed, specsById])
   const goalGroups = goal === 'bird' ? BIRD_GROUPS : goal === 'pollinator' ? POLLINATOR_GROUPS : []
 
+  const layoutSyncCaption =
+    layoutRemote === 'skipped'
+      ? 'Sign in to sync your layout to the cloud.'
+      : layoutRemote === 'loading'
+        ? 'Loading your saved layout…'
+        : layoutRemote === 'saving'
+          ? 'Saving layout…'
+          : layoutRemote === 'saved'
+            ? 'Layout saved.'
+            : layoutRemote === 'error'
+              ? 'Could not load or save your layout.'
+              : null
+
   return (
     <div className="garden-planner-page">
       <header className="page-header">
@@ -733,6 +873,15 @@ export function GardenPlannerPage() {
           Build a planting layout around a habitat goal, then use the planner to test spacing and
           structure before the database-backed recommendations are connected.
         </p>
+        {layoutSyncCaption ? (
+          <p
+            role="status"
+            aria-live="polite"
+            style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}
+          >
+            {layoutSyncCaption}
+          </p>
+        ) : null}
       </header>
 
       <section className="card card-body garden-goal-panel" aria-label="Garden goal">

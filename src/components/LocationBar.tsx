@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import { useLocationArea } from '../context/LocationContext'
 import { useWeather } from '../hooks/useWeather'
 import { geocodeAustralia } from '../lib/geocodeAu'
 import { getRegionCentroid } from '../lib/nearestRegion'
-import { IconPin } from './Icons'
+import { IconPin, IconProfile } from './Icons'
 import { WeatherMini } from './WeatherMini'
 
 const SOFT_DISMISS_KEY = 'gardenwise-location-soft-dismiss-v1'
@@ -148,6 +149,18 @@ export function LocationBar() {
               <WeatherMini state={weatherState} />
             </div>
           ) : null}
+
+          <NavLink
+            to="/profile"
+            aria-label="Profile"
+            className={({ isActive }) =>
+              `location-bar__profile-tab${isActive ? ' location-bar__profile-tab--active' : ''}`
+            }
+            end
+          >
+            <IconProfile className="location-bar__profile-icon" />
+            <span className="location-bar__profile-label">Profile</span>
+          </NavLink>
 
           <span className="location-bar__actions">
             {regionCode ? (

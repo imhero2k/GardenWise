@@ -7,6 +7,13 @@ import { queryRegionWeeds } from './weeds.mjs'
 import { queryTopWeeds } from './topWeeds.mjs'
 import { queryPlantDetails } from './plantDetails.mjs'
 import { queryPlannerRecommendations } from './plannerRecommendations.mjs'
+import { isFirebaseAdminConfigured, verifyFirebaseIdToken } from './firebaseAdmin.mjs'
+import {
+  getPlannerLayoutItem,
+  putPlannerLayoutItem,
+  isPlannerLayoutTableConfigured,
+} from './plannerLayoutDynamo.mjs'
+import { validatePlannerLayoutPayload } from './plannerLayoutValidate.mjs'
 
 /**
  * pg parses sslmode=require as verify-full (strict CA check). RDS uses Amazon's CA; Node
@@ -92,11 +99,38 @@ function wrap(label, handler) {
   }
 }
 
+/** Bearer Firebase ID token → `req.firebaseUid` (503 if Admin SDK missing, 401 if bad token). */
+async function requireFirebaseUid(req, res, next) {
+  if (!isFirebaseAdminConfigured()) {
+    res.status(503).json({ error: 'Firebase Admin is not configured (set FIREBASE_SERVICE_ACCOUNT_JSON or GOOGLE_APPLICATION_CREDENTIALS)' })
+    return
+  }
+  const h = req.headers.authorization
+  const m = typeof h === 'string' && /^Bearer\s+(\S+)/i.exec(h)
+  const token = m?.[1]
+  if (!token) {
+    res.status(401).json({ error: 'Missing Authorization: Bearer Firebase ID token' })
+    return
+  }
+  try {
+    const uid = await verifyFirebaseIdToken(token)
+    req.firebaseUid = uid
+    next()
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' })
+  }
+}
+
 export const app = express()
 
 // CORS: set CORS_ORIGIN to your frontend origin(s), comma-separated. Local Vite dev origins
 // are merged in automatically when CORS_ORIGIN is non-empty so you can hit Lambda from localhost.
-const LOCAL_VITE_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
+const LOCAL_VITE_ORIGINS = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+]
 const fromEnv = (process.env.CORS_ORIGIN ?? '')
   .split(',')
   .map((s) => s.trim())
@@ -105,12 +139,20 @@ const allowList = fromEnv.length ? [...new Set([...fromEnv, ...LOCAL_VITE_ORIGIN
 app.use(
   cors({
     origin: allowList.length ? allowList : true,
-    methods: ['GET', 'OPTIONS'],
+    methods: ['GET', 'PUT', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 )
 
+app.use(express.json({ limit: '600kb' }))
+
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, database: isDatabaseConfigured() })
+  res.json({
+    ok: true,
+    database: isDatabaseConfigured(),
+    plannerLayoutStorage: isPlannerLayoutTableConfigured(),
+    firebaseAdmin: isFirebaseAdminConfigured(),
+  })
 })
 
 app.get(
@@ -187,3 +229,40 @@ app.get(
     res.json(data)
   }),
 )
+
+app.get('/api/planner/layout', requireFirebaseUid, async (req, res) => {
+  if (!isPlannerLayoutTableConfigured()) {
+    res.status(503).json({ error: 'Planner layout storage is not configured (DYNAMODB_PLANNER_LAYOUT_TABLE)' })
+    return
+  }
+  try {
+    const item = await getPlannerLayoutItem(req.firebaseUid)
+    if (!item?.payload) {
+      res.json({ layout: null, updatedAt: item?.updatedAt ?? null })
+      return
+    }
+    res.json({ layout: item.payload, updatedAt: item.updatedAt ?? null })
+  } catch (err) {
+    console.error('[planner-layout get]', err)
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to load layout' })
+  }
+})
+
+app.put('/api/planner/layout', requireFirebaseUid, async (req, res) => {
+  if (!isPlannerLayoutTableConfigured()) {
+    res.status(503).json({ error: 'Planner layout storage is not configured (DYNAMODB_PLANNER_LAYOUT_TABLE)' })
+    return
+  }
+  const checked = validatePlannerLayoutPayload(req.body)
+  if (!checked.ok) {
+    res.status(400).json({ error: checked.error })
+    return
+  }
+  try {
+    const { updatedAt } = await putPlannerLayoutItem(req.firebaseUid, checked.payload)
+    res.json({ ok: true, updatedAt })
+  } catch (err) {
+    console.error('[planner-layout put]', err)
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to save layout' })
+  }
+})
