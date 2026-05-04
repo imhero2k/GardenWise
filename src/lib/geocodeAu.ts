@@ -9,7 +9,7 @@ const NOMINATIM_REVERSE = 'https://nominatim.openstreetmap.org/reverse'
 const NOMINATIM_HEADERS: HeadersInit = {
   Accept: 'application/json',
   'Accept-Language': 'en-AU',
-  'User-Agent': 'GardenWise/1.0 (https://github.com/imhero2k/GardenWise)',
+  'User-Agent': 'RootVio/1.0 (https://rootivio.app)',
 }
 
 /** Nominatim address.state values → app region codes */
@@ -68,7 +68,7 @@ export interface ReverseGeocodeAustraliaResult {
 
 /**
  * Resolve coordinates to a suburb/postcode label via Nominatim reverse.
- * Victoria-only for GardenWise — returns null if the resolved state is not VIC.
+ * Victoria-only for RootVio — returns null if the resolved state is not VIC.
  * Use sparingly (rate limits); call after a deliberate GPS fix.
  */
 export async function reverseGeocodeAustralia(
@@ -99,7 +99,7 @@ export async function reverseGeocodeAustralia(
   return { label: labelFromHit(hit, 'VIC') }
 }
 
-/** Always bias to Victoria so Nominatim prefers VIC matches (GardenWise is VIC-only). */
+/** Always bias to Victoria so Nominatim prefers VIC matches (RootVio is VIC-only). */
 function buildQuery(raw: string): string {
   const t = raw.trim().replace(/\s+/g, ' ')
   if (!t) return ''
@@ -150,7 +150,7 @@ export async function geocodeAustralia(
   const regionCode = regionFromHit(hit, lat, lng)
   if (regionCode !== 'VIC') {
     throw new Error(
-      'That location is not in Victoria. GardenWise only supports Victorian suburbs and postcodes.',
+      'That location is not in Victoria. RootVio only supports Victorian suburbs and postcodes.',
     )
   }
 

@@ -41,7 +41,7 @@ export function BottomNav() {
       <div className="bottom-nav__inner">
         <NavLink to="/" end className={homeLinkClass}>
           <img src={logoImg} alt="" className="bottom-nav__logo" aria-hidden="true" />
-          <span className="bottom-nav__brand">GardenWise</span>
+          <span className="bottom-nav__brand">RootVio</span>
           <IconHome />
           <span>Home</span>
         </NavLink>

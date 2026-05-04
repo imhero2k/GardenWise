@@ -54,7 +54,7 @@ export function ProfilePage() {
         <p className="eyebrow">Account</p>
         <h1>Profile</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Your GardenWise sign-in (Firebase).
+          Your RootVio sign-in (Firebase).
         </p>
       </header>
 

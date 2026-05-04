@@ -8,7 +8,7 @@
  */
 
 const WIKI_HEADERS = {
-  'Api-User-Agent': 'GardenWise/1.0 (https://github.com/imhero2k/GardenWise)',
+  'Api-User-Agent': 'RootVio/1.0 (https://rootivio.app)',
 }
 
 export type PlantEnrichmentImage = {

@@ -499,7 +499,7 @@ img {
 /*
  * Mobile-first: bottom-pinned tab bar with full-width, icon-over-label tabs.
  * Desktop (>=768px) overrides this to a top-pinned, clustered layout where
- * the Home tab becomes the GardenWise logo (see media query below).
+ * the Home tab becomes the RootVio logo (see media query below).
  * Class name kept as `bottom-nav` to avoid touching every page that uses it.
  */
 .bottom-nav {
@@ -586,7 +586,7 @@ img {
 }
 
 /*
- * Desktop / tablet: top-pinned navigation. Home tab is the GardenWise logo,
+ * Desktop / tablet: top-pinned navigation. Home tab is the RootVio logo,
  * followed by the other tabs with uniform spacing. The inner wrapper mirrors
  * `.main-content` (max-width: 960px, centered, side padding `var(--space-xl)`)
  * so the logo's left edge lines up with the page content below.
@@ -623,7 +623,7 @@ img {
     height: 18px;
   }
 
-  /* Home tab becomes the logo + GardenWise wordmark (no label, no pill background). */
+  /* Home tab becomes the logo + RootVio wordmark (no label, no pill background). */
   .bottom-nav__link--home {
     padding: 0.25rem 0.7rem 0.25rem 0.4rem;
     gap: 0.55rem;

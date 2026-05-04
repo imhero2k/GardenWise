@@ -7,7 +7,7 @@ import { getRegionCentroid } from '../lib/nearestRegion'
 import { IconPin, IconProfile } from './Icons'
 import { WeatherMini } from './WeatherMini'
 
-const SOFT_DISMISS_KEY = 'gardenwise-location-soft-dismiss-v1'
+const SOFT_DISMISS_KEY = 'rootvio-location-soft-dismiss-v1'
 
 function readSoftDismissed(): boolean {
   try {
@@ -191,7 +191,7 @@ export function LocationBar() {
             Local area
           </h2>
           <p className="location-dialog__hint">
-            GardenWise covers <strong>Victoria only</strong>. Enter a Victorian postcode or suburb, or use browser
+            RootVio covers <strong>Victoria only</strong>. Enter a Victorian postcode or suburb, or use browser
             location once. We use this for tips and nearby ideas — not for ads.
           </p>
 

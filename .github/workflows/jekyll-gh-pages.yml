@@ -15,4 +15,4 @@ jobs:
     steps:
       - run: |
           echo "This workflow is intentionally inactive."
-          echo "Deploy GardenWise from: Deploy GardenWise (Vite) → GitHub Pages (pages.yml on push to main)."
+          echo "Deploy RootVio from: Deploy RootVio (Vite) → GitHub Pages (pages.yml on push to main)."

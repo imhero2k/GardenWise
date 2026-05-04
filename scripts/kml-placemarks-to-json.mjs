@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Reads Google My Maps KML (stdin or file) and prints JSON for GardenWise:
+ * Reads Google My Maps KML (stdin or file) and prints JSON for RootVio:
  * [{ id, name, lat, lng, kind, folder, description, websites[], phone }]
  *
  * KML <coordinates> order is longitude,latitude — output uses lat,lng.

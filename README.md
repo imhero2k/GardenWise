@@ -1,4 +1,4 @@
-# GardenWise
+# RootVio
 
 **Grow Smart. Garden Responsibly.** — A React + Vite frontend for plant recommendations, weed identification, maps, and weather insights.
 

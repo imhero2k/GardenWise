@@ -408,7 +408,7 @@ export function LearnPage() {
         >
           environment.vic.gov.au
         </a>
-        . GardenWise is not affiliated with the Victorian Government.
+        . RootVio is not affiliated with the Victorian Government.
       </aside>
     </>
   )

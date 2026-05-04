@@ -26,7 +26,7 @@ export function SiteFooter() {
       <nav className="site-footer__grid" aria-label="Footer links">
         <div className="site-footer__brand-col">
           <Link to="/" className="site-footer__brand">
-            GardenWise
+            RootVio
           </Link>
           <p className="site-footer__tagline">Grow smart. Garden responsibly.</p>
         </div>

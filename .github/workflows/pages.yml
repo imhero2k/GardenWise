@@ -1,4 +1,4 @@
-name: Deploy GardenWise (Vite) → GitHub Pages
+name: Deploy RootVio (Vite) → GitHub Pages
 
 on:
   push:

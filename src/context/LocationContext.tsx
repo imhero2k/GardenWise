@@ -12,7 +12,7 @@ import { isLikelyAustraliaRegion, nearestAustralianRegion } from '../lib/nearest
 import type { AURegionCode, GeoCoords, StoredLocationV1 } from '../types/location'
 import { AU_REGIONS } from '../types/location'
 
-const STORAGE_KEY = 'gardenwise-location-v1'
+const STORAGE_KEY = 'rootvio-location-v1'
 
 function loadStored(): StoredLocationV1 | null {
   try {
@@ -154,7 +154,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       const inferred = nearestAustralianRegion(lat, lng)
       if (inferred !== 'VIC') {
         setGeoError(
-          'GardenWise is Victoria-only. Your location appears to be outside Victoria. Enter a Victorian postcode or suburb instead.',
+          'RootVio is Victoria-only. Your location appears to be outside Victoria. Enter a Victorian postcode or suburb instead.',
         )
         setIsDetecting(false)
         return

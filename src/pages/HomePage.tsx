@@ -169,7 +169,7 @@ export function HomePage() {
         <div className="hero-inner">
           <div className="hero-brand">
             <img src={logoImg} alt="" className="hero-brand__logo" aria-hidden="true" />
-            <span className="hero-brand__text">GardenWise</span>
+            <span className="hero-brand__text">RootVio</span>
           </div>
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.85)' }}>
             Sustainable gardening

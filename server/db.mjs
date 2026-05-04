@@ -1,5 +1,5 @@
 /**
- * Shared SQL helpers for GardenWise endpoints.
+ * Shared SQL helpers for RootVio endpoints.
  *
  * Schema is fixed (PostgreSQL 17 + PostGIS 3.5 on RDS):
  *   plant(id, scientific_name, common_name, lf_code, nursery_available)
