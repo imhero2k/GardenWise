@@ -436,17 +436,19 @@ export function PlantSearchPage() {
         {coords && !rdsError && rdsPlants.length > 0 && (
           <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {canPrevRds && (
+                <button
+                  type="button"
+                  className="btn btn-ghost pagination-step-btn"
+                  disabled={rdsLoading}
+                  onClick={() => setRdsOffset((o) => Math.max(0, o - RDS_PAGE_SIZE))}
+                >
+                  Previous page
+                </button>
+              )}
               <button
                 type="button"
-                className="btn btn-ghost"
-                disabled={!canPrevRds || rdsLoading}
-                onClick={() => setRdsOffset((o) => Math.max(0, o - RDS_PAGE_SIZE))}
-              >
-                Previous page
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost pagination-step-btn"
                 disabled={!canNextRds || rdsLoading}
                 onClick={() => setRdsOffset((o) => o + RDS_PAGE_SIZE)}
               >

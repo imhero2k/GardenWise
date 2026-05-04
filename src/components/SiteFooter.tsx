@@ -52,7 +52,7 @@ export function SiteFooter() {
             <Link to="/learn#invasive">Environmental weeds</Link>
           </li>
           <li>
-            <FooterMuted>Gardening tutorial</FooterMuted>
+            <Link to="/beginners">Beginner tutorials</Link>
           </li>
         </FooterCol>
         <FooterCol title="Connect">

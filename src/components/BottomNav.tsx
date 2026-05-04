@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import { IconBook, IconHome, IconLeaf, IconMap, IconPlanner, IconSearch } from './Icons'
+import { IconBook, IconHome, IconLeaf, IconMap, IconPlanner, IconSearch, IconSprout } from './Icons'
 import logoImg from '../assets/logo.png'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -16,6 +16,14 @@ const WEED_MENU: MenuItem[] = [
   { to: '/weed#prohibited', label: 'State prohibited weeds' },
   { to: '/weed#rules', label: 'General rules' },
   { to: '/weed#disposal', label: 'Disposal guide' },
+]
+
+const BEGINNER_MENU: MenuItem[] = [
+  { to: '/beginners#your-space', label: 'Read your garden' },
+  { to: '/beginners#plan-small', label: 'Start small' },
+  { to: '/beginners#planting', label: 'Plant & mulch' },
+  { to: '/beginners#watering', label: 'Watering' },
+  { to: '/beginners#ongoing-care', label: 'Ongoing care' },
 ]
 
 const LEARN_MENU: MenuItem[] = [
@@ -64,6 +72,13 @@ export function BottomNav() {
           <IconMap />
           <span>Map</span>
         </NavLink>
+        <div className="bottom-nav__item bottom-nav__item--has-menu">
+          <NavLink to="/beginners" className={linkClass} title="Beginner gardening tutorials">
+            <IconSprout />
+            <span>Basics</span>
+          </NavLink>
+          <NavMenu items={BEGINNER_MENU} />
+        </div>
         <div className="bottom-nav__item bottom-nav__item--has-menu">
           <NavLink to="/learn" className={linkClass}>
             <IconBook />

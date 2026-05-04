@@ -393,6 +393,46 @@ export function IconBook({ className }: { className?: string }) {
   )
 }
 
+/** Small sprout — beginner guides / getting started. */
+export function IconSprout({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M12 21V11"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 14c-2-3.5-5.5-5.5-8.5-5 2.5 4.5 6 6.5 8.5 5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 14c2-3.5 5.5-5.5 8.5-5-2.5 4.5-6 6.5-8.5 5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 21h3M12 21H9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export function IconPlanner({ className }: { className?: string }) {
   return (
     <svg

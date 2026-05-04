@@ -987,17 +987,19 @@ export function WeedPage() {
         {showTopWeedsGrid && topWeeds.length > 0 && (
           <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {topWeedsOffset > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-ghost pagination-step-btn"
+                  disabled={topWeedsLoading}
+                  onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
+                >
+                  Previous page
+                </button>
+              )}
               <button
                 type="button"
-                className="btn btn-ghost"
-                disabled={topWeedsOffset <= 0 || topWeedsLoading}
-                onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
-              >
-                Previous page
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost pagination-step-btn"
                 disabled={!topWeedsHasMore || topWeedsLoading}
                 onClick={() => setTopWeedsOffset((o) => o + TOP_WEEDS_PAGE_SIZE)}
               >
@@ -1074,7 +1076,12 @@ export function WeedPage() {
             <p style={{ fontSize: '0.88rem', color: '#78350f', margin: 0 }}>
               The following weeds are <strong>State Prohibited Weeds</strong> in Victoria. You must <strong>not</strong> attempt to remove them yourself — report them to the Department of Energy, Environment and Climate Action immediately.
             </p>
-            <a href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-xs)', marginTop: 'var(--space-sm)', background: 'var(--color-warning)', color: '#fff', padding: '0.45rem 1rem', borderRadius: 999, fontSize: '0.83rem', fontWeight: 600, textDecoration: 'none' }}>
+            <a
+              href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="weed-report-cta"
+            >
               Report a State Prohibited Weed →
             </a>
           </div>
@@ -1111,8 +1118,26 @@ export function WeedPage() {
           {GENERAL_RULES.map((rule, i) => {
             const open = openRules.has(i)
             return (
-              <div key={i} style={{ border: `1px solid ${open ? 'var(--color-accent)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', overflow: 'hidden', transition: 'border-color var(--transition)' }}>
-                <button onClick={() => toggleRule(i)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-md)', padding: 'var(--space-md)', background: 'var(--color-surface)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+              <div
+                key={i}
+                className={`weed-rules-accordion-item${open ? ' weed-rules-accordion-item--open' : ''}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleRule(i)}
+                  className="weed-rules-accordion-item__trigger"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-md)',
+                    padding: 'var(--space-md)',
+                    background: 'var(--color-surface)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
                   <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{rule.emoji}</span>
                   <span style={{ flex: 1, fontWeight: 600, fontSize: '0.95rem', color: 'var(--color-text)' }}>{rule.title}</span>
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--transition)' }}>▼</span>
@@ -1137,8 +1162,20 @@ export function WeedPage() {
           {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
             const active = selectedType === type
             return (
-              <button key={type} onClick={() => handleTypeSelect(type)}
-                style={{ border: `2px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', padding: 0, background: active ? 'rgba(46,125,50,0.08)' : 'var(--color-surface)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'stretch', transition: 'all var(--transition)', boxShadow: active ? '0 0 0 3px rgba(46,125,50,0.15)' : 'none', textAlign: 'center', overflow: 'hidden' }}
+              <button
+                key={type}
+                type="button"
+                className={`weed-disposal-type-btn${active ? ' weed-disposal-type-btn--active' : ''}`}
+                onClick={() => handleTypeSelect(type)}
+                style={{
+                  padding: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  textAlign: 'center',
+                  overflow: 'hidden',
+                }}
               >
                 <div style={{ position: 'relative', height: 80, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
                   <img src={imgUrl} alt="" loading="lazy" referrerPolicy="no-referrer"
