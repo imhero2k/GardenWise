@@ -749,13 +749,16 @@ export function GardenPlannerPage() {
     }
 
     let cancelled = false
+    let loadOk = false
     const ac = new AbortController()
     queueMicrotask(() => {
       if (cancelled) return
       setLayoutRemote('loading')
       void fetchPlannerLayoutFromApi(ac.signal)
         .then(({ layout }) => {
-          if (cancelled || !layout) return
+          if (cancelled) return
+          loadOk = true
+          if (!layout) return
           setWidthStr(layout.widthStr)
           setDepthStr(layout.depthStr)
           setGoal(layout.goal)
@@ -769,10 +772,11 @@ export function GardenPlannerPage() {
           if (!cancelled) setLayoutRemote('error')
         })
         .finally(() => {
-          if (!cancelled) {
+          if (!cancelled && loadOk) {
             layoutHydratedRef.current = true
-            setLayoutRemote((prev) => (prev === 'error' ? prev : 'idle'))
+            setLayoutRemote('idle')
           }
+          // on error: layoutHydratedRef stays false so the save effect stays blocked
         })
     })
     return () => {
@@ -861,7 +865,7 @@ export function GardenPlannerPage() {
           : layoutRemote === 'saved'
             ? 'Layout saved.'
             : layoutRemote === 'error'
-              ? 'Could not load or save your layout.'
+              ? 'Could not load your layout — saves are paused. Refresh to retry.'
               : null
 
   return (
