@@ -75,6 +75,17 @@ jobs:
           cp -r dist/* pages-root/
           if [ -f CNAME ]; then cp CNAME pages-root/; fi
 
+      # https://rootivio.app/iteration1/ — same branch as root (`production`), alternate base path (alias URL).
+      - name: Build production at /iteration1/
+        env:
+          VITE_BASE_PATH: /iteration1/
+        run: npm run build
+
+      - name: Stage production at iteration1
+        run: |
+          mkdir -p pages-root/iteration1
+          cp -r dist/* pages-root/iteration1/
+
       - uses: actions/upload-pages-artifact@v4
         with:
           path: pages-root
