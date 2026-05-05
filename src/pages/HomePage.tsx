@@ -18,7 +18,7 @@ import weedRotatorGorse from '../assets/home/weed-rotator-gorse.png'
 const WEED_EXAMPLE_SLIDES: { src: string; alt: string }[] = [
   {
     src: weedRotatorKhaki,
-    alt: 'Low-growing invasive weed with spiky white flower clusters among grass.',
+    alt: 'Low-growing environmental weed with spiky white flower clusters among grass.',
   },
   {
     src: weedRotatorThistle,
@@ -363,7 +363,7 @@ const INVASIVE_IMPACT_STATS: {
   },
   {
     value: '$24.5B',
-    label: 'Estimated yearly cost of invasive species to Australia — plants are the largest share.',
+    label: 'Estimated yearly cost of environmental weeds to Australia — plants are the largest share.',
     source: 'CSIRO (NeoBiota, 2021)',
     href: 'https://www.csiro.au/',
   },
@@ -520,7 +520,6 @@ function HomeImpactWeedRotator() {
 
 export function HomePage() {
   const impactTitleReveal = useScrollReveal<HTMLHeadingElement>('fade-up')
-  const missionReveal = useScrollReveal<HTMLElement>('fade-up')
   const impactBodyReveal = useScrollReveal<HTMLDivElement>('slide-right')
   const impactAsideReveal = useScrollReveal<HTMLElement>('slide-left')
   const impactMoreReveal = useScrollReveal<HTMLParagraphElement>('fade-in')
@@ -562,8 +561,8 @@ export function HomePage() {
             </span>
           </h1>
           <p className="home-hero__rise home-hero__rise--d4">
-            Every garden counts. RootVio empowers Victorian gardeners to grow local, remove invasive
-            species, and protect the biodiversity that makes this state extraordinary.
+            Every garden counts. RootVio empowers Victorian gardeners to grow local, remove
+            environmental weeds, and protect the biodiversity that makes this state extraordinary.
           </p>
           <div className="hero-cta-row home-hero__rise home-hero__rise--d5">
             <Link to="/plants" className="btn btn-primary home-hero__cta-btn">
@@ -581,35 +580,13 @@ export function HomePage() {
         <HomeQuickPathLoop />
       </section>
 
-      <section
-        className={`section-block home-mission card ${missionReveal.revealClass}`.trim()}
-        ref={missionReveal.ref}
-        aria-labelledby="home-mission-heading"
-      >
-        <h2 id="home-mission-heading" className="home-mission__title">
-          Our mission
-        </h2>
-        <div className="home-mission__body">
-          <p>
-            Victoria’s native plants and animals are under pressure. Habitat loss, climate change and
-            the spread of invasive species are pushing hundreds of species toward extinction.
-          </p>
-          <p className="home-mission__emphasis">RootVio believes that gardeners are part of the solution.</p>
-          <p>
-            Our mission is to educate and empower Victorian home gardeners to increase local biodiversity,
-            reduce the spread of invasive plants, and contribute — one garden at a time — to a healthier
-            natural environment for future generations.
-          </p>
-        </div>
-      </section>
-
       <section className="section-block home-impact" aria-labelledby="home-impact-heading">
         <h2
           id="home-impact-heading"
           ref={impactTitleReveal.ref}
           className={`home-impact__heading ${impactTitleReveal.revealClass}`.trim()}
         >
-          Why invasive species matter
+          Why environmental weeds matter
         </h2>
         <div className="home-impact__layout">
           <div
@@ -621,7 +598,7 @@ export function HomePage() {
               significantly impact it.
             </p>
             <p>
-              Some common garden plants can escape and become invasive weeds, harming native
+              Some common garden plants can escape and become environmental weeds, harming native
               ecosystems and wildlife.
             </p>
             <p>
@@ -631,7 +608,7 @@ export function HomePage() {
           </div>
           <aside
             className={`home-impact__aside ${impactAsideReveal.revealClass}`.trim()}
-            aria-label="Examples of invasive weeds"
+            aria-label="Examples of environmental weeds"
             ref={impactAsideReveal.ref}
           >
             <HomeImpactWeedRotator />
@@ -646,7 +623,7 @@ export function HomePage() {
               className={`home-impact__more ${impactMoreReveal.revealClass}`.trim()}
               ref={impactMoreReveal.ref}
             >
-              <Link to="/learn#invasive" className="home-impact__more-link">
+              <Link to="/learn#environmental-weeds" className="home-impact__more-link">
                 Read more on environmental weeds
               </Link>
               <span className="home-impact__more-sep" aria-hidden="true">

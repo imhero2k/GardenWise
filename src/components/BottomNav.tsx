@@ -1,5 +1,14 @@
 import { Link, NavLink } from 'react-router-dom'
-import { IconBook, IconHome, IconLeaf, IconMap, IconPlanner, IconSearch, IconSprout } from './Icons'
+import {
+  IconAbout,
+  IconBook,
+  IconHome,
+  IconLeaf,
+  IconMap,
+  IconPlanner,
+  IconSearch,
+  IconSprout,
+} from './Icons'
 import logoImg from '../assets/logo.png'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -28,7 +37,7 @@ const BEGINNER_MENU: MenuItem[] = [
 
 const LEARN_MENU: MenuItem[] = [
   { to: '/learn#native', label: 'Native plants 101' },
-  { to: '/learn#invasive', label: 'Weeds 101 (invasive plants)' },
+  { to: '/learn#environmental-weeds', label: 'Weeds 101 (environmental weeds)' },
 ]
 
 function NavMenu({ items }: { items: MenuItem[] }) {
@@ -86,6 +95,10 @@ export function BottomNav() {
           </NavLink>
           <NavMenu items={LEARN_MENU} />
         </div>
+        <NavLink to="/about" className={linkClass}>
+          <IconAbout />
+          <span>About</span>
+        </NavLink>
       </div>
     </nav>
   )

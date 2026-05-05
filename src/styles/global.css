@@ -11,6 +11,8 @@
   --color-warning: #e65100;
   --color-danger: #c62828;
   --color-success: #2e7d32;
+  --color-link-hover: #e3b23c;
+  --content-max-w: 1200px;
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
@@ -101,8 +103,29 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
+a:hover,
+a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
+}
+
+/* Whole-card links: hover emphasis is layout/shadow; keep inherited text colors */
+a.feature-tile:hover,
+a.feature-tile:focus-visible,
+a.home-quick-paths__card:hover,
+a.home-quick-paths__card:focus-visible {
+  color: inherit;
+}
+
+a.weed-learn-link:hover,
+a.weed-learn-link:focus-visible {
+  color: var(--color-text);
+}
+
+/* Button-styled links: white text must beat global a:hover/a:focus-visible */
+a.btn-primary:hover,
+a.btn-primary:focus-visible {
+  color: #fff;
 }
 
 button {
@@ -133,7 +156,7 @@ img {
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: 960px;
+  max-width: var(--content-max-w);
   margin: 0 auto;
   padding: var(--space-md) var(--space-md) var(--space-xl);
 }
@@ -179,11 +202,20 @@ img {
   text-decoration: none;
   display: inline-block;
   line-height: 1.15;
+  transition: color var(--transition);
 }
 
 .site-footer__brand:hover {
-  color: var(--color-primary);
+  color: var(--color-link-hover);
   text-decoration: none;
+}
+
+.site-footer__brand:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
+  outline: 2px solid var(--color-link-hover);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .site-footer__tagline {
@@ -216,13 +248,22 @@ img {
 .site-footer__list a {
   font-size: 0.9rem;
   font-weight: 400;
-  color: var(--color-primary-dark);
+  color: var(--color-text-muted);
   text-decoration: none;
+  transition: color var(--transition);
 }
 
 .site-footer__list a:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
+  color: var(--color-link-hover);
+  text-decoration: none;
+}
+
+.site-footer__list a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
+  outline: 2px solid var(--color-link-hover);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }
 
 .site-footer__muted {
@@ -271,6 +312,7 @@ img {
   background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
   box-shadow: var(--shadow-hover);
   filter: brightness(1.03);
+  color: #fff;
 }
 
 .btn-primary:active {
@@ -282,6 +324,7 @@ img {
 .btn-primary:focus-visible {
   outline: 3px solid rgba(46, 125, 50, 0.45);
   outline-offset: 2px;
+  color: #fff;
 }
 
 .btn-secondary {
@@ -308,6 +351,7 @@ img {
 .btn-secondary:focus-visible {
   outline: 3px solid rgba(46, 125, 50, 0.35);
   outline-offset: 2px;
+  color: var(--color-primary);
 }
 
 .btn-ghost {
@@ -340,6 +384,63 @@ img {
 
 .btn-link:hover {
   color: var(--color-primary-dark);
+}
+
+/* Floating "back to top" */
+.back-to-top {
+  position: fixed;
+  right: calc(var(--space-md) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--bottom-nav-h) + var(--space-md) + env(safe-area-inset-bottom, 0px));
+  z-index: 80;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  color: var(--color-primary-dark);
+  box-shadow: var(--shadow-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity var(--transition),
+    transform var(--transition),
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    box-shadow var(--transition);
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: color-mix(in srgb, var(--color-link-hover) 18%, white);
+  border-color: color-mix(in srgb, var(--color-link-hover) 40%, rgba(46, 125, 50, 0.2));
+  color: color-mix(in srgb, var(--color-link-hover) 80%, var(--color-text));
+  box-shadow: var(--shadow-hover);
+}
+
+.back-to-top:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-link-hover) 55%, transparent);
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .back-to-top {
+    bottom: calc(var(--space-xl) + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .btn-block {
@@ -774,14 +875,36 @@ img {
   opacity: 1;
 }
 
-.bottom-nav__link:hover {
+/* Hover / focus: same pill treatment as active, softer mint (active = deeper forest tint). */
+.bottom-nav__link:hover,
+.bottom-nav__link:focus-visible {
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-accent-soft) 72%, transparent);
+  text-decoration: none;
+  outline: none;
+}
+
+.bottom-nav__link:hover svg,
+.bottom-nav__link:focus-visible svg {
+  opacity: 1;
+}
+
+.bottom-nav__link--active:hover,
+.bottom-nav__link--active:focus-visible {
   color: var(--color-primary-dark);
+  background: rgba(46, 125, 50, 0.16);
+  text-decoration: none;
+}
+
+.bottom-nav__link--active:hover svg,
+.bottom-nav__link--active:focus-visible svg {
+  opacity: 1;
 }
 
 /*
  * Desktop / tablet: top-pinned navigation. Home tab is the RootVio logo,
  * followed by the other tabs with uniform spacing. The inner wrapper mirrors
- * `.main-content` (max-width: 960px, centered, side padding `var(--space-xl)`)
+ * `.main-content` (max-width: `--content-max-w`, centered, side padding `var(--space-xl)`)
  * so the logo's left edge lines up with the page content below.
  */
 @media (min-width: 768px) {
@@ -796,7 +919,7 @@ img {
 
   .bottom-nav__inner {
     flex: 0 1 auto;
-    max-width: 960px;
+    max-width: var(--content-max-w);
     margin: 0 auto;
     padding: 0 var(--space-xl);
     justify-content: flex-start;
@@ -846,6 +969,16 @@ img {
 
   .bottom-nav__link--home.bottom-nav__link--active {
     background: transparent;
+  }
+
+  .bottom-nav__link--home:hover:not(.bottom-nav__link--active),
+  .bottom-nav__link--home:focus-visible:not(.bottom-nav__link--active) {
+    background: color-mix(in srgb, var(--color-accent-soft) 72%, transparent);
+  }
+
+  .bottom-nav__link--home.bottom-nav__link--active:hover,
+  .bottom-nav__link--home.bottom-nav__link--active:focus-visible {
+    background: color-mix(in srgb, var(--color-accent-soft) 45%, transparent);
   }
 
   /* Tabs that have a dropdown menu */
@@ -921,8 +1054,9 @@ img {
 
   .bottom-nav__menu-item:hover,
   .bottom-nav__menu-item:focus-visible {
-    background: rgba(46, 125, 50, 0.1);
+    background: color-mix(in srgb, var(--color-link-hover) 28%, transparent);
     color: var(--color-primary-dark);
+    text-decoration: none;
     outline: none;
   }
 }
@@ -1467,7 +1601,7 @@ img {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 960px;
+  max-width: var(--content-max-w);
   margin: 0 auto;
   padding: 0 var(--space-md);
 }
@@ -1798,11 +1932,12 @@ img {
   transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .home-impact__more-link:hover {
-    color: var(--color-primary);
-  }
+.home-impact__more-link:hover,
+.home-impact__more-link:focus-visible {
+  color: var(--color-link-hover);
+}
 
+@media (prefers-reduced-motion: no-preference) {
   .home-impact__more-link:hover::after {
     transform: translateX(4px);
   }
@@ -1814,7 +1949,7 @@ img {
   font-weight: 400;
 }
 
-/* Quick paths — between hero and mission */
+/* Quick paths — below hero */
 .home-quick-paths {
   margin-bottom: var(--space-xl);
   scroll-margin-top: var(--space-lg);
@@ -2041,7 +2176,7 @@ img {
   }
 }
 
-/* Mission statement — between hero and impact */
+/* Mission statement (home was moved to /about; shared card styles) */
 .home-mission {
   padding: var(--space-xl);
   margin-bottom: var(--space-2xl);
@@ -2300,9 +2435,10 @@ img {
   text-decoration: none;
 }
 
-.home-native-benefits__photo-credit a:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
+.home-native-benefits__photo-credit a:hover,
+.home-native-benefits__photo-credit a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
 }
 
 /* Plant detail header */
@@ -2416,6 +2552,37 @@ img {
   font-size: 0.9rem;
   color: var(--color-text-muted);
   line-height: 1.5;
+}
+
+.map-radius {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: calc(-1 * var(--space-xs)) 0 var(--space-md);
+}
+
+.map-radius__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.map-radius__select {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--color-primary-dark);
+}
+
+.map-radius__note {
+  flex: 1 1 18rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
 }
 
 .nursery-map-layout {
@@ -2646,9 +2813,10 @@ img {
   letter-spacing: -0.02em;
 }
 
-.app-brand:hover {
+.app-brand:hover,
+.app-brand:focus-visible {
+  color: var(--color-link-hover);
   text-decoration: none;
-  opacity: 0.9;
 }
 
 .top-bar {
@@ -2769,6 +2937,24 @@ img {
   color: var(--color-text);
 }
 
+.location-bar__summary--clickable {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.location-bar__summary--clickable:hover .location-bar__truncate {
+  color: var(--color-link-hover);
+}
+
+.location-bar__summary--clickable:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-link-hover) 60%, transparent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
 .location-bar__badge {
   font-size: 0.72rem;
   font-weight: 700;
@@ -2820,8 +3006,10 @@ img {
   cursor: pointer;
 }
 
-.location-bar__link:hover {
-  color: var(--color-primary);
+.location-bar__link:hover,
+.location-bar__link:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
 }
 
 .location-bar__link--emph {
@@ -3344,6 +3532,69 @@ button.vicflora-card {
   margin-bottom: var(--space-xl);
 }
 
+/* Learn page: optional side navigation (desktop/tablet) */
+.learn-layout {
+  display: block;
+}
+
+.learn-sidenav {
+  display: none;
+}
+
+/*
+ * Wide-screen enhancement: keep Learn content full width (same as other pages),
+ * and park the sidenav in the left "gutter" so it doesn't shrink the article.
+ */
+@media (min-width: 1400px) {
+  .learn-sidenav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    position: fixed;
+    top: calc(var(--bottom-nav-h) + var(--space-md));
+    left: calc(50% - 600px - 240px);
+    width: 220px;
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .learn-sidenav__title {
+    margin: 0 0 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .learn-sidenav__link {
+    display: block;
+    padding: 0.45rem 0.55rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-primary-dark);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  .learn-sidenav__link:hover,
+  .learn-sidenav__link:focus-visible {
+    background: color-mix(in srgb, var(--color-link-hover) 18%, transparent);
+    color: var(--color-link-hover);
+    text-decoration: none;
+    outline: none;
+  }
+
+  .learn-sidenav__link:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-link-hover) 55%, transparent);
+    outline-offset: 2px;
+  }
+}
+
 @media (min-width: 720px) {
   .learn-topics {
     grid-template-columns: repeat(2, 1fr);
@@ -3442,6 +3693,12 @@ button.vicflora-card {
 .learn-disclaimer a {
   color: var(--color-primary-dark);
   text-decoration: underline;
+}
+
+.learn-disclaimer a:hover,
+.learn-disclaimer a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
 }
 
 /* Learn page · chapter dividers (native plants & weeds) */
@@ -3564,8 +3821,9 @@ button.vicflora-card {
   border-bottom: 1px dashed currentColor;
 }
 
-.learn-topic__footer a:hover {
-  color: var(--color-primary);
+.learn-topic__footer a:hover,
+.learn-topic__footer a:focus-visible {
+  color: var(--color-link-hover);
 }
 
 .learn-topic__list a {
@@ -3573,8 +3831,10 @@ button.vicflora-card {
   text-decoration: underline;
 }
 
-.learn-topic__list a:hover {
-  color: var(--color-primary);
+.learn-topic__list a:hover,
+.learn-topic__list a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
 }
 
 .learn-tiers {

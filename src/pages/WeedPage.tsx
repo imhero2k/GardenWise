@@ -648,10 +648,10 @@ const PROHIBITED_WEEDS: { name: string; chinese: string; emoji: string; imgUrl: 
   { name: 'Lagarosiphon', chinese: '', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
   { name: 'Knotweed', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
   { name: 'Mesquite', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
-  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but extremely invasive grass. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
+  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but a serious environmental weed. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
   { name: 'Parthenium Weed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
   { name: 'Branched Broomrape', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
-  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient invasive; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
+  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient lineage and a serious environmental weed; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
   { name: 'Camel Thorn', chinese: '', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
   { name: 'Karoo & Giraffe Thorn', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
   { name: 'Poverty Weed', chinese: '', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
@@ -836,11 +836,11 @@ export function WeedPage() {
         </p>
       </header>
 
-      <Link to="/learn#invasive" className="weed-learn-link">
+      <Link to="/learn#environmental-weeds" className="weed-learn-link">
         <span className="weed-learn-link__icon"><IconBook /></span>
         <span className="weed-learn-link__text">
           <strong>Why does this matter?</strong> Read{' '}
-          <em>Invasive plants in your garden</em> in Native plants 101.
+          <em>Environmental weeds in your garden</em> in Native plants 101.
         </span>
         <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
       </Link>
@@ -854,7 +854,7 @@ export function WeedPage() {
             </div>
             <div>
               <h3>Weed checker</h3>
-              <p>Scan or upload a plant to check invasive risk — same as Plant Safety Check on Home.</p>
+              <p>Scan or upload a plant to check environmental weed risk — same as Plant Safety Check on Home.</p>
             </div>
           </a>
           <a href="#prohibited" className="feature-tile">

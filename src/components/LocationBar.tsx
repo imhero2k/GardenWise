@@ -134,10 +134,16 @@ export function LocationBar() {
           </span>
 
           {regionCode ? (
-            <span className="location-bar__summary" title={areaLabel}>
+            <button
+              type="button"
+              className="location-bar__summary location-bar__summary--clickable"
+              title="Change local area"
+              aria-label={`Change local area (currently ${areaLabel})`}
+              onClick={openDialog}
+            >
               <span className="location-bar__badge">{areaShort}</span>
               <span className="location-bar__truncate">{areaLabel}</span>
-            </span>
+            </button>
           ) : showNudge ? (
             <span className="location-bar__hint">Set once for local tips</span>
           ) : (

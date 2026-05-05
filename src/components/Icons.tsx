@@ -41,6 +41,31 @@ export function IconHome({ className }: { className?: string }) {
   )
 }
 
+/** Info circle — About / mission nav. */
+export function IconAbout({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M12 16v-5h-.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="8" r="1" fill="currentColor" />
+    </svg>
+  )
+}
+
 export function IconSearch({ className }: { className?: string }) {
   return (
     <svg

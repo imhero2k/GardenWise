@@ -19,15 +19,17 @@ export function NurseryMapPage() {
   const [filter, setFilter] = useState<Filter>('all')
   const [selected, setSelected] = useState<Nursery | null>(null)
   const [listOpen, setListOpen] = useState(true)
+  const [nearbyRadiusKm, setNearbyRadiusKm] = useState(20)
 
   const filtered = useMemo(() => {
     if (filter === 'nearby') {
       if (coords) {
-        return [...nurseries]
+        const within = [...nurseries]
           .map((n) => ({ n, d: haversineKm(coords.lat, coords.lng, n.lat, n.lng) }))
           .sort((a, b) => a.d - b.d)
-          .slice(0, 14)
-          .map((x) => x.n)
+
+        const matches = within.filter((x) => x.d <= nearbyRadiusKm).map((x) => x.n)
+        return matches.length > 0 ? matches : within.slice(0, 14).map((x) => x.n)
       }
       return nurseries.slice(0, 12)
     }
@@ -37,7 +39,7 @@ export function NurseryMapPage() {
       if (filter === 'garden') return n.kind === 'public_garden'
       return true
     })
-  }, [filter, coords])
+  }, [filter, coords, nearbyRadiusKm])
 
   return (
     <>
@@ -87,6 +89,28 @@ export function NurseryMapPage() {
         ))}
       </div>
 
+      {filter === 'nearby' && coords ? (
+        <div className="map-radius" aria-label="Nearby radius">
+          <label className="map-radius__label" htmlFor="nearby-radius">
+            Radius
+          </label>
+          <select
+            id="nearby-radius"
+            className="map-radius__select"
+            value={nearbyRadiusKm}
+            onChange={(e) => setNearbyRadiusKm(Number(e.target.value))}
+          >
+            <option value={5}>5 km</option>
+            <option value={10}>10 km</option>
+            <option value={20}>20 km</option>
+            <option value={30}>30 km</option>
+            <option value={50}>50 km</option>
+            <option value={100}>100 km</option>
+          </select>
+          <span className="map-radius__note">If none are within range, we show the closest places.</span>
+        </div>
+      ) : null}
+
       <p className="map-hint" style={{ marginTop: 0, marginBottom: 'var(--space-md)' }}>
         <strong>Map:</strong> double-click to zoom in, or use the +/− control at the{' '}
         <strong>bottom left</strong> of the map. Tap a pin or choose a name in the list for details.
@@ -94,7 +118,12 @@ export function NurseryMapPage() {
 
       <div className="nursery-map-layout">
         <div className="nursery-map-pane">
-          <NurseryLeafletMap items={filtered} selected={selected} onSelect={setSelected} />
+          <NurseryLeafletMap
+            items={filtered}
+            selected={selected}
+            onSelect={setSelected}
+            focus={filter === 'nearby' && coords ? { lat: coords.lat, lng: coords.lng, radiusKm: nearbyRadiusKm } : undefined}
+          />
         </div>
 
         <aside className="nursery-map-sidebar" aria-label="Nursery and garden list">
@@ -184,7 +213,7 @@ export function NurseryMapPage() {
             )}
             {selected.kind === 'public_garden' && <span className="badge badge-neutral">Public garden</span>}
             {selected.organic && <span className="badge badge-low">Organic</span>}
-            {selected.lowInvasiveFocus && <span className="badge badge-low">Low-invasive focus</span>}
+            {selected.lowInvasiveFocus && <span className="badge badge-low">Low environmental weed focus</span>}
           </div>
         </div>
       )}
