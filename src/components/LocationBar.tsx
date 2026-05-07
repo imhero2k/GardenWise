@@ -145,7 +145,15 @@ export function LocationBar() {
               <span className="location-bar__truncate">{areaLabel}</span>
             </button>
           ) : showNudge ? (
-            <span className="location-bar__hint">Set once for local tips</span>
+            <button
+              type="button"
+              className="location-bar__hint location-bar__hint--clickable"
+              onClick={openDialog}
+              title="Set your local area"
+              aria-label="Set your local area"
+            >
+              Set once for local tips
+            </button>
           ) : (
             <span className="location-bar__hint location-bar__hint--muted">Area not set</span>
           )}

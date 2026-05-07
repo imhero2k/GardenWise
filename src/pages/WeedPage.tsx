@@ -827,12 +827,32 @@ export function WeedPage() {
     : []
 
   return (
-    <>
+    <div className="weed-layout">
+      <aside className="weed-sidenav" aria-label="Weed page sections">
+        <p className="weed-sidenav__title">On this page</p>
+        <a className="weed-sidenav__link" href="#top-weeds">
+          Top weeds
+        </a>
+        <a className="weed-sidenav__link" href="#weed-checker">
+          Weed checker
+        </a>
+        <a className="weed-sidenav__link" href="#prohibited">
+          Prohibited weeds
+        </a>
+        <a className="weed-sidenav__link" href="#rules">
+          General rules
+        </a>
+        <a className="weed-sidenav__link" href="#disposal">
+          Disposal guide
+        </a>
+      </aside>
+
+      <div className="weed-layout__main">
       <header className="page-header">
-        <p className="eyebrow">Weeds</p>
-        <h1>Weed help</h1>
+          <p className="eyebrow">Weeds</p>
+          <h1>Weed help</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Identify risky plants, reduce spread, and dispose of material responsibly.
+            Identify risky plants, reduce spread, and dispose of material responsibly.
         </p>
       </header>
 
@@ -1227,7 +1247,7 @@ export function WeedPage() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-md)' }}>
+              <div className="weed-disposal-columns">
                 <div style={{ background: 'rgba(230,81,0,0.06)', border: '1px solid rgba(230,81,0,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
                   <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-warning)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>⚡ What makes it risky</h4>
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
@@ -1260,7 +1280,7 @@ export function WeedPage() {
         })()}
       </WeedSection>
 
-      <footer
+        <footer
         style={{
           marginTop: 'var(--space-xl)',
           paddingTop: 'var(--space-md)',
@@ -1274,7 +1294,7 @@ export function WeedPage() {
         <a href="https://weeds.org.au/" target="_blank" rel="noreferrer">Weeds Australia</a>
         {' '}and{' '}
         <a href="https://agriculture.vic.gov.au/biosecurity/weeds" target="_blank" rel="noreferrer">Agriculture Victoria</a>.
-      </footer>
+        </footer>
 
       {/* ── Top-weed detail dialog (mirrors PlantMe) ── */}
       <dialog
@@ -1324,6 +1344,7 @@ export function WeedPage() {
           </div>
         </div>
       )}
-    </>
+      </div>
+    </div>
   )
 }

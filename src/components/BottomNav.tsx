@@ -28,11 +28,10 @@ const WEED_MENU: MenuItem[] = [
 ]
 
 const BEGINNER_MENU: MenuItem[] = [
-  { to: '/beginners#your-space', label: 'Read your garden' },
-  { to: '/beginners#plan-small', label: 'Start small' },
-  { to: '/beginners#planting', label: 'Plant & mulch' },
-  { to: '/beginners#watering', label: 'Watering' },
-  { to: '/beginners#ongoing-care', label: 'Ongoing care' },
+  { to: '/beginners/your-space', label: 'Read your garden' },
+  { to: '/beginners/establish-potted', label: 'Establish potted plant' },
+  { to: '/beginners/mulching', label: 'Mulching guide' },
+  { to: '/beginners/watering-guide', label: 'Watering guide' },
 ]
 
 const LEARN_MENU: MenuItem[] = [
@@ -62,43 +61,45 @@ export function BottomNav() {
           <IconHome />
           <span>Home</span>
         </NavLink>
-        <NavLink to="/plants" className={linkClass}>
-          <IconSearch />
-          <span>PlantMe</span>
-        </NavLink>
-        <div className="bottom-nav__item bottom-nav__item--has-menu">
-          <NavLink to="/weed" className={linkClass}>
-            <IconLeaf />
-            <span>Weeds</span>
+        <div className="bottom-nav__right" aria-label="Primary links">
+          <NavLink to="/plants" className={linkClass}>
+            <IconSearch />
+            <span>PlantMe</span>
           </NavLink>
-          <NavMenu items={WEED_MENU} />
-        </div>
-        <NavLink to="/planner" className={linkClass}>
-          <IconPlanner />
-          <span>Planner</span>
-        </NavLink>
-        <NavLink to="/map" className={linkClass}>
-          <IconMap />
-          <span>Map</span>
-        </NavLink>
-        <div className="bottom-nav__item bottom-nav__item--has-menu">
-          <NavLink to="/beginners" className={linkClass} title="Beginner gardening tutorials">
-            <IconSprout />
-            <span>Basics</span>
+          <div className="bottom-nav__item bottom-nav__item--has-menu">
+            <NavLink to="/weed" className={linkClass}>
+              <IconLeaf />
+              <span>Weeds</span>
+            </NavLink>
+            <NavMenu items={WEED_MENU} />
+          </div>
+          <NavLink to="/planner" className={linkClass}>
+            <IconPlanner />
+            <span>Planner</span>
           </NavLink>
-          <NavMenu items={BEGINNER_MENU} />
-        </div>
-        <div className="bottom-nav__item bottom-nav__item--has-menu">
-          <NavLink to="/learn" className={linkClass}>
-            <IconBook />
-            <span>Learn</span>
+          <NavLink to="/map" className={linkClass}>
+            <IconMap />
+            <span>Map</span>
           </NavLink>
-          <NavMenu items={LEARN_MENU} />
+          <div className="bottom-nav__item bottom-nav__item--has-menu">
+            <NavLink to="/beginners" className={linkClass} title="Beginner gardening tutorials">
+              <IconSprout />
+              <span>Basics</span>
+            </NavLink>
+            <NavMenu items={BEGINNER_MENU} />
+          </div>
+          <div className="bottom-nav__item bottom-nav__item--has-menu">
+            <NavLink to="/learn" className={linkClass}>
+              <IconBook />
+              <span>Learn</span>
+            </NavLink>
+            <NavMenu items={LEARN_MENU} />
+          </div>
+          <NavLink to="/about" className={linkClass}>
+            <IconAbout />
+            <span>About</span>
+          </NavLink>
         </div>
-        <NavLink to="/about" className={linkClass}>
-          <IconAbout />
-          <span>About</span>
-        </NavLink>
       </div>
     </nav>
   )

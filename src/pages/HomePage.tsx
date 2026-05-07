@@ -448,14 +448,14 @@ function HomeNativeBenefitCard({ item, index }: { item: NativePlantBenefit; inde
       ref={ref}
       className={`card home-native-benefits__box${item.image ? ' home-native-benefits__box--has-bg' : ''} ${revealClass}`.trim()}
       role="listitem"
+      tabIndex={0}
       style={item.image ? { ...benefitBackgroundStyle(item.image), ...delayStyle } : delayStyle}
     >
-      <span className="home-native-benefits__index" aria-hidden="true">
-        {index + 1}
-      </span>
-      <div className="home-native-benefits__text">
-        <span className="home-native-benefits__title">{item.title}</span>
-        <span className="home-native-benefits__body">{item.body}</span>
+      <div className="home-native-benefits__inner">
+        <div className="home-native-benefits__head">
+          <span className="home-native-benefits__title">{item.title}</span>
+        </div>
+        <p className="home-native-benefits__body">{item.body}</p>
       </div>
     </article>
   )
@@ -493,9 +493,6 @@ function HomeImpactWeedRotator() {
           />
         ))}
       </div>
-      <p className="home-impact-weeds-caption">
-        Plants like these can escape from gardens and damage native bushland.
-      </p>
       <p className="home-native-benefits__photo-credit">
         <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">
           Unsplash
@@ -519,7 +516,7 @@ function HomeImpactWeedRotator() {
 }
 
 export function HomePage() {
-  const impactTitleReveal = useScrollReveal<HTMLHeadingElement>('fade-up')
+  const impactTitleReveal = useScrollReveal<HTMLDivElement>('fade-up')
   const impactBodyReveal = useScrollReveal<HTMLDivElement>('slide-right')
   const impactAsideReveal = useScrollReveal<HTMLElement>('slide-left')
   const impactMoreReveal = useScrollReveal<HTMLParagraphElement>('fade-in')
@@ -581,26 +578,23 @@ export function HomePage() {
       </section>
 
       <section className="section-block home-impact" aria-labelledby="home-impact-heading">
-        <h2
-          id="home-impact-heading"
-          ref={impactTitleReveal.ref}
-          className={`home-impact__heading ${impactTitleReveal.revealClass}`.trim()}
-        >
-          Why environmental weeds matter
-        </h2>
         <div className="home-impact__layout">
+          <div
+            ref={impactTitleReveal.ref}
+            className={`home-impact__lead ${impactTitleReveal.revealClass}`.trim()}
+          >
+            <h2 id="home-impact-heading" className="home-impact__heading">
+              Why environmental weeds matter
+            </h2>
+            <p className="home-section-lead">
+              Environmental weeds are plants—often from gardens—that spread into bushland and
+              waterways and outcompete local species, damaging habitats we all share.
+            </p>
+          </div>
           <div
             className={`home-impact__body ${impactBodyReveal.revealClass}`.trim()}
             ref={impactBodyReveal.ref}
           >
-            <p>
-              Victoria’s natural environment is shared by everyone, and even home gardens can
-              significantly impact it.
-            </p>
-            <p>
-              Some common garden plants can escape and become environmental weeds, harming native
-              ecosystems and wildlife.
-            </p>
             <p>
               Choosing native alternatives helps protect the environment, and every garden contributes
               to the bigger picture.
@@ -637,10 +631,18 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="section-block">
-        <h2 ref={benefitsTitleReveal.ref} className={benefitsTitleReveal.revealClass}>
+      <section className="section-block home-benefits-block" aria-labelledby="home-benefits-heading">
+        <h2
+          id="home-benefits-heading"
+          ref={benefitsTitleReveal.ref}
+          className={benefitsTitleReveal.revealClass}
+        >
           Benefits of native plants
         </h2>
+        <p className="home-section-lead">
+          Native plants are species that evolved in your region and belong naturally in local
+          ecosystems, supporting wildlife without being introduced from elsewhere.
+        </p>
         <div className="home-native-benefits">
           <div className="home-native-benefits__grid" role="list">
             {NATIVE_PLANT_BENEFITS.map((item, i) => (
