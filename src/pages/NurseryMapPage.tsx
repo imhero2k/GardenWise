@@ -7,13 +7,6 @@ import type { Nursery } from '../types/plant'
 
 type Filter = 'all' | 'nursery' | 'garden' | 'nearby'
 
-function formatDescriptionHtml(html: string): string {
-  return html
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .trim()
-}
-
 export function NurseryMapPage() {
   const { areaLabel, regionCode, coords } = useLocationArea()
   const [filter, setFilter] = useState<Filter>('all')
@@ -152,9 +145,7 @@ export function NurseryMapPage() {
                     <span className="nursery-list__name">{n.name}</span>
                     <span className="nursery-list__tags">
                       {n.kind === 'public_garden' && <span className="badge badge-neutral">Garden</span>}
-                      {n.websites && n.websites.length > 0 && (
-                        <span className="badge badge-neutral">Web</span>
-                      )}
+                      {n.website && <span className="badge badge-neutral">Web</span>}
                     </span>
                   </button>
                 </li>
@@ -176,34 +167,38 @@ export function NurseryMapPage() {
         <div className="card card-body fade-up" style={{ marginTop: 'var(--space-md)' }}>
           <h2 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-sm)' }}>{selected.name}</h2>
 
-          {selected.description && (
-            <p
-              style={{
-                margin: '0 0 var(--space-sm)',
-                fontSize: '0.9rem',
-                whiteSpace: 'pre-line',
-                color: 'var(--color-text-muted)',
-              }}
-            >
-              {formatDescriptionHtml(selected.description)}
+          {selected.address && (
+            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+              <strong style={{ color: 'var(--color-text)' }}>Address:</strong> {selected.address}
             </p>
           )}
 
-          {selected.websites && selected.websites.length > 0 && (
-            <ul className="nursery-detail-links">
-              {selected.websites.map((url) => (
-                <li key={url}>
-                  <a href={url} target="_blank" rel="noopener noreferrer">
-                    {url.replace(/^https?:\/\//, '')}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          {selected.website && (
+            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+              <strong style={{ color: 'var(--color-text)' }}>Website:</strong>{' '}
+              <a href={selected.website} target="_blank" rel="noopener noreferrer" className="nursery-detail-link">
+                {selected.website.replace(/^https?:\/\//, '')}
+              </a>
+            </p>
+          )}
+
+          {selected.openingHours && (
+            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+              <strong style={{ color: 'var(--color-text)' }}>Opening hours:</strong> {selected.openingHours}
+            </p>
           )}
 
           {selected.phone && (
-            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.9rem' }}>
+            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+              <strong style={{ color: 'var(--color-text)' }}>Phone number:</strong>{' '}
               <a href={`tel:${selected.phone.replace(/\s/g, '')}`}>{selected.phone}</a>
+            </p>
+          )}
+
+          {selected.email && (
+            <p style={{ margin: '0 0 var(--space-sm)', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+              <strong style={{ color: 'var(--color-text)' }}>Email:</strong>{' '}
+              <a href={`mailto:${selected.email}`}>{selected.email}</a>
             </p>
           )}
 

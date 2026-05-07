@@ -26,12 +26,11 @@ export interface Nursery {
   /** WGS84 longitude (decimal degrees) */
   lng: number
   kind: NurseryKind
-  /** Raw layer description (may include line breaks as HTML) */
-  description?: string | null
-  /** URLs parsed from the layer description */
-  websites?: string[]
   address?: string
   phone?: string
+  email?: string
+  website?: string
+  openingHours?: string
   rating?: number
   organic?: boolean
   lowInvasiveFocus?: boolean

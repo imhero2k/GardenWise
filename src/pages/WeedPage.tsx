@@ -492,21 +492,6 @@ function TopWeedDetailContent({
           <li>
             <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
           </li>
-          {weed.riskScore != null && (
-            <li>
-              <strong>Risk score:</strong> {weed.riskScore}
-            </li>
-          )}
-          {weed.isWons && (
-            <li>
-              <strong style={{ color: 'var(--color-danger)' }}>WoNS</strong> — Weed of National Significance
-            </li>
-          )}
-          {weed.weedStatusVic && (
-            <li>
-              <strong>Status (Vic):</strong> {weed.weedStatusVic}
-            </li>
-          )}
         </ul>
       </div>
       {summary ? (
@@ -985,14 +970,7 @@ export function WeedPage() {
                       <span>
                         <strong>Risk:</strong> {w.riskRating ?? 'Unknown'}
                       </span>
-                      {w.isWons && <span style={{ color: 'var(--color-danger)', fontWeight: 800 }}>WoNS</span>}
-                      {w.riskScore != null && <span style={{ color: 'var(--color-text-muted)' }}>score {w.riskScore}</span>}
                     </div>
-                    {w.weedStatusVic ? (
-                      <p className="top-weed-card__status">{w.weedStatusVic}</p>
-                    ) : (
-                      <p className="top-weed-card__status top-weed-card__status--empty" aria-hidden="true" />
-                    )}
                     {blurb ? <p className="top-weed-card__blurb top-weed-card__blurb--filled">{blurb}</p> : (
                       <p className="top-weed-card__blurb top-weed-card__blurb--reserve" aria-hidden="true" />
                     )}

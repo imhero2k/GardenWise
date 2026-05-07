@@ -97,6 +97,7 @@ function RdsPlantCard({
             {blurb}
           </p>
         )}
+
         <p style={{ fontSize: '0.78rem', color: 'var(--color-primary)', margin: 'var(--space-sm) 0 0' }}>
           View details
         </p>
@@ -220,6 +221,7 @@ function DbPlantDetailContent({
           </a>
         </p>
       )}
+
       <WildlifeSection state={detail} />
       <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
         Short descriptions and photos may come from Wikipedia and iNaturalist when not stored in your database.

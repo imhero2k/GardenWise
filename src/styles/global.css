@@ -3126,6 +3126,35 @@ img {
 .nursery-detail-links a {
   color: var(--color-primary-dark);
   word-break: break-all;
+  transition:
+    color var(--transition),
+    text-decoration-color var(--transition);
+}
+
+.nursery-detail-links a:hover,
+.nursery-detail-links a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-link-hover) 85%, transparent);
+}
+
+.nursery-detail-link {
+  color: var(--color-primary-dark);
+  word-break: break-all;
+  transition:
+    color var(--transition),
+    text-decoration-color var(--transition);
+}
+
+.nursery-detail-link:hover,
+.nursery-detail-link:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-link-hover) 85%, transparent);
 }
 
 /* Weed upload */
