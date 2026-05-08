@@ -53,7 +53,8 @@ export const BIOREGION_HIT_CTE = /* sql */ `
 export const PLANT_SELECT = /* sql */ `
   p.id,
   p.scientific_name,
-  p.common_name
+  p.common_name,
+  p.lf_code
 `
 
 /**

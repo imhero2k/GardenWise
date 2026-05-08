@@ -69,6 +69,31 @@ function parseQ(raw) {
   return typeof raw === 'string' ? raw.trim() : ''
 }
 
+const LF_CODES = new Set([
+  'MS',
+  'SS',
+  'T',
+  'MH',
+  'PS',
+  'SH',
+  'GF',
+  'LH',
+  'EP',
+  'MTG',
+  'SC',
+  'LTG',
+  'MNG',
+  'LNG',
+  'TTG',
+  'HG',
+])
+
+function parseLfCode(raw) {
+  if (typeof raw !== 'string') return ''
+  const value = raw.trim().toUpperCase()
+  return LF_CODES.has(value) ? value : ''
+}
+
 function parseLatLng(req, res) {
   const lat = Number(req.query.lat)
   const lng = Number(req.query.lng)
@@ -164,6 +189,7 @@ app.get(
       limit: parsePageSize(req.query.pageSize),
       offset: parseOffset(req.query.offset),
       q: parseQ(req.query.q),
+      lfCode: parseLfCode(req.query.lfCode),
       wildlife: parseWildlifeCategories(req.query.wildlife),
     })
     res.json(data)

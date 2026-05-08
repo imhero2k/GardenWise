@@ -2,6 +2,7 @@ export type RecommendedPlant = {
   id: string
   scientificName: string
   commonName: string | null
+  lfCode?: string | null
   family: string | null
   description: string | null
   imageUrl: string | null
@@ -31,6 +32,7 @@ export type RecommendationsResponse = {
   offset: number
   hasMore: boolean
   q?: string | null
+  lfCode?: string | null
   wildlife?: WildlifeCategory[]
 }
 
@@ -51,12 +53,14 @@ export async function fetchRecommendations(
     pageSize?: number
     offset?: number
     q?: string
+    lfCode?: string
     wildlife?: ReadonlyArray<WildlifeCategory>
   },
 ): Promise<RecommendationsResponse> {
   const pageSize = options?.pageSize ?? 12
   const offset = options?.offset ?? 0
   const q = (options?.q ?? '').trim()
+  const lfCode = (options?.lfCode ?? '').trim().toUpperCase()
   const wildlife = options?.wildlife ?? []
   const base = apiBase()
   const qs = new URLSearchParams({
@@ -66,6 +70,7 @@ export async function fetchRecommendations(
     offset: String(offset),
   })
   if (q) qs.set('q', q)
+  if (lfCode) qs.set('lfCode', lfCode)
   if (wildlife.length) qs.set('wildlife', wildlife.join(','))
   const path = `/api/recommendations?${qs.toString()}`
   const url = base ? `${base}${path}` : path
@@ -89,6 +94,7 @@ export async function fetchRecommendations(
     offset: j.offset ?? 0,
     hasMore: j.hasMore ?? false,
     q: j.q ?? null,
+    lfCode: j.lfCode ?? null,
     wildlife: j.wildlife ?? [],
   }
 }

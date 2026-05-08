@@ -6,6 +6,7 @@
 // a clean remount of this component whenever its module changes.
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import * as THREE from 'three'
+import WebGL from 'three/examples/jsm/capabilities/WebGL.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { PlantSpec } from '../data/plantSpecs'
 
@@ -152,6 +153,20 @@ function buildGhost(spec: PlantSpec): THREE.Mesh {
   return m
 }
 
+function renderWebGLUnavailable(el: HTMLElement) {
+  el.innerHTML = `
+    <div style="padding: 24px; font-family: sans-serif;">
+      <h2>Your browser or device does not support WebGL.</h2>
+      <p>Please enable hardware acceleration, update your graphics driver, or try another browser.</p>
+    </div>
+  `
+}
+
+function isWebGLAvailable() {
+  const helper = WebGL as typeof WebGL & { isWebGLAvailable?: () => boolean }
+  return helper.isWebGLAvailable ? helper.isWebGLAvailable() : helper.isWebGL2Available()
+}
+
 export function GardenPlannerScene({
   gardenWidth,
   gardenDepth,
@@ -199,6 +214,13 @@ export function GardenPlannerScene({
     const initialDepth = gardenDepthRef.current
     const plantUidMap = plantUidMapRef.current
 
+    if (!isWebGLAvailable()) {
+      renderWebGLUnavailable(el)
+      return () => {
+        el.innerHTML = ''
+      }
+    }
+
     const scene = new THREE.Scene()
     scene.background = new THREE.Color('#eef5ea')
     sceneRef.current = scene
@@ -206,7 +228,15 @@ export function GardenPlannerScene({
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000)
     cameraRef.current = camera
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    let renderer: THREE.WebGLRenderer
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true })
+    } catch {
+      renderWebGLUnavailable(el)
+      return () => {
+        el.innerHTML = ''
+      }
+    }
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap

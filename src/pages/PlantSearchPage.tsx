@@ -18,6 +18,31 @@ const RDS_PAGE_SIZE = 12
 
 const WILDLIFE_CATEGORY_IDS = WILDLIFE_CATEGORY_OPTIONS.map((o) => o.id)
 
+const LF_CODE_OPTIONS = [
+  { code: 'MS', label: 'Medium Shrub' },
+  { code: 'SS', label: 'Small Shrub' },
+  { code: 'T', label: 'Tree' },
+  { code: 'MH', label: 'Medium Herb' },
+  { code: 'PS', label: 'Prostrate Shrub' },
+  { code: 'SH', label: 'Small Herb' },
+  { code: 'GF', label: 'Ground Fern' },
+  { code: 'LH', label: 'Large Herb' },
+  { code: 'EP', label: 'Epiphyte' },
+  { code: 'MTG', label: 'Medium Tufted Grass' },
+  { code: 'SC', label: 'Scrambler / Climber' },
+  { code: 'LTG', label: 'Large Tufted Grass' },
+  { code: 'MNG', label: 'Medium Non-tufted Grass' },
+  { code: 'LNG', label: 'Large Non-tufted Grass' },
+  { code: 'TTG', label: 'Tiny Tufted Grass' },
+  { code: 'HG', label: 'Herbaceous Groundcover' },
+] as const
+
+function lfCodeLabel(code: string | null | undefined): string | null {
+  if (!code) return null
+  const match = LF_CODE_OPTIONS.find((o) => o.code === code)
+  return match ? match.label : code
+}
+
 function parseWildlifeParam(raw: string | null): WildlifeCategory[] {
   if (!raw) return []
   const known = new Set<WildlifeCategory>(WILDLIFE_CATEGORY_IDS)
@@ -73,6 +98,11 @@ function RdsPlantCard({
         {plant.family && (
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
             Family: {plant.family}
+          </p>
+        )}
+        {plant.lfCode && (
+          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-xs) 0 0' }}>
+            Life form: {lfCodeLabel(plant.lfCode)}
           </p>
         )}
         {loadingBlurb && (
@@ -198,9 +228,10 @@ function DbPlantDetailContent({
         {common && sci && common.toLowerCase() !== sci.toLowerCase() && (
           <p className="plant-detail-dialog__sci">{sci}</p>
         )}
-        {plant.family && (
+        {(plant.family || plant.lfCode) && (
           <ul className="plant-detail-dialog__meta">
-            <li>Family: {plant.family}</li>
+            {plant.family && <li>Family: {plant.family}</li>}
+            {plant.lfCode && <li>Life form: {lfCodeLabel(plant.lfCode)}</li>}
           </ul>
         )}
       </div>
@@ -238,6 +269,7 @@ export function PlantSearchPage() {
   const [rdsPlants, setRdsPlants] = useState<RecommendedPlant[]>([])
   const [rdsRegionName, setRdsRegionName] = useState<string | null>(null)
   const [rdsSearch, setRdsSearch] = useState('')
+  const [rdsLfCode, setRdsLfCode] = useState('')
   const [rdsOffset, setRdsOffset] = useState(0)
   const [rdsLoading, setRdsLoading] = useState(false)
   const [rdsHasMore, setRdsHasMore] = useState(false)
@@ -291,6 +323,7 @@ export function PlantSearchPage() {
         pageSize: RDS_PAGE_SIZE,
         offset: rdsOffset,
         q: rdsSearch,
+        lfCode: rdsLfCode,
         wildlife,
       })
         .then((res) => {
@@ -312,16 +345,16 @@ export function PlantSearchPage() {
         })
     })
     return () => ac.abort()
-  }, [coords, rdsOffset, rdsSearch, wildlife])
+  }, [coords, rdsOffset, rdsSearch, rdsLfCode, wildlife])
 
-  // When search term or wildlife filter changes, jump back to the first page.
+  // When filters change, jump back to the first page.
   const lastResetKey = useRef<string>('')
   useEffect(() => {
-    const key = `${rdsSearch}::${wildlife.join(',')}`
+    const key = `${rdsSearch}::${rdsLfCode}::${wildlife.join(',')}`
     if (lastResetKey.current === key) return
     lastResetKey.current = key
     queueMicrotask(() => setRdsOffset(0))
-  }, [rdsSearch, wildlife])
+  }, [rdsSearch, rdsLfCode, wildlife])
 
   useEffect(() => {
     if (!dbPlantDetail) return
@@ -413,6 +446,44 @@ export function PlantSearchPage() {
           />
         </div>
 
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+          <label
+            htmlFor="lf-code-filter"
+            style={{
+              display: 'block',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              color: 'var(--color-text-muted)',
+              marginBottom: 'var(--space-xs)',
+            }}
+          >
+            Life form
+          </label>
+          <select
+            id="lf-code-filter"
+            value={rdsLfCode}
+            onChange={(e) => setRdsLfCode(e.target.value)}
+            disabled={rdsLoading && rdsPlants.length === 0}
+            style={{
+              width: '100%',
+              maxWidth: '24rem',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.75rem 0.9rem',
+              background: 'var(--color-surface)',
+              color: 'var(--color-text)',
+              font: 'inherit',
+            }}
+          >
+            <option value="">All life forms</option>
+            {LF_CODE_OPTIONS.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <WildlifeFilter
           value={wildlife}
           onChange={handleWildlifeChange}
@@ -456,6 +527,7 @@ export function PlantSearchPage() {
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
               Page {Math.floor(rdsOffset / RDS_PAGE_SIZE) + 1}
               {rdsSearch.trim() ? ` · filtering “${rdsSearch.trim()}”` : ''}
+              {rdsLfCode ? ` · ${lfCodeLabel(rdsLfCode)}` : ''}
               {wildlife.length
                 ? ` · attracts ${wildlife
                     .map(
@@ -470,8 +542,8 @@ export function PlantSearchPage() {
 
         {!rdsLoading && coords && !rdsError && rdsPlants.length === 0 && (
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--space-lg)' }}>
-            {wildlife.length || rdsSearch.trim()
-              ? 'No plants match your filters. Try clearing the wildlife filter or search term.'
+            {wildlife.length || rdsSearch.trim() || rdsLfCode
+              ? 'No plants match your filters. Try clearing the life form, wildlife filter, or search term.'
               : 'No plants returned for this point. Check bioregion–plant links in the database, or widen your dataset.'}
           </p>
         )}
