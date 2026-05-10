@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { IconSearch } from '../components/Icons'
+import { FeatureIcon } from '../components/FeatureIcons'
 import {
   GardenPlannerScene,
   type PlacedPlant,
@@ -9,6 +10,14 @@ import { isFirebaseAuthConfigured } from '../auth/firebase'
 import { useAuth } from '../context/useAuth'
 import { useLocationArea } from '../context/LocationContext'
 import { PLANT_SPECS, type PlantForm, type PlantSpec } from '../data/plantSpecs'
+import {
+  FEATURE_SPECS,
+  FEATURE_CATEGORY_LABEL,
+  FEATURE_CATEGORY_ORDER,
+  isFeatureSpec,
+  type FeatureCategory,
+  type FeatureSpec,
+} from '../data/featureSpecs'
 import {
   fetchPlannerRecommendations,
   type PlannerGoal,
@@ -25,18 +34,23 @@ import {
 const DEFAULT_WIDTH = 10
 const DEFAULT_DEPTH = 6
 
-const LOCAL_PLANNER_SPEC_IDS = new Set(PLANT_SPECS.map((p) => p.id))
+type AnySpec = PlantSpec | FeatureSpec
 
-/** Persist full specs for placements not backed by bundled `PLANT_SPECS` (database picks). */
+const LOCAL_PLANNER_SPEC_IDS = new Set<string>([
+  ...PLANT_SPECS.map((p) => p.id),
+  ...FEATURE_SPECS.map((f) => f.id),
+])
+
+/** Persist full specs for placements not backed by bundled catalogs (database picks). */
 function plannerSpecsPatchForSave(
   placed: PlacedPlant[],
-  specsById: Record<string, PlantSpec>,
+  specsById: Record<string, AnySpec>,
 ): Record<string, PlantSpec> | undefined {
   const out: Record<string, PlantSpec> = {}
   for (const pid of [...new Set(placed.map((p) => p.specId))]) {
     if (LOCAL_PLANNER_SPEC_IDS.has(pid)) continue
     const s = specsById[pid]
-    if (s) out[pid] = s
+    if (s && !isFeatureSpec(s)) out[pid] = s
   }
   return Object.keys(out).length > 0 ? out : undefined
 }
@@ -67,6 +81,16 @@ interface FormCounts {
   ground: number
   front: number
   back: number
+  /** Total habitat features placed (any kind). */
+  features: number
+  /** Nest boxes — bird nesting cavity target. */
+  nestBoxes: number
+  /** Insect hotels — pollinator/insect shelter target. */
+  insectHotels: number
+  /** Rock piles + log piles — ground shelter target. */
+  groundShelters: number
+  /** Bird baths + shallow dishes — water source target. */
+  waterSources: number
 }
 
 interface ProgressItem {
@@ -325,7 +349,7 @@ function clampDim(raw: string, fallback: number): number {
   return Math.max(2, Math.min(60, n))
 }
 
-function spacingWarnings(placed: PlacedPlant[], specs: Record<string, PlantSpec>): string[] {
+function spacingWarnings(placed: PlacedPlant[], specs: Record<string, AnySpec>): string[] {
   const warnings: string[] = []
   for (let i = 0; i < placed.length; i += 1) {
     for (let j = i + 1; j < placed.length; j += 1) {
@@ -348,11 +372,24 @@ function spacingWarnings(placed: PlacedPlant[], specs: Record<string, PlantSpec>
   return warnings.slice(0, 5)
 }
 
-function placedCounts(placed: PlacedPlant[], specs: Record<string, PlantSpec>): FormCounts {
+function placedCounts(placed: PlacedPlant[], specs: Record<string, AnySpec>): FormCounts {
   return placed.reduce<FormCounts>(
     (counts, item) => {
       const spec = specs[item.specId]
       if (!spec) return counts
+      if (isFeatureSpec(spec)) {
+        counts.total += 1
+        counts.features += 1
+        if (spec.featureKind === 'nestBox') counts.nestBoxes += 1
+        if (spec.featureKind === 'insectHotel') counts.insectHotels += 1
+        if (spec.featureKind === 'rockPile' || spec.featureKind === 'logPile') {
+          counts.groundShelters += 1
+        }
+        if (spec.featureKind === 'birdBath' || spec.featureKind === 'shallowDish') {
+          counts.waterSources += 1
+        }
+        return counts
+      }
 
       counts.total += 1
       if (spec.form === 'tree') counts.canopy += 1
@@ -363,7 +400,19 @@ function placedCounts(placed: PlacedPlant[], specs: Record<string, PlantSpec>): 
 
       return counts
     },
-    { total: 0, canopy: 0, mid: 0, ground: 0, front: 0, back: 0 },
+    {
+      total: 0,
+      canopy: 0,
+      mid: 0,
+      ground: 0,
+      front: 0,
+      back: 0,
+      features: 0,
+      nestBoxes: 0,
+      insectHotels: 0,
+      groundShelters: 0,
+      waterSources: 0,
+    },
   )
 }
 
@@ -421,16 +470,33 @@ function goalHeadline(goal: GardenGoal, counts: FormCounts): string {
 
 function goalProgress(goal: GardenGoal, counts: FormCounts): number {
   if (goal === 'bird') {
-    return Math.round(((Math.min(counts.canopy, 1) + Math.min(counts.mid, 2) + Math.min(counts.ground, 3)) / 6) * 100)
+    // 6 plant points (canopy 1 + mid 2 + ground 3) + 3 feature points
+    // (nest box 1 + ground shelter 1 + water 1) = 9 total.
+    const plantPts =
+      Math.min(counts.canopy, 1) + Math.min(counts.mid, 2) + Math.min(counts.ground, 3)
+    const featurePts =
+      Math.min(counts.nestBoxes, 1) +
+      Math.min(counts.groundShelters, 1) +
+      Math.min(counts.waterSources, 1)
+    return Math.round(((plantPts + featurePts) / 9) * 100)
   }
   if (goal === 'pollinator') {
-    return Math.round(((Math.min(counts.front, 4) + Math.min(counts.back, 2)) / 6) * 100)
+    // 6 plant points (front 4 + back 2) + 3 feature points
+    // (insect hotel 1 + log/rock shelter 1 + water 1) = 9 total.
+    const plantPts = Math.min(counts.front, 4) + Math.min(counts.back, 2)
+    const featurePts =
+      Math.min(counts.insectHotels, 1) +
+      Math.min(counts.groundShelters, 1) +
+      Math.min(counts.waterSources, 1)
+    return Math.round(((plantPts + featurePts) / 9) * 100)
   }
   return counts.total > 0 ? 100 : 0
 }
 
 function goalProgressItems(goal: GardenGoal, counts: FormCounts): ProgressItem[] {
   if (goal === 'bird') {
+    const plantStructureDone =
+      counts.canopy >= 1 && counts.mid >= 2 && counts.ground >= 3
     return [
       {
         title: 'Canopy layer',
@@ -448,19 +514,45 @@ function goalProgressItems(goal: GardenGoal, counts: FormCounts): ProgressItem[]
         state: counts.ground >= 3 ? 'complete' : counts.mid >= 2 ? 'active' : 'waiting',
       },
       {
-        title: 'Bird food traits',
-        detail: 'Needs 2 fleshy-fruited or bird-dispersed species once database traits are connected.',
-        state: counts.canopy >= 1 && counts.mid >= 2 && counts.ground >= 3 ? 'active' : 'waiting',
+        title: 'Nesting cavity',
+        detail: `${counts.nestBoxes} nest box${counts.nestBoxes === 1 ? '' : 'es'} placed; aim for at least 1.`,
+        state:
+          counts.nestBoxes >= 1
+            ? 'complete'
+            : plantStructureDone
+              ? 'active'
+              : 'waiting',
       },
       {
-        title: 'Flowering ground support',
-        detail: 'Ground layer flowering support will be validated from flowering trait data.',
-        state: 'waiting',
+        title: 'Ground shelter',
+        detail: `${counts.groundShelters} rock or log pile${counts.groundShelters === 1 ? '' : 's'} placed; aim for at least 1.`,
+        state:
+          counts.groundShelters >= 1
+            ? 'complete'
+            : counts.nestBoxes >= 1
+              ? 'active'
+              : 'waiting',
+      },
+      {
+        title: 'Water source',
+        detail: `${counts.waterSources} bird bath or dish${counts.waterSources === 1 ? '' : 'es'} placed; aim for at least 1.`,
+        state:
+          counts.waterSources >= 1
+            ? 'complete'
+            : counts.groundShelters >= 1
+              ? 'active'
+              : 'waiting',
+      },
+      {
+        title: 'Bird food traits',
+        detail: 'Needs 2 fleshy-fruited or bird-dispersed species once database traits are connected.',
+        state: plantStructureDone ? 'active' : 'waiting',
       },
     ]
   }
 
   if (goal === 'pollinator') {
+    const plantStructureDone = counts.front >= 4 && counts.back >= 2
     return [
       {
         title: 'Front nectar layer',
@@ -473,9 +565,39 @@ function goalProgressItems(goal: GardenGoal, counts: FormCounts): ProgressItem[]
         state: counts.back >= 2 ? 'complete' : counts.front >= 4 ? 'active' : 'waiting',
       },
       {
+        title: 'Insect shelter',
+        detail: `${counts.insectHotels} insect hotel${counts.insectHotels === 1 ? '' : 's'} placed; aim for at least 1.`,
+        state:
+          counts.insectHotels >= 1
+            ? 'complete'
+            : plantStructureDone
+              ? 'active'
+              : 'waiting',
+      },
+      {
+        title: 'Ground / log shelter',
+        detail: `${counts.groundShelters} rock or log pile${counts.groundShelters === 1 ? '' : 's'} placed; aim for at least 1 for ground-nesting bees.`,
+        state:
+          counts.groundShelters >= 1
+            ? 'complete'
+            : counts.insectHotels >= 1
+              ? 'active'
+              : 'waiting',
+      },
+      {
+        title: 'Water source',
+        detail: `${counts.waterSources} dish${counts.waterSources === 1 ? '' : 'es'} placed; a shallow dish with stones helps insects drink safely.`,
+        state:
+          counts.waterSources >= 1
+            ? 'complete'
+            : counts.groundShelters >= 1
+              ? 'active'
+              : 'waiting',
+      },
+      {
         title: 'Flowering seasons',
         detail: 'Needs at least 3 seasons with at least 3 species flowering in each covered season.',
-        state: counts.front >= 4 && counts.back >= 2 ? 'active' : 'waiting',
+        state: plantStructureDone ? 'active' : 'waiting',
       },
       {
         title: 'Pollinator syndrome',
@@ -588,6 +710,27 @@ function recommendationMeta(plant: PlannerRecommendationPlant): string {
   return bits.join(' · ')
 }
 
+/** Which feature kinds are explicit targets for each garden goal. */
+const GOAL_FEATURE_TARGETS: Record<GardenGoal, string[]> = {
+  free: [],
+  bird: ['nestBox', 'rockPile', 'logPile', 'birdBath', 'shallowDish'],
+  pollinator: ['insectHotel', 'logPile', 'rockPile', 'shallowDish'],
+}
+
+function featureRecommendedForGoal(kind: string, goal: GardenGoal): boolean {
+  return GOAL_FEATURE_TARGETS[goal].includes(kind)
+}
+
+function featureGoalNote(goal: GardenGoal): string | null {
+  if (goal === 'bird') {
+    return 'Bird-friendly target: at least 1 nest box, 1 rock or log pile, and 1 water source.'
+  }
+  if (goal === 'pollinator') {
+    return 'Pollinator target: at least 1 insect hotel, 1 log/rock pile, and 1 shallow water dish.'
+  }
+  return null
+}
+
 function recommendationGroupById(
   data: PlannerRecommendationsResponse | null,
 ): Record<string, PlannerRecommendationGroup> {
@@ -617,6 +760,7 @@ export function GardenPlannerPage() {
   const [plannerLoading, setPlannerLoading] = useState(false)
   const [plannerError, setPlannerError] = useState<string | null>(null)
   const [groupPages, setGroupPages] = useState<Record<string, number>>({})
+  const [catalogTab, setCatalogTab] = useState<'plants' | 'features'>('plants')
 
   const { state: authState } = useAuth()
   const layoutHydratedRef = useRef(false)
@@ -632,9 +776,25 @@ export function GardenPlannerPage() {
     return m
   }, [])
 
-  const specsById = useMemo(
-    () => ({ ...localSpecsById, ...dbSpecsById }),
-    [localSpecsById, dbSpecsById],
+  const featureSpecsById = useMemo(() => {
+    const m: Record<string, FeatureSpec> = {}
+    FEATURE_SPECS.forEach((f) => {
+      m[f.id] = f
+    })
+    return m
+  }, [])
+
+  const featuresByCategory = useMemo(() => {
+    const m: Record<FeatureCategory, FeatureSpec[]> = { shelter: [], water: [] }
+    FEATURE_SPECS.forEach((f) => {
+      m[f.category].push(f)
+    })
+    return m
+  }, [])
+
+  const specsById = useMemo<Record<string, AnySpec>>(
+    () => ({ ...localSpecsById, ...featureSpecsById, ...dbSpecsById }),
+    [localSpecsById, featureSpecsById, dbSpecsById],
   )
 
   const specsPatchForSave = useMemo(
@@ -944,9 +1104,95 @@ export function GardenPlannerPage() {
 
       <div className="garden-planner-layout">
         <aside className="garden-planner-sidebar card card-body" aria-label="Plant catalog">
-          {goal === 'free' ? (
+          <h2 className="garden-planner-panel-title">
+            {goal === 'free' ? 'Catalog' : 'Goal recommendations'}
+          </h2>
+          <div
+            className="planner-catalog-tabs"
+            role="tablist"
+            aria-label="Catalog category"
+          >
+            <button
+              type="button"
+              role="tab"
+              className={`planner-catalog-tab${catalogTab === 'plants' ? ' active' : ''}`}
+              aria-selected={catalogTab === 'plants'}
+              onClick={() => setCatalogTab('plants')}
+            >
+              Plants
+            </button>
+            <button
+              type="button"
+              role="tab"
+              className={`planner-catalog-tab${catalogTab === 'features' ? ' active' : ''}`}
+              aria-selected={catalogTab === 'features'}
+              onClick={() => setCatalogTab('features')}
+            >
+              Features
+            </button>
+          </div>
+
+          {catalogTab === 'features' ? (
             <>
-              <h2 className="garden-planner-panel-title">Plant catalog</h2>
+              {featureGoalNote(goal) && (
+                <p className="garden-planner-sidebar-note">{featureGoalNote(goal)}</p>
+              )}
+              <div className="planner-feature-catalog">
+                {FEATURE_CATEGORY_ORDER.map((cat) => {
+                  const items = featuresByCategory[cat]
+                  if (items.length === 0) return null
+                  return (
+                    <div key={cat} className="planner-feature-group">
+                      <h3 className="planner-feature-group__title">
+                        {FEATURE_CATEGORY_LABEL[cat]}
+                      </h3>
+                      <ul className="planner-feature-list">
+                        {items.map((f) => {
+                          const active = pendingSpecId === f.id
+                          const recommended = featureRecommendedForGoal(f.featureKind, goal)
+                          return (
+                            <li key={f.id}>
+                              <button
+                                type="button"
+                                className={`planner-feature-item${active ? ' active' : ''}${recommended ? ' recommended' : ''}`}
+                                onClick={() =>
+                                  setPendingSpecId(active ? null : f.id)
+                                }
+                                aria-pressed={active}
+                                title={f.sizeLabel}
+                              >
+                                <span
+                                  className="planner-feature-item__icon"
+                                  style={{ color: f.primaryColor }}
+                                  aria-hidden
+                                >
+                                  <FeatureIcon kind={f.featureKind} />
+                                </span>
+                                <span className="planner-feature-item__text">
+                                  <span className="planner-feature-item__name">
+                                    {f.commonName}
+                                    {recommended && (
+                                      <span className="planner-feature-item__badge">
+                                        Recommended
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span className="planner-feature-item__desc">
+                                    {f.description}
+                                  </span>
+                                </span>
+                              </button>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          ) : goal === 'free' ? (
+            <>
               <div className="search-field" style={{ marginBottom: 'var(--space-sm)' }}>
                 <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
                   <IconSearch />
@@ -999,7 +1245,6 @@ export function GardenPlannerPage() {
             </>
           ) : (
             <>
-              <h2 className="garden-planner-panel-title">Goal recommendations</h2>
               <p className="garden-planner-sidebar-note">
                 {plannerLoading
                   ? 'Loading database-matched recommendations...'
@@ -1169,26 +1414,55 @@ export function GardenPlannerPage() {
             onPlace={handlePlace}
             onRemove={handleRemove}
           />
-          <div className="garden-planner-hint">
-            {pendingSpec ? (
-              <>
-                Placing <strong>{pendingSpec.commonName}</strong> - click inside the garden.
-                Footprint will be <strong>{pendingSpec.matureWidth.toFixed(1)} m</strong> wide
-                (minimum spacing ≈ {pendingSpec.recommendedSpacing.toFixed(1)} m).
-                {pendingSpec.note ? <> {pendingSpec.note}</> : null}
-              </>
-            ) : goal === 'free' ? (
-              <>Left-drag to rotate · right-drag to pan · scroll to zoom · click a plant in the catalog to start placing.</>
-            ) : plannerLoading ? (
-              <>Loading database recommendations for this garden goal.</>
-            ) : !coords ? (
-              <>Set a Victorian location to load goal-based species recommendations.</>
-            ) : plannerError ? (
-              <>Could not load goal recommendations: {plannerError}</>
-            ) : (
-              <>Click a recommended species on the left, then click inside the garden to place it.</>
-            )}
-          </div>
+          {pendingSpec && isFeatureSpec(pendingSpec) ? (
+            <div className="planner-feature-banner" role="status">
+              <span className="planner-feature-banner__bullet" aria-hidden>!</span>
+              <div className="planner-feature-banner__body">
+                <p className="planner-feature-banner__title">
+                  Placing {pendingSpec.commonName.toLowerCase().startsWith('a') ||
+                  pendingSpec.commonName.toLowerCase().startsWith('e') ||
+                  pendingSpec.commonName.toLowerCase().startsWith('i') ||
+                  pendingSpec.commonName.toLowerCase().startsWith('o') ||
+                  pendingSpec.commonName.toLowerCase().startsWith('u')
+                    ? 'an'
+                    : 'a'}{' '}
+                  {pendingSpec.commonName}
+                </p>
+                <p className="planner-feature-banner__detail">
+                  {pendingSpec.placementNote}
+                </p>
+                <p className="planner-feature-banner__meta">{pendingSpec.sizeLabel}</p>
+              </div>
+              <a
+                className="planner-feature-banner__more"
+                href="#"
+                onClick={(e) => e.preventDefault()}
+              >
+                Learn more →
+              </a>
+            </div>
+          ) : (
+            <div className="garden-planner-hint">
+              {pendingSpec ? (
+                <>
+                  Placing <strong>{pendingSpec.commonName}</strong> - click inside the garden.
+                  Footprint will be <strong>{pendingSpec.matureWidth.toFixed(1)} m</strong> wide
+                  (minimum spacing ≈ {pendingSpec.recommendedSpacing.toFixed(1)} m).
+                  {!isFeatureSpec(pendingSpec) && pendingSpec.note ? <> {pendingSpec.note}</> : null}
+                </>
+              ) : goal === 'free' ? (
+                <>Left-drag to rotate · right-drag to pan · scroll to zoom · click a plant in the catalog to start placing.</>
+              ) : plannerLoading ? (
+                <>Loading database recommendations for this garden goal.</>
+              ) : !coords ? (
+                <>Set a Victorian location to load goal-based species recommendations.</>
+              ) : plannerError ? (
+                <>Could not load goal recommendations: {plannerError}</>
+              ) : (
+                <>Click a recommended species on the left, then click inside the garden to place it.</>
+              )}
+            </div>
+          )}
         </div>
 
         <aside className="garden-planner-insights card card-body" aria-label="Recommendation reason and setup progress">
@@ -1253,12 +1527,15 @@ export function GardenPlannerPage() {
                 {placed.map((p) => {
                   const s = specsById[p.specId]
                   if (!s) return null
+                  const typeLabel = isFeatureSpec(s)
+                    ? FEATURE_CATEGORY_LABEL[s.category]
+                    : FORM_LABEL[s.form]
                   return (
                     <li key={p.uid}>
                       <span>
                         <strong>{s.commonName}</strong>
                         <small>
-                          {FORM_LABEL[s.form]} · {p.x.toFixed(1)} m, {p.z.toFixed(1)} m
+                          {typeLabel} · {p.x.toFixed(1)} m, {p.z.toFixed(1)} m
                         </small>
                       </span>
                       <button

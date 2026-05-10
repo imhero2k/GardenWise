@@ -9,6 +9,10 @@ import * as THREE from 'three'
 import WebGL from 'three/examples/jsm/capabilities/WebGL.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { PlantSpec } from '../data/plantSpecs'
+import type { FeatureSpec } from '../data/featureSpecs'
+import { isFeatureSpec } from '../data/featureSpecs'
+
+export type PlannerSpec = PlantSpec | FeatureSpec
 
 export interface PlacedPlant {
   uid: string
@@ -25,8 +29,8 @@ interface Props {
   gardenWidth: number
   gardenDepth: number
   placed: PlacedPlant[]
-  specsById: Record<string, PlantSpec>
-  pendingSpec: PlantSpec | null
+  specsById: Record<string, PlannerSpec>
+  pendingSpec: PlannerSpec | null
   viewMode: PlannerViewMode
   /** Increment to programmatically reset/refit the camera. */
   resetSignal: number
@@ -143,14 +147,198 @@ function buildPlantMesh(spec: PlantSpec): THREE.Group {
   return group
 }
 
-function buildGhost(spec: PlantSpec): THREE.Mesh {
+function buildGhost(spec: PlannerSpec): THREE.Mesh {
   const radius = Math.max(0.08, spec.matureWidth / 2)
+  const color = isFeatureSpec(spec) ? spec.primaryColor : spec.canopyColor
   const m = new THREE.Mesh(
     new THREE.CylinderGeometry(radius, radius, 0.02, 48),
-    new THREE.MeshBasicMaterial({ color: spec.canopyColor, transparent: true, opacity: 0.45 }),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.45 }),
   )
   m.position.y = 0.01
   return m
+}
+
+/** Programmatic mesh for a habitat feature (nest box, insect hotel, log pile, …). */
+function buildFeatureMesh(spec: FeatureSpec): THREE.Group {
+  const group = new THREE.Group()
+
+  const widthX = Math.max(0.1, spec.matureWidth)
+  const depthZ = Math.max(0.1, spec.matureDepth ?? spec.matureWidth)
+  const height = Math.max(0.05, spec.matureHeight)
+
+  // Footprint ring — brown to distinguish from plant green rings.
+  const footR = Math.max(widthX, depthZ) / 2
+  const footprint = new THREE.Mesh(
+    new THREE.RingGeometry(footR * 0.97, footR, 48),
+    new THREE.MeshBasicMaterial({
+      color: 0x8d6e63,
+      transparent: true,
+      opacity: 0.65,
+      side: THREE.DoubleSide,
+    }),
+  )
+  footprint.rotation.x = -Math.PI / 2
+  footprint.position.y = 0.02
+  group.add(footprint)
+
+  // Optional pole (nest box, insect hotel, bird bath).
+  let baseY = 0
+  if (spec.mount === 'pole' && spec.poleHeight && spec.poleHeight > 0) {
+    const pole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.05, spec.poleHeight, 10),
+      new THREE.MeshStandardMaterial({ color: '#5a4630', roughness: 1 }),
+    )
+    pole.position.y = spec.poleHeight / 2
+    pole.castShadow = true
+    pole.receiveShadow = true
+    group.add(pole)
+    baseY = spec.poleHeight
+  }
+
+  if (spec.shape === 'box') {
+    // Nest box / insect hotel.
+    const bodyHeight = height * (spec.featureKind === 'nestBox' ? 0.78 : 0.96)
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(widthX, bodyHeight, depthZ),
+      new THREE.MeshStandardMaterial({ color: spec.primaryColor, roughness: 0.9 }),
+    )
+    body.position.y = baseY + bodyHeight / 2
+    body.castShadow = true
+    body.receiveShadow = true
+    group.add(body)
+
+    if (spec.featureKind === 'nestBox') {
+      // Pitched roof.
+      const roof = new THREE.Mesh(
+        new THREE.ConeGeometry(Math.max(widthX, depthZ) * 0.78, height * 0.32, 4),
+        new THREE.MeshStandardMaterial({
+          color: spec.secondaryColor ?? '#3a2418',
+          roughness: 0.9,
+        }),
+      )
+      roof.rotation.y = Math.PI / 4
+      roof.position.y = baseY + bodyHeight + height * 0.16
+      roof.castShadow = true
+      group.add(roof)
+
+      // Entry hole.
+      const hole = new THREE.Mesh(
+        new THREE.CircleGeometry(Math.min(widthX, depthZ) * 0.18, 16),
+        new THREE.MeshBasicMaterial({ color: 0x111111 }),
+      )
+      hole.position.set(0, baseY + bodyHeight * 0.62, depthZ / 2 + 0.001)
+      group.add(hole)
+    } else if (spec.featureKind === 'insectHotel') {
+      // Horizontal slats with darker tubes for visual texture.
+      const slats = 4
+      for (let i = 0; i < slats; i += 1) {
+        const slat = new THREE.Mesh(
+          new THREE.BoxGeometry(widthX * 0.86, bodyHeight * 0.18, depthZ * 1.02),
+          new THREE.MeshStandardMaterial({
+            color: i % 2 === 0 ? spec.secondaryColor ?? '#8c6a3a' : '#6f4f24',
+            roughness: 0.95,
+          }),
+        )
+        slat.position.y = baseY + bodyHeight * (0.12 + i * 0.22)
+        slat.castShadow = true
+        group.add(slat)
+      }
+    }
+  } else if (spec.shape === 'pile') {
+    // Rock pile / log pile — stack of 3–4 ellipsoid/cylinder blobs.
+    if (spec.featureKind === 'rockPile') {
+      const rocks = [
+        { rx: widthX * 0.45, ry: height * 0.5, rz: depthZ * 0.45, x: -widthX * 0.18, y: height * 0.5, z: 0 },
+        { rx: widthX * 0.32, ry: height * 0.42, rz: depthZ * 0.35, x: widthX * 0.22, y: height * 0.42, z: depthZ * 0.05 },
+        { rx: widthX * 0.22, ry: height * 0.3, rz: depthZ * 0.22, x: widthX * 0.0, y: height * 0.95, z: -depthZ * 0.1 },
+      ]
+      rocks.forEach((r, i) => {
+        const geo = new THREE.SphereGeometry(1, 14, 10)
+        geo.scale(r.rx, r.ry, r.rz)
+        const rock = new THREE.Mesh(
+          geo,
+          new THREE.MeshStandardMaterial({
+            color: i === 1 ? spec.secondaryColor ?? '#6c7174' : spec.primaryColor,
+            roughness: 1,
+            flatShading: true,
+          }),
+        )
+        rock.position.set(r.x, r.y, r.z)
+        rock.castShadow = true
+        rock.receiveShadow = true
+        group.add(rock)
+      })
+    } else {
+      // Log pile — three stacked logs (long axis = X).
+      const logRadius = height * 0.32
+      const logLen = widthX
+      const logGeo = new THREE.CylinderGeometry(logRadius, logRadius, logLen, 14)
+      const logMat = new THREE.MeshStandardMaterial({ color: spec.primaryColor, roughness: 1 })
+      const logMatDark = new THREE.MeshStandardMaterial({
+        color: spec.secondaryColor ?? '#4d2f17',
+        roughness: 1,
+      })
+      const positions: [number, number, number][] = [
+        [0, logRadius, -depthZ * 0.22],
+        [0, logRadius, depthZ * 0.22],
+        [0, logRadius * 3, 0],
+      ]
+      positions.forEach(([x, y, z], i) => {
+        const log = new THREE.Mesh(logGeo, i === 1 ? logMatDark : logMat)
+        log.rotation.z = Math.PI / 2
+        log.position.set(x, y, z)
+        log.castShadow = true
+        log.receiveShadow = true
+        group.add(log)
+      })
+    }
+  } else if (spec.shape === 'pedestal') {
+    // Bird bath: pole already added; add the basin on top.
+    const basinR = widthX / 2
+    const basin = new THREE.Mesh(
+      new THREE.CylinderGeometry(basinR, basinR * 0.78, basinR * 0.32, 24),
+      new THREE.MeshStandardMaterial({ color: spec.primaryColor, roughness: 0.6 }),
+    )
+    basin.position.y = baseY + basinR * 0.16
+    basin.castShadow = true
+    basin.receiveShadow = true
+    group.add(basin)
+
+    const water = new THREE.Mesh(
+      new THREE.CylinderGeometry(basinR * 0.85, basinR * 0.85, 0.02, 24),
+      new THREE.MeshStandardMaterial({
+        color: spec.secondaryColor ?? '#5e8db5',
+        roughness: 0.2,
+        metalness: 0.1,
+      }),
+    )
+    water.position.y = baseY + basinR * 0.32 + 0.001
+    group.add(water)
+  } else if (spec.shape === 'dish') {
+    // Shallow dish on the ground.
+    const r = widthX / 2
+    const dish = new THREE.Mesh(
+      new THREE.CylinderGeometry(r, r * 0.85, height, 24),
+      new THREE.MeshStandardMaterial({ color: spec.primaryColor, roughness: 0.6 }),
+    )
+    dish.position.y = height / 2
+    dish.castShadow = true
+    dish.receiveShadow = true
+    group.add(dish)
+
+    const water = new THREE.Mesh(
+      new THREE.CylinderGeometry(r * 0.88, r * 0.88, 0.02, 24),
+      new THREE.MeshStandardMaterial({
+        color: spec.secondaryColor ?? '#5e8db5',
+        roughness: 0.2,
+        metalness: 0.1,
+      }),
+    )
+    water.position.y = height + 0.001
+    group.add(water)
+  }
+
+  return group
 }
 
 function renderWebGLUnavailable(el: HTMLElement) {
@@ -530,7 +718,7 @@ export function GardenPlannerScene({
     placed.forEach((p) => {
       const spec = specsById[p.specId]
       if (!spec) return
-      const group = buildPlantMesh(spec)
+      const group = isFeatureSpec(spec) ? buildFeatureMesh(spec) : buildPlantMesh(spec)
       group.position.set(p.x, 0, p.z)
       root.add(group)
       plantUidMapRef.current.set(group, p.uid)

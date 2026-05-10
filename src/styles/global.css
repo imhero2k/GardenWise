@@ -3063,13 +3063,12 @@ button.vicflora-card {
 
 .garden-planner-layout {
   display: grid;
-  grid-template-columns: minmax(240px, 300px) minmax(360px, 1fr);
+  grid-template-columns:
+    minmax(240px, 300px)
+    minmax(360px, 1fr)
+    minmax(260px, 320px);
   gap: var(--space-md);
   align-items: start;
-}
-
-.garden-planner-insights {
-  grid-column: 1 / -1;
 }
 
 .garden-planner-sidebar {
@@ -3159,6 +3158,237 @@ button.vicflora-card {
   font-size: 0.72rem;
   color: var(--color-text-muted);
   line-height: 1.2;
+}
+
+/* ── Plants / Features segmented tabs ─────────────────────────── */
+.planner-catalog-tabs {
+  display: inline-flex;
+  align-self: stretch;
+  padding: 0.25rem;
+  margin: 0 0 var(--space-sm);
+  background: rgba(46, 125, 50, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  gap: 0.25rem;
+}
+
+.planner-catalog-tab {
+  flex: 1;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    box-shadow var(--transition);
+}
+
+.planner-catalog-tab:hover {
+  color: var(--color-text);
+}
+
+.planner-catalog-tab.active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* ── Feature catalog (Shelter / Water groups) ─────────────────── */
+.planner-feature-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.planner-feature-group__title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+}
+
+.planner-feature-list {
+  list-style: none;
+  margin: 0 0 var(--space-xs);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.planner-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.planner-feature-item:hover {
+  background: var(--color-bg);
+  border-color: rgba(46, 125, 50, 0.28);
+}
+
+.planner-feature-item.active {
+  border-color: rgba(230, 129, 0, 0.7);
+  background: rgba(255, 246, 232, 0.95);
+  box-shadow: 0 1px 2px rgba(230, 129, 0, 0.18);
+}
+
+.planner-feature-item__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(46, 125, 50, 0.08);
+}
+
+.planner-feature-item.active .planner-feature-item__icon {
+  background: rgba(230, 129, 0, 0.14);
+}
+
+.planner-feature-item__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.planner-feature-item__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.planner-feature-item__name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--color-text);
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.planner-feature-item__badge {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--color-primary-dark);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.planner-feature-item.recommended {
+  border-color: rgba(46, 125, 50, 0.42);
+}
+
+.planner-feature-item__desc {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+/* ── Bottom "Placing an X" warning banner ─────────────────────── */
+.planner-feature-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(230, 129, 0, 0.45);
+  background: rgba(255, 246, 232, 0.95);
+  color: var(--color-text);
+}
+
+.planner-feature-banner__bullet {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(230, 129, 0, 0.85);
+  color: rgba(230, 129, 0, 0.95);
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1rem;
+}
+
+.planner-feature-banner__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.planner-feature-banner__title {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.planner-feature-banner__detail {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: rgba(120, 75, 10, 0.92);
+}
+
+.planner-feature-banner__meta {
+  margin: 0.3rem 0 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+}
+
+.planner-feature-banner__more {
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.planner-feature-banner__more:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .planner-feature-banner {
+    flex-wrap: wrap;
+  }
+  .planner-feature-banner__more {
+    margin-left: 2.6rem;
+  }
 }
 
 .garden-goal-catalog {
@@ -3571,6 +3801,17 @@ button.vicflora-card {
   font-size: 0.72rem;
   line-height: 1.25;
   margin-top: 0.12rem;
+}
+
+/* Mid widths: drop the insights rail under the stage but keep the catalog rail. */
+@media (max-width: 1100px) {
+  .garden-planner-layout {
+    grid-template-columns: minmax(240px, 300px) minmax(360px, 1fr);
+  }
+
+  .garden-planner-insights {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 760px) {
