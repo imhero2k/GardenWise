@@ -1,3 +1,5 @@
+import type { JSX } from 'react'
+
 import type { FeatureKind } from '../data/featureSpecs'
 
 interface IconProps {
