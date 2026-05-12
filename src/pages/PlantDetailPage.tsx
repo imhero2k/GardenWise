@@ -40,7 +40,7 @@ export function PlantDetailPage() {
       </div>
 
       <div className="detail-section">
-        <h2>Environmental weed risk</h2>
+        <h2>Invasive risk</h2>
         <div className={`risk-banner${highRisk ? ' risk-banner--high' : ''}`}>
           <RiskBadge level={plant.invasiveRisk} />
           <p style={{ margin: highRisk ? 'var(--space-sm) 0 0' : 0, fontSize: '0.95rem' }}>
@@ -48,7 +48,7 @@ export function PlantDetailPage() {
               ? 'High-risk species can escape into bushland and outcompete natives. Consider removing or replacing with local alternatives.'
               : plant.invasiveRisk === 'Medium'
                 ? 'Monitor spread in warm, wet climates and keep contained where advised by your council.'
-                : 'Lower risk as an environmental weed when grown responsibly in suitable conditions.'}
+                : 'Lower invasive potential when grown responsibly in suitable conditions.'}
           </p>
         </div>
       </div>

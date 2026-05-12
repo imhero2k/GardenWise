@@ -4,8 +4,6 @@ import { AuthProvider } from './context/AuthContext'
 import { Layout } from './components/Layout'
 import { RequireAuth } from './components/RequireAuth'
 import { HomePage } from './pages/HomePage'
-import { BeginnerGuidesPage } from './pages/BeginnerGuidesPage'
-import { BeginnerGuideStepPage } from './pages/BeginnerGuideStepPage'
 import { LearnPage } from './pages/LearnPage'
 import { NurseryMapPage } from './pages/NurseryMapPage'
 import { PlantDetailPage } from './pages/PlantDetailPage'
@@ -14,7 +12,6 @@ import { WeedPage } from './pages/WeedPage'
 import { SignInPage } from './pages/SignInPage'
 import { GardenPlannerPage } from './pages/GardenPlannerPage'
 import { ProfilePage } from './pages/ProfilePage'
-import { AboutPage } from './pages/AboutPage'
 
 const routerBasename =
   import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '')
@@ -43,10 +40,7 @@ export default function App() {
               <Route path="weed" element={<WeedPage />} />
               <Route path="planner" element={<GardenPlannerPage />} />
               <Route path="map" element={<NurseryMapPage />} />
-              <Route path="beginners" element={<BeginnerGuidesPage />} />
-              <Route path="beginners/:id" element={<BeginnerGuideStepPage />} />
               <Route path="learn" element={<LearnPage />} />
-              <Route path="about" element={<AboutPage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
