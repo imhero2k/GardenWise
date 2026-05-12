@@ -1,7 +1,7 @@
 # Build with this directory as context (includes model/):
 #   docker build -f lambda_weedscan/Dockerfile -t weedscan-lambda:test lambda_weedscan
 #
-# From repo root (e.g. GardenWise):
+# From repo root (e.g. RootVio):
 #   docker build -f lambda_weedscan/Dockerfile -t weedscan-lambda:test lambda_weedscan
 #
 # Local invoke (Lambda Runtime Interface Emulator is in the base image):

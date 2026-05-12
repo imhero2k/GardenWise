@@ -18,12 +18,14 @@ type Props = {
   items: Nursery[]
   selected: Nursery | null
   onSelect: (n: Nursery) => void
+  focus?: { lat: number; lng: number; radiusKm: number }
 }
 
-export function NurseryLeafletMap({ items, selected, onSelect }: Props) {
+export function NurseryLeafletMap({ items, selected, onSelect, focus }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Map<string, L.CircleMarker>>(new Map())
+  const radiusRef = useRef<L.Circle | null>(null)
   const onSelectRef = useRef(onSelect)
   const selectedRef = useRef(selected)
 
@@ -76,6 +78,8 @@ export function NurseryLeafletMap({ items, selected, onSelect }: Props) {
 
     markersRef.current.forEach((m) => m.remove())
     markersRef.current.clear()
+    radiusRef.current?.remove()
+    radiusRef.current = null
 
     const selId = selectedRef.current?.id
 
@@ -97,9 +101,24 @@ export function NurseryLeafletMap({ items, selected, onSelect }: Props) {
       markersRef.current.set(n.id, cm)
     })
 
+    if (focus) {
+      radiusRef.current = L.circle([focus.lat, focus.lng], {
+        radius: focus.radiusKm * 1000,
+        color: '#E3B23C',
+        weight: 2,
+        opacity: 0.8,
+        fillColor: '#E3B23C',
+        fillOpacity: 0.08,
+        interactive: false,
+      }).addTo(map)
+    }
+
     const applyView = () => {
       map.invalidateSize()
-      if (items.length > 0) {
+      if (focus && radiusRef.current) {
+        // Tighter framing for the radius view so the circle doesn't feel "lost" in whitespace.
+        map.fitBounds(radiusRef.current.getBounds().pad(0.04))
+      } else if (items.length > 0) {
         const bounds = L.latLngBounds(items.map((n) => [n.lat, n.lng] as L.LatLngExpression))
         map.fitBounds(bounds.pad(0.12))
       } else {
@@ -111,7 +130,7 @@ export function NurseryLeafletMap({ items, selected, onSelect }: Props) {
       applyView()
     })
     return () => window.cancelAnimationFrame(t)
-  }, [items])
+  }, [items, focus])
 
   useEffect(() => {
     const map = mapRef.current
