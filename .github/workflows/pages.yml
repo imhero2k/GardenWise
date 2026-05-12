@@ -2,7 +2,7 @@ name: Deploy RootVio (Vite) → GitHub Pages
 
 on:
   push:
-    branches: [main, production]
+    branches: [main, iteration1, iteration2]
   workflow_dispatch:
 
 # Use Node 24 for JS-based actions (removes Node 20 deprecation warnings)
@@ -40,14 +40,31 @@ jobs:
           node-version: '22'
           cache: npm
 
-      # https://rootivio.app/iteration2/ — always built from main (current / “next”).
-      - name: Build /iteration2/ from main
+      # https://rootivio.app/iteration1/ — built from branch iteration1.
+      - name: Build /iteration1/ from iteration1
+        env:
+          VITE_BASE_PATH: /iteration1/
+        run: |
+          set -e
+          git fetch origin iteration1
+          git checkout -B __pages_iteration1 origin/iteration1
+          npm ci
+          npm run typecheck && npm run lint
+          npm run build
+
+      - name: Stage iteration1
+        run: |
+          mkdir -p pages-root/iteration1
+          cp -r dist/* pages-root/iteration1/
+
+      # https://rootivio.app/iteration2/ — built from branch iteration2.
+      - name: Build /iteration2/ from iteration2
         env:
           VITE_BASE_PATH: /iteration2/
         run: |
           set -e
-          git fetch origin main
-          git checkout -B __pages_main origin/main
+          git fetch origin iteration2
+          git checkout -B __pages_iteration2 origin/iteration2
           npm ci
           npm run typecheck && npm run lint
           npm run build
@@ -57,34 +74,34 @@ jobs:
           mkdir -p pages-root/iteration2
           cp -r dist/* pages-root/iteration2/
 
-      # https://rootivio.app/ (stable production) — built from branch production.
-      - name: Build site root from production
+      # https://rootivio.app/ (stable production root) — built from branch iteration2, alternate base path.
+      - name: Build site root from iteration2
         env:
           VITE_BASE_PATH: /
-        run: |
-          set -e
-          git fetch origin production
-          git checkout -B __pages_production origin/production
-          npm ci
-          npm run typecheck && npm run lint
-          npm run build
+        run: npm run build
 
-      - name: Stage production at Pages root
+      - name: Stage iteration2 at Pages root
         run: |
           mkdir -p pages-root
           cp -r dist/* pages-root/
           if [ -f CNAME ]; then cp CNAME pages-root/; fi
 
-      # https://rootivio.app/iteration1/ — same branch as root (`production`), alternate base path (alias URL).
-      - name: Build production at /iteration1/
+      # https://rootivio.app/iteration3/ — built from main (current / “next”).
+      - name: Build /iteration3/ from main
         env:
-          VITE_BASE_PATH: /iteration1/
-        run: npm run build
-
-      - name: Stage production at iteration1
+          VITE_BASE_PATH: /iteration3/
         run: |
-          mkdir -p pages-root/iteration1
-          cp -r dist/* pages-root/iteration1/
+          set -e
+          git fetch origin main
+          git checkout -B __pages_main origin/main
+          npm ci
+          npm run typecheck && npm run lint
+          npm run build
+
+      - name: Stage iteration3
+        run: |
+          mkdir -p pages-root/iteration3
+          cp -r dist/* pages-root/iteration3/
 
       - uses: actions/upload-pages-artifact@v4
         with:
