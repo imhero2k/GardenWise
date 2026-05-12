@@ -761,6 +761,7 @@ export function GardenPlannerPage() {
   const [plannerError, setPlannerError] = useState<string | null>(null)
   const [groupPages, setGroupPages] = useState<Record<string, number>>({})
   const [catalogTab, setCatalogTab] = useState<'plants' | 'features'>('plants')
+  const [expandedFeatureId, setExpandedFeatureId] = useState<string | null>(null)
 
   const { state: authState } = useAuth()
   const layoutHydratedRef = useRef(false)
@@ -1150,38 +1151,115 @@ export function GardenPlannerPage() {
                         {items.map((f) => {
                           const active = pendingSpecId === f.id
                           const recommended = featureRecommendedForGoal(f.featureKind, goal)
+                          const expanded = expandedFeatureId === f.id
                           return (
-                            <li key={f.id}>
-                              <button
-                                type="button"
-                                className={`planner-feature-item${active ? ' active' : ''}${recommended ? ' recommended' : ''}`}
-                                onClick={() =>
-                                  setPendingSpecId(active ? null : f.id)
-                                }
-                                aria-pressed={active}
-                                title={f.sizeLabel}
-                              >
-                                <span
-                                  className="planner-feature-item__icon"
-                                  style={{ color: f.primaryColor }}
-                                  aria-hidden
+                            <li key={f.id} className="planner-feature-list__item">
+                              <div className="planner-feature-item-wrap">
+                                <button
+                                  type="button"
+                                  className={`planner-feature-item${active ? ' active' : ''}${recommended ? ' recommended' : ''}${expanded ? ' expanded' : ''}`}
+                                  onClick={() =>
+                                    setPendingSpecId(active ? null : f.id)
+                                  }
+                                  aria-pressed={active}
+                                  title={f.sizeLabel}
                                 >
-                                  <FeatureIcon kind={f.featureKind} />
-                                </span>
-                                <span className="planner-feature-item__text">
-                                  <span className="planner-feature-item__name">
-                                    {f.commonName}
-                                    {recommended && (
-                                      <span className="planner-feature-item__badge">
-                                        Recommended
-                                      </span>
+                                  <span
+                                    className="planner-feature-item__icon"
+                                    style={{ color: f.primaryColor }}
+                                    aria-hidden
+                                  >
+                                    <FeatureIcon kind={f.featureKind} />
+                                  </span>
+                                  <span className="planner-feature-item__text">
+                                    <span className="planner-feature-item__name">
+                                      {f.commonName}
+                                      {recommended && (
+                                        <span className="planner-feature-item__badge">
+                                          Recommended
+                                        </span>
+                                      )}
+                                    </span>
+                                    <span className="planner-feature-item__desc">
+                                      {f.description}
+                                    </span>
+                                  </span>
+                                </button>
+                                {f.info && (
+                                  <button
+                                    type="button"
+                                    className={`planner-feature-info-toggle${expanded ? ' active' : ''}`}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setExpandedFeatureId(expanded ? null : f.id)
+                                    }}
+                                    aria-expanded={expanded}
+                                    aria-controls={`feature-info-${f.id}`}
+                                    aria-label={`${expanded ? 'Collapse' : 'Show'} details for ${f.commonName}`}
+                                  >
+                                    i
+                                  </button>
+                                )}
+                              </div>
+                              {expanded && f.info && (
+                                <div
+                                  className="planner-feature-details"
+                                  id={`feature-info-${f.id}`}
+                                  role="region"
+                                  aria-label={`${f.commonName} details`}
+                                >
+                                  <p className="planner-feature-details__intro">
+                                    {f.info.introParts.map((part, idx) =>
+                                      part.bold ? (
+                                        <strong key={idx}>{part.text}</strong>
+                                      ) : (
+                                        <span key={idx}>{part.text}</span>
+                                      ),
                                     )}
-                                  </span>
-                                  <span className="planner-feature-item__desc">
-                                    {f.description}
-                                  </span>
-                                </span>
-                              </button>
+                                  </p>
+                                  <div className="planner-feature-details__stat">
+                                    <span className="planner-feature-details__stat-num">
+                                      {f.info.stat}
+                                    </span>
+                                    <span className="planner-feature-details__stat-cap">
+                                      {f.info.statCaption}
+                                    </span>
+                                  </div>
+                                  <p className="planner-feature-details__tips-title">
+                                    Placement tips
+                                  </p>
+                                  <ul className="planner-feature-details__tips">
+                                    {f.info.placementTips.map((tip) => (
+                                      <li key={tip}>{tip}</li>
+                                    ))}
+                                  </ul>
+                                  <p className="planner-feature-details__footer">
+                                    {f.info.footer}
+                                  </p>
+                                  {f.info.links && f.info.links.length > 0 && (
+                                    <ul className="planner-feature-details__links">
+                                      {f.info.links.map((link) => (
+                                        <li key={link.url}>
+                                          <a
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noreferrer noopener"
+                                          >
+                                            {link.label}
+                                          </a>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                  <button
+                                    type="button"
+                                    className="planner-feature-details__collapse"
+                                    onClick={() => setExpandedFeatureId(null)}
+                                  >
+                                    Collapse ↑
+                                  </button>
+                                </div>
+                              )}
                             </li>
                           )
                         })}
@@ -1433,13 +1511,21 @@ export function GardenPlannerPage() {
                 </p>
                 <p className="planner-feature-banner__meta">{pendingSpec.sizeLabel}</p>
               </div>
-              <a
+              <button
+                type="button"
                 className="planner-feature-banner__more"
-                href="#"
-                onClick={(e) => e.preventDefault()}
+                onClick={() => {
+                  setCatalogTab('features')
+                  setExpandedFeatureId(pendingSpec.id)
+                  window.requestAnimationFrame(() => {
+                    document
+                      .getElementById(`feature-info-${pendingSpec.id}`)
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  })
+                }}
               >
                 Learn more →
-              </a>
+              </button>
             </div>
           ) : (
             <div className="garden-planner-hint">
