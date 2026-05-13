@@ -6,11 +6,11 @@
     "lng": 143.8580837,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "Clunes and Avoca Markets",
-    "phone": "0438 384 802",
-    "email": "59huan@gmail.com",
-    "website": "https://www.centralhighlandsgrowers.com.au/producersandfarmers/allendale-native-amp-habitat-plants",
-    "opening_hours": "By appointment"
+    "description": "Contact Phone\t0438 384 802<br>Contact Email\t59huan@gmail.com<br>Web: https://www.centralhighlandsgrowers.com.au/producersandfarmers/allendale-native-amp-habitat-plants",
+    "websites": [
+      "https://www.centralhighlandsgrowers.com.au/producersandfarmers/allendale-native-amp-habitat-plants"
+    ],
+    "phone": "0438 384 802"
   },
   {
     "id": "vic-arborline-hamilton--3775613-14202879",
@@ -19,349 +19,376 @@
     "lng": 142.0287856,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "124 Lodge Rd, Hamilton, VIC",
-    "phone": "(03) 5572 5044",
-    "email": "nursery@arborline.com.au",
-    "website": "http://arborline.com.au/",
-    "opening_hours": "Mon-Fri 8:00am - 4:30pm"
+    "description": "http://arborline.com.au/",
+    "websites": [
+      "http://arborline.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-austplant-nursery-gardens-authurs-seat--3837497-14495864",
-    "name": "Austplant Nursery & Gardens, Arthurs Seat",
-    "lat": -38.3749713,
-    "lng": 144.95864,
+    "name": "Austplant Nursery & Gardens, Authurs Seat",
+    "lat": -38.374973,
+    "lng": 144.958639,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "249 Purves Rd, Arthurs Seat, VIC 3936",
-    "phone": "(03) 5989 6120",
-    "email": null,
-    "website": "https://austplant.com.au",
-    "opening_hours": "Wed-Sat 8:30am - 5:00pm, Sun 10:00am - 5:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-australian-native-farm-forestry-discount--3598833-14577773",
     "name": "Australian Native Farm Forestry Discount Plants Pty",
-    "lat": -35.9883331,
-    "lng": 145.777732,
+    "lat": -35.988326,
+    "lng": 145.777733,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "6 Cobrawonga Road, Cobram East VIC 3644",
-    "phone": "0417 123 432",
-    "email": "admin@iwanttrees.com.au",
-    "website": "https://iwanttrees.com.au/",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-avalon-nursery--3758001-14372705",
     "name": "Avalon Nursery",
-    "lat": -37.5800095,
-    "lng": 143.7270451,
+    "lat": -37.580012,
+    "lng": 143.72705,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "41 Kopkes Rd, Haddon VIC 3351",
-    "phone": "(03) 5342 4519",
-    "email": "sales@avalonnursery.com.au",
-    "website": "https://www.avalonnursery.com.au/",
-    "opening_hours": "Daily 9:00am - 5:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-bacchus-marsh-greenhouse-nursery--3766335-14444683",
+    "name": "Bacchus Marsh Greenhouse Nursery",
+    "lat": -37.6633517,
+    "lng": 144.4468289,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "Contact Phone\t0419 368 801<br>Contact Email\tbmseedlings@bigpond.com",
+    "websites": [],
+    "phone": "0419 368 801"
   },
   {
     "id": "vic-ballarat-advanced-tree-nursery--3755762-14369631",
     "name": "Ballarat Advanced Tree Nursery",
-    "lat": -37.5576192,
-    "lng": 143.6963124,
+    "lat": -37.5576153,
+    "lng": 143.6963143,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1014 Ballarat-Carngham Road, Cardigan VIC 3352",
-    "phone": "0490 431 140",
-    "email": "ballaratadvancedtreenursery@gmail.com",
-    "website": "https://www.ballaratnursery.com/",
-    "opening_hours": "Mon-Fri 9:00am - 4:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-ballarat-wild-plants--3758233-14387611",
     "name": "Ballarat Wild Plants",
-    "lat": -37.58233,
-    "lng": 143.87611,
+    "lat": -37.5823289,
+    "lng": 143.8761139,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "435 Joseph Street, Canadian VIC 3350",
-    "phone": "0409 388 014",
-    "email": "matt.wildplants@gmail.com",
-    "website": null,
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-bayside-community-plant-nursery--3796267-14503722",
     "name": "Bayside Community Plant Nursery",
-    "lat": -37.9626703,
-    "lng": 145.037224,
+    "lat": -37.9626741,
+    "lng": 145.0372232,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "315-317 Reserve Road, Cheltenham VIC 3192",
-    "phone": "(03) 9583 8408",
-    "email": null,
-    "website": "https://www.bayside.vic.gov.au/community-nursery",
-    "opening_hours": "Thu & Sat 10:00am - 12:00pm (April to Oct)"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-bili-nursery-formerly-skinc-port-melbour--3783153-14494111",
     "name": "Bili Nursery (formerly SKINC), Port Melbourne",
-    "lat": -37.8315277,
-    "lng": 144.9411132,
+    "lat": -37.8315342,
+    "lng": 144.9411133,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "525 Williamstown Rd, Port Melbourne VIC 3207",
-    "phone": "(03) 9645 1384",
-    "email": "bilinursery@westgatebiodiversity.org.au",
-    "website": "https://westgatebiodiversity.org.au/",
-    "opening_hours": "Mon-Fri 9:00am - 4:00pm; Sat 10:00am - 4:00pm"
+    "description": "https://westgatebiodiversity.org.au/",
+    "websites": [
+      "https://westgatebiodiversity.org.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-billabong-garden-complex--3634639-14540089",
     "name": "Billabong Garden Complex",
-    "lat": -36.34639,
-    "lng": 145.40089,
+    "lat": -36.3463859,
+    "lng": 145.4008937,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "295 Numurkah Rd, Shepparton VIC 3631",
-    "phone": "(03) 5821 8632",
-    "email": "billabongnursery@connectgv.com.au",
-    "website": "https://www.billabonggardencomplex.com.au/",
-    "opening_hours": "Mon-Fri 9:00am - 5:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-bimbadeen-native-nursery--3774759-14522389",
+    "name": "Bimbadeen Native Nursery",
+    "lat": -37.747586,
+    "lng": 145.223889,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "https://www.manninghambusiness.com.au/local-directory/bimbadeen-native-nursery/",
+    "websites": [
+      "https://www.manninghambusiness.com.au/local-directory/bimbadeen-native-nursery/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-blue-gum-forest-nursery-korumburra--3840798-14581420",
-    "name": "Blue Gum Forest Nursery",
-    "lat": -38.4079836,
-    "lng": 145.814201,
+    "name": "Blue Gum Forest Nursery, Korumburra",
+    "lat": -38.407983,
+    "lng": 145.814203,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "285 Korumburra-Warragul Road, Korumburra VIC 3950",
-    "phone": "(03) 5658 1114",
-    "email": "info@bluegumforestnursery.com.au",
-    "website": "http://www.bluegumforestnursery.com.au/",
-    "opening_hours": "Mon-Fri 9:00am - 4:00pm"
+    "description": "http://www.bluegumforestnursery.com.au/",
+    "websites": [
+      "http://www.bluegumforestnursery.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-bower-bird-nursery--3695682-14622235",
     "name": "Bower Bird Nursery",
-    "lat": -36.95682,
-    "lng": 146.22235,
+    "lat": -36.9568242,
+    "lng": 146.2223499,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1125 Tabletop Road, Tolmie, VIC 3723",
-    "phone": "0439 610 525",
-    "email": "info@bowerbirdnursery.au",
-    "website": null,
-    "opening_hours": "Sat-Sun 10:00am - 4:00pm"
+    "description": "Contact Phone\t0439 610 525<br>Contact Email\tinfo@bowerbirdnursery.au",
+    "websites": [],
+    "phone": "0439 610 525"
   },
   {
     "id": "vic-buffalo-river-native-nursery--3658050-14669719",
     "name": "Buffalo River Native Nursery",
-    "lat": -36.5805,
-    "lng": 146.69719,
+    "lat": -36.5804965,
+    "lng": 146.6971886,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "9 Merriang South Rd, Myrtleford VIC 3737",
-    "phone": "(03) 5754 4252",
-    "email": null,
-    "website": "https://www.brnative.com",
-    "opening_hours": "Fri, Sun 09:30am - 04:30pm"
+    "description": "10% discount to APS Vic members",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-bungalook-nursery--3784278-14514774",
     "name": "Bungalook Nursery",
-    "lat": -37.8427812,
-    "lng": 145.1477418,
+    "lat": -37.842782,
+    "lng": 145.1477436,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "107 Fulton Road, Blackburn South VIC 3130",
-    "phone": "0473 122 534",
-    "email": "wcipp@yahoo.com.au",
-    "website": "https://www.bungalooknursery.com.au/",
-    "opening_hours": "Wed & Fri 9:00am - 1:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-bushland-flora--3779654-14536362",
-    "name": "Yarraview Bushland Flora Nursery",
-    "lat": -37.79654,
-    "lng": 145.36362,
+    "name": "Bushland Flora",
+    "lat": -37.7965365,
+    "lng": 145.3636187,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "136 York Rd, Mount Evelyn VIC 3796",
-    "phone": "(03) 9736 4364",
-    "email": null,
-    "website": "https://knoxbrookenursery.au",
-    "opening_hours": "Mon-Fri 7:30am - 4:00pm"
+    "description": "https://bushlandflora.com.au/",
+    "websites": [
+      "https://bushlandflora.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-candlebark-indigenous-nursery--3778465-14532124",
     "name": "Candlebark Indigenous Nursery",
-    "lat": -37.784649,
-    "lng": 145.321235,
+    "lat": -37.7846508,
+    "lng": 145.3212412,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "308 Hull Road, Mooroolbark VIC 3138",
-    "phone": "(03) 9727 0594",
-    "email": "info@candlebark.org.au",
-    "website": "https://candlebark.org.au/",
-    "opening_hours": "Tue–Fri & Sun 9:00am - 3:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-cardinya-view-nursery-berwick--3801902-14535776",
-    "name": "CEC nursery",
-    "lat": -38.0190162,
-    "lng": 145.3577576,
+    "name": "Cardinya View Nursery, Berwick",
+    "lat": -38.019023,
+    "lng": 145.357764,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "62 Cameron Way, Pakenham, VIC 3810",
-    "phone": "(03) 5947 7871",
-    "email": null,
-    "website": "https://cecinc.net.au/cec-nursery/",
-    "opening_hours": null
+    "description": "ph 03 9769 9887 cardinyaview@aapt.net.au",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-carrum-indigenous-nursery-inc--3806839-14515557",
     "name": "Carrum Indigenous Nursery Inc.",
-    "lat": -38.06839,
-    "lng": 145.15557,
+    "lat": -38.068388,
+    "lng": 145.155566,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "Learmonth Rd, Carrum VIC 3197",
-    "phone": "0415 047 922",
-    "email": null,
-    "website": "http://www.carrumindigenousnursery.com.au",
-    "opening_hours": "Tue - Wed, Fri 10:00am - 03:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-casuarina-indigenous-nursery--3836915-14245321",
-    "name": "Worn Gundidj Nursery",
-    "lat": -38.3691459,
-    "lng": 142.4532111,
+    "name": "Casuarina Indigenous Nursery",
+    "lat": -38.369154,
+    "lng": 142.453205,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1-3 Rooneys Rd, Warrnambool, VIC 3280",
-    "phone": "(03) 5561 5315",
-    "email": null,
-    "website": "https://worngundidj.au",
-    "opening_hours": "By appointment"
+    "description": "https://www.facebook.com/CasuarinaIndigenousNursery",
+    "websites": [
+      "https://www.facebook.com/CasuarinaIndigenousNursery"
+    ],
+    "phone": null
   },
   {
     "id": "vic-codrington-nursery--3826553-14195232",
     "name": "Codrington Nursery",
-    "lat": -38.2655268,
-    "lng": 141.952319,
+    "lat": -38.2655272,
+    "lng": 141.9523202,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "28 Downs Road, Codrington, VIC 3285",
-    "phone": "(03) 5568 4330",
-    "email": "info@codrington-nursery.com.au",
-    "website": "https://www.codrington-nursery.com.au/",
-    "opening_hours": "Wed-Fri 10:00am - 5:00pm, Sat 10:00am - 03:00pm"
+    "description": "https://www.codrington-nursery.com.au/",
+    "websites": [
+      "https://www.codrington-nursery.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-crisp-indigenous-plant-nursery-ringwood--3782080-14523103",
-    "name": "CRISP Indigenous Plant Nursery",
-    "lat": -37.8208008,
-    "lng": 145.2310257,
+    "name": "CRISP Indigenous Plant Nursery, Ringwood",
+    "lat": -37.820804,
+    "lng": 145.231033,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "17 Greenwood Ave, Ringwood VIC 3134",
-    "phone": "(03) 9879 3911",
-    "email": "info@crispnursery.org.au",
-    "website": "http://www.crispnursery.org.au",
-    "opening_hours": "Wed & Fri 9:30am - 12:30pm; Sat 10:00am - 1:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-edendale-farm-indigenous-nursery--3770079-14515469",
-    "name": "Edendale Farm Indigenous Nursery",
-    "lat": -37.70079,
-    "lng": 145.15469,
+    "name": "Edendale Farm Indigenous nursery",
+    "lat": -37.700795,
+    "lng": 145.1546901,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "30 Gastons Rd, Eltham VIC 3095",
-    "phone": "(03) 9433 3711",
-    "email": "edendale@nillumbik.vic.gov.au",
-    "website": "https://www.edendale.vic.gov.au/nursery",
-    "opening_hours": "Daily 10:00am - 4:30pm"
+    "description": "https://www.edendale.vic.gov.au/Indigenous-nursery",
+    "websites": [
+      "https://www.edendale.vic.gov.au/Indigenous-nursery"
+    ],
+    "phone": null
   },
   {
     "id": "vic-frankston-indigenous-nursery--3812253-14513231",
     "name": "Frankston Indigenous Nursery",
-    "lat": -38.12253,
-    "lng": 145.13231,
+    "lat": -38.1225256,
+    "lng": 145.1323112,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "32R McMannis Wy, Seaford VIC 3198",
-    "phone": "(03) 9768 1513",
-    "email": "fin@frankston.vic.gov.au",
-    "website": "https://www.frankston.vic.gov.au/Environment-and-Waste/Environment/Frankston-Indigenous-Nursery",
-    "opening_hours": "Mon-Fri 9:00am - 3:00pm; Sat 9:00am - 1:00pm"
+    "description": "http://www.frankston.vic.gov.au/Environment_and_Waste/Environment/Frankston_Indigenous_Nursery",
+    "websites": [
+      "http://www.frankston.vic.gov.au/Environment_and_Waste/Environment/Frankston_Indigenous_Nursery"
+    ],
+    "phone": null
   },
   {
     "id": "vic-friends-of-the-helmeted-honeyeater-nurse--3782327-14549295",
     "name": "Friends of the Helmeted Honeyeater Nursery",
-    "lat": -37.823269,
-    "lng": 145.49295,
+    "lat": -37.8232708,
+    "lng": 145.4929547,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1217 Macclesfield Rd, Yellingbo VIC 3139",
-    "phone": "(03) 5964 8341",
-    "email": "heho@helmetedhoneyeater.org.au",
-    "website": "https://www.helmetedhoneyeater.org.au/nursery/",
-    "opening_hours": "Tue, Thu, Fri 9:00am - 3:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-gannawarra-trees-nursery-cohuna--3581666-14420285",
+    "name": "Gannawarra Trees Nursery, Cohuna",
+    "lat": -35.816663,
+    "lng": 144.2028542,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "http://www.gannawarratrees.com.au/",
+    "websites": [
+      "http://www.gannawarratrees.com.au/"
+    ],
+    "phone": null
+  },
+  {
+    "id": "vic-geelong-native-plants-mt-duneed--3823165-14431946",
+    "name": "Geelong Native Plants, Mt Duneed",
+    "lat": -38.2316548,
+    "lng": 144.3194556,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "https://www.geelongnativeplants.com.au/",
+    "websites": [
+      "https://www.geelongnativeplants.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-goldfields-revegetation-mandurang--3681494-14431758",
-    "name": "Goldfields Revegetation native nursery",
-    "lat": -36.81494,
-    "lng": 144.31758,
+    "name": "Goldfields Revegetation, Mandurang",
+    "lat": -36.814943,
+    "lng": 144.317579,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "230 Tannery Ln, Mandurang VIC 3551",
-    "phone": "(03) 5439 5384",
-    "email": "info@goldfieldsrevegetation.com.au",
-    "website": "http://www.instagram.com/goldfieldsrevegetation/?hl=en",
-    "opening_hours": "Daily 10:00am - 4:00pm"
+    "description": "http://www.goldfieldsrevegetation.com.au/ContactUs.asp<br>5% discount to APS Vic members",
+    "websites": [
+      "http://www.goldfieldsrevegetation.com.au/ContactUs.asp"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-goulburn-valley-tree-group-tatura--3644265-14518420",
+    "id": "vic-goulburn-valley-tree-group--3644264-14522349",
     "name": "Goulburn Valley Tree Group",
-    "lat": -36.44265,
-    "lng": 145.1842,
+    "lat": -36.4426424,
+    "lng": 145.223491,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "4-6 Kerford St, Tatura VIC 3616",
-    "phone": "0400 059 765",
-    "email": "gvtreegroup@gmail.com",
-    "website": "https://www.landcarevic.org.au/groups/goulburnbroken/gvtree/",
-    "opening_hours": null
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-greenlink-box-hill--3780713-14513085",
     "name": "Greenlink Box Hill",
-    "lat": -37.80713,
-    "lng": 145.13085,
+    "lat": -37.807132,
+    "lng": 145.130848,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "41 Wimmera Street, Box Hill North VIC 3129",
-    "phone": "0479 121 653",
-    "email": "greenlinkboxhill@gmail.com",
-    "website": "https://www.greenlinkboxhill.org",
-    "opening_hours": "Tue & Wed 9:00am - 12:00pm"
+    "description": "https://greenlinkboxhill.org/",
+    "websites": [
+      "https://greenlinkboxhill.org/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-greenlink-sandbelt-indigenous-nursery-cl--3794306-14510862",
+    "id": "vic-greenlink-sandbelt-indigenous-nursery--3795834-14512282",
     "name": "Greenlink Sandbelt Indigenous Nursery",
-    "lat": -37.943063,
-    "lng": 145.10862,
+    "lat": -37.9583421,
+    "lng": 145.1228224,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "587 Heatherton Rd, Clayton South VIC 3169",
-    "phone": "0488 004 012",
-    "email": "greenlinksandbelt@gmail.com",
-    "website": "https://greenlinksandbelt.org.au/",
-    "opening_hours": "Wed 9:00am - 12:00pm, Sun 11:00am - 02:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-grevilleas-maximus-nicholson--3779910-14773940",
+    "name": "Grevilleas Maximus, Nicholson",
+    "lat": -37.7990969,
+    "lng": 147.7394022,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "ph 03 5156 8956 robnorm.nb@gmail.com",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-greybox-grasslands-indigenous-nursery--3779460-14442509",
@@ -370,167 +397,199 @@
     "lng": 144.4250878,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "50 School Road, Balliang East 33400",
-    "phone": "(03) 5369 5221",
-    "email": null,
-    "website": null,
-    "opening_hours": null
+    "description": "Peter Wlodarczyk<br>(03) 5369 5221",
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-grow-locals--3735706-14452627",
+    "name": "Grow Locals",
+    "lat": -37.3570644,
+    "lng": 144.5262738,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-habitat-native-plant-co--3673829-14421905",
     "name": "Habitat Native Plant Co",
-    "lat": -36.7382927,
-    "lng": 144.2190528,
+    "lat": -36.7382886,
+    "lng": 144.2190511,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "86 Maiden Gully Rd, Maiden Gully VIC 3551",
-    "phone": "0417 544 1596",
-    "email": null,
-    "website": null,
-    "opening_hours": "By appointment"
+    "description": "https://www.habitatnativeplantco.com/<br>10% discount to APS Vic members",
+    "websites": [
+      "https://www.habitatnativeplantco.com/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-inglewood-wildflowers--3657788-14387817",
-    "name": "Inglewood Native Plants",
-    "lat": -36.57788,
-    "lng": 143.87817,
+    "id": "vic-healesville-plants--3764571-14549718",
+    "name": "Healesville Plants",
+    "lat": -37.6457123,
+    "lng": 145.4971819,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "477 Inglewood-Rheola Rd, Inglewood, Victoria 3517",
-    "phone": null,
-    "email": "inglewoodwildflowers@gmail.com",
-    "website": "https://www.inglewoodwildflowers.com.au",
-    "opening_hours": "Fri 10:00am - 04:00pm"
+    "description": "https://www.yellowpages.com.au/vic/healesville/healesville-plants-13210948-listing.html",
+    "websites": [
+      "https://www.yellowpages.com.au/vic/healesville/healesville-plants-13210948-listing.html"
+    ],
+    "phone": null
+  },
+  {
+    "id": "vic-inglewood-wildflowers--3659991-14382444",
+    "name": "Inglewood Wildflowers",
+    "lat": -36.5999138,
+    "lng": 143.8244448,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "Contact Email\tInglewoodwildflowers@gmail.com<br>Website\tInglewoodwildflowers.com.au",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-iramoo-indigenous-nursery--3774986-14479548",
-    "name": "Iramoo grassland centre & nursery",
+    "name": "Iramoo Indigenous Nursery",
     "lat": -37.7498625,
     "lng": 144.7954786,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "Building 1J,St Albans Campus, Victoria University, St Albans VIC 3021",
-    "phone": null,
-    "email": null,
-    "website": "https://www.vu.edu.au/about-vu/strategy-leadership-governance/strategic-plan-annual-reports/protecting-country/sustainability-at-vu/iramoo-grassland-centre-nursery",
-    "opening_hours": "Thu 10:00am - 03:00pm"
+    "description": "https://www.friendsvic.org/2017/01/05/iramoo-grassland-centre-and-nursery/",
+    "websites": [
+      "https://www.friendsvic.org/2017/01/05/iramoo-grassland-centre-and-nursery/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-ironstone-park-nursery-heathcote--3695033-14476305",
     "name": "Ironstone Park Nursery, Heathcote",
-    "lat": -36.95033,
-    "lng": 144.76305,
+    "lat": -36.9503281,
+    "lng": 144.7630487,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "33 Palling Rd, Heathcote VIC 3523",
-    "phone": "0419 878 950",
-    "email": "ironstonepark@gmail.com",
-    "website": null,
-    "opening_hours": "By appointment"
+    "description": "https://ironstonepark.com/<br>ph 0419 878 950 ironstonepark@gmail.com<br>5% discount to APS Vic members",
+    "websites": [
+      "https://ironstonepark.com/"
+    ],
+    "phone": null
+  },
+  {
+    "id": "vic-kareelah-bush-nursery--3832783-14518215",
+    "name": "Kareelah Bush Nursery",
+    "lat": -38.327835,
+    "lng": 145.18215,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-karwarra-australian-plant-garden-kaloram--3781620-14538022",
-    "name": "Karwarra Australian Plant Garden",
+    "name": "Karwarra Australian Plant Garden, Kalorama",
     "lat": -37.816199,
     "lng": 145.380224,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1190-1196 Mt Dandenong Tourist Rd, Kalorama VIC 3766",
-    "phone": null,
-    "email": "karwarra@yarraranges.vic.gov.au",
-    "website": "https://www.yarraranges.vic.gov.au/Lists/Parks-Facilities/Karwarra-Australian-Plant-Garden",
-    "opening_hours": "Tue-Fri 10:00am - 4:00pm; Sat-Sun 1:00pm - 4:00pm"
+    "description": "https://www.yarraranges.vic.gov.au/Lists/Parks-Facilities/Karwarra-Australian-Plant-Garden",
+    "websites": [
+      "https://www.yarraranges.vic.gov.au/Lists/Parks-Facilities/Karwarra-Australian-Plant-Garden"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-knoxbrooke-nursery--3789063-14526019",
+    "id": "vic-knoxbrooke-nursery--3779654-14536362",
     "name": "Knoxbrooke Nursery",
-    "lat": -37.890631,
-    "lng": 145.260193,
+    "lat": -37.7965365,
+    "lng": 145.3636187,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "136 York Rd, Mt Evelyn",
-    "phone": "(03) 9758 4544",
-    "email": null,
-    "website": "https://knoxbrookenursery.au",
-    "opening_hours": "Mon-Fri 8:30am - 4:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-kui-nursery-colac--3834015-14357778",
-    "name": "Kui Community Nursery, Colac",
-    "lat": -38.3401524,
-    "lng": 143.57778,
+    "id": "vic-kui-nursery-colac--3834407-14359187",
+    "name": "Kui Nursery, Colac",
+    "lat": -38.3440748,
+    "lng": 143.5918687,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "101 Queen St, Colac, VIC 3250",
-    "phone": "(03) 5231 4164",
-    "email": null,
-    "website": null,
-    "opening_hours": "Mon-Fri 8:30am - 3:30pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-kuranga-native-nursery--3779669-14536341",
-    "name": "Kuranga Native Nursery",
-    "lat": -37.7966904,
-    "lng": 145.3634125,
+    "id": "vic-kuranga-native-nursery-mt-evelyn--3779667-14537226",
+    "name": "Kuranga Native Nursery, Mt Evelyn",
+    "lat": -37.796672,
+    "lng": 145.372258,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "118 York Rd, Mt Evelyn, VIC 3796",
-    "phone": "(03) 9760 8100",
-    "email": "info@kuranga.com.au",
-    "website": "https://www.kuranga.com.au",
-    "opening_hours": "Daily 8:30am – 5:00pm"
+    "description": "https://www.kuranga.com.au/",
+    "websites": [
+      "https://www.kuranga.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-latrobe-wildlife-sanctuary-keelbundora-i--3771631-14505059",
     "name": "LaTrobe Wildlife Sanctuary Keelbundora Indigenous Nursery",
-    "lat": -37.716311,
-    "lng": 145.05059,
+    "lat": -37.7163134,
+    "lng": 145.0505938,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "La Trobe University, Bundoora Camphs",
-    "phone": "(03) 9479 1206",
-    "email": "wildlife@latrobe.edu.au",
-    "website": "https://www.latrobe.edu.au/wildlife/indigenous-nursery",
-    "opening_hours": null
+    "description": "(03) 9479 2871",
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-mckindlay-s-riverine-nursery-moama--3610480-14476059",
-    "name": "McKindlay's Riverine Nursery, Moama",
-    "lat": -36.1048,
-    "lng": 144.76059,
+    "id": "vic-maryknoll-indigenous-plant-nursery--3803386-14559970",
+    "name": "Maryknoll Indigenous Plant Nursery",
+    "lat": -38.033858,
+    "lng": 145.599695,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1323 Perricoota Rd, Moama NSW 2731",
-    "phone": " 0408 641 222",
-    "email": null,
-    "website": "https://mckindlaysriverinenursery.com.au",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-mckindlay-s-riverine-nursery-moama--3604269-14463605",
+    "name": "McKindlay’s Riverine Nursery, Moama",
+    "lat": -36.0426861,
+    "lng": 144.6360491,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-melaleuca-nursery-inverloch--3861671-14570136",
-    "name": "Melaleuca Nursery",
-    "lat": -38.6167096,
-    "lng": 145.7013583,
+    "name": "Melaleuca Nursery, Inverloch",
+    "lat": -38.616712,
+    "lng": 145.701358,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "50 Pearsalls Rd, Inverloch VIC 3996",
-    "phone": "(03) 5674 1014",
-    "email": "info@melaleucanursery.com.au",
-    "website": "https://www.melaleucanursery.com.au",
-    "opening_hours": "Mon-Fri 9:00am - 5:00pm"
+    "description": "https://www.melaleucanursery.com/<br>ph 03 5674 1014 info@gonativelandscapes.com",
+    "websites": [
+      "https://www.melaleucanursery.com/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-merricks-nursery--3839212-14507026",
+    "id": "vic-merricks-nursery--3838705-14509871",
     "name": "Merricks Nursery",
-    "lat": -38.3921171,
-    "lng": 145.0702587,
+    "lat": -38.38705,
+    "lng": 145.098708,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "3361 Frankston - Flinders Rd, Merricks VIC 3916",
-    "phone": "0400 615 344",
-    "email": null,
-    "website": null,
-    "opening_hours": "Mon - Fri 7:30am - 4:00pm"
+    "description": "ph 03 5983 1412",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-mike-s-native-nursery--3772805-14513088",
@@ -539,24 +598,24 @@
     "lng": 145.1308799,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "63 Sackville Street Montmorency, VIC, Australia, Victoria 3094",
-    "phone": "0418 372 262",
-    "email": "mikwilliams@optusnet.com.au",
-    "website": "https://www.facebook.com/forestlinenursery/",
-    "opening_hours": null
+    "description": "https://www.facebook.com/forestlinenursery/",
+    "websites": [
+      "https://www.facebook.com/forestlinenursery/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-mildura-native-nursery--3415641-14215986",
-    "name": "GrowAbility Nursery",
+    "name": "Mildura Native Nursery",
     "lat": -34.1564093,
     "lng": 142.1598566,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "363 Cureton Avenue, Mildura, VIC 3500",
-    "phone": "(03) 5023 2761",
-    "email": "reception@christiecentre.com.au",
-    "website": "https://christiecentre.com.au/social-enterprises/growability-nursery/",
-    "opening_hours": "Mon-Fri 8:00am - 4:00pm"
+    "description": "http://nativegrowth.com.au/mildura-native-nursery<br>5% discount for APS Vic members",
+    "websites": [
+      "http://nativegrowth.com.au/mildura-native-nursery"
+    ],
+    "phone": null
   },
   {
     "id": "vic-moorabool-landcare-network-nursery--3771260-14431294",
@@ -565,50 +624,42 @@
     "lng": 144.3129386,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1327 Glenmore Rd, Glenmore, VIC 3340",
-    "phone": "0459 622 588",
-    "email": "nursery@mln.org.au",
-    "website": "https://www.mln.org.au/",
-    "opening_hours": null
+    "description": "Contact Phone\t0459 622 588<br>Contact Email\tnursery@mln.org.au",
+    "websites": [],
+    "phone": "0459 622 588"
   },
   {
-    "id": "vic-moriac-plant-nursery--3825555-14418653",
+    "id": "vic-moriac-plant-nursery--3824300-14416678",
     "name": "Moriac Plant Nursery",
-    "lat": -38.25555,
-    "lng": 144.18653,
+    "lat": -38.2430018,
+    "lng": 144.1667766,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "640 Cape Otway Rd, Moriac VIC 3240",
-    "phone": "0460 718 476",
-    "email": null,
-    "website": "https://moriacplantnursery.com.au",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-mornington-peninsula-shire-nursery--3832367-14502390",
+    "id": "vic-mornington-peninsula-shire-nursery--3827290-14504060",
     "name": "Mornington Peninsula Shire Nursery",
-    "lat": -38.32367,
-    "lng": 145.0239,
+    "lat": -38.2728955,
+    "lng": 145.0406037,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "The Briars, 450 Nepean Hwy, Mount Martha VIC 3934",
-    "phone": "(03) 5974 8417",
-    "email": "nursery@mornpen.vic.gov.au",
-    "website": "https://www.mornpen.vic.gov.au/Community-Services/The-Briars/Shire-Nursery",
-    "opening_hours": "Wed-Fri 9:00am - 3:30pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-narrap-nursery--3760455-14510340",
-    "name": "Narrap Bush Nursery",
-    "lat": -37.60455,
-    "lng": 145.1034,
+    "id": "vic-narrap-nursery--3767783-14552135",
+    "name": "Narrap Nursery",
+    "lat": -37.6778268,
+    "lng": 145.5213493,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "68 Albert Road, Healsville, VIC 3777",
-    "phone": null,
-    "email": "narrap.admin@wurundjeri.com.au",
-    "website": "https://www.wurundjeri.com.au/services/natural-resource-management/narrap-country-team/",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-neangar-nursery-eaglehawk--3670898-14426001",
@@ -617,89 +668,101 @@
     "lng": 144.260008,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "8 McClelland Dr, Eaglehawk VIC 3556",
-    "phone": "(03) 5446 9260",
-    "email": "neangarnursery@bigpond.com",
-    "website": "http://www.neangarnursery.com.au/",
-    "opening_hours": "Mon-Fri 8:30am - 4:30pm"
+    "description": "http://www.neangarnursery.com.au/",
+    "websites": [
+      "http://www.neangarnursery.com.au/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-newport-lakes-native-nursery--3784133-14488340",
-    "name": "Newport Lakes Native Nursery",
-    "lat": -37.84133,
-    "lng": 144.8834,
+    "id": "vic-neerim-native-flora--3800069-14599912",
+    "name": "Neerim Native Flora",
+    "lat": -38.0006893,
+    "lng": 145.9991207,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "2 Lakes Dr, Newport VIC 3015",
-    "phone": "(03) 9391 0044",
-    "email": "newportlakesnativenursery@gmail.com",
-    "website": "https://newportnativenursery.com.au",
-    "opening_hours": "Daily 11:00am - 4:00pm"
+    "description": "(03) 5628 1419",
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-newstead-natives--3711311-14405786",
+    "id": "vic-newport-lakes-native-nursery-wyndham--3784006-14487147",
+    "name": "Newport Lakes Native Nursery, Wyndham",
+    "lat": -37.840058,
+    "lng": 144.871474,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-newstead-natives--3711207-14406809",
     "name": "Newstead Natives",
-    "lat": -37.11311,
-    "lng": 144.05786,
+    "lat": -37.1120748,
+    "lng": 144.0680906,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "4 Palmerston St, Newstead VIC 3462",
-    "phone": "(03) 5476 2691",
-    "email": "natives@newstead.vicmail.net",
-    "website": "https://newsteadnatives.wordpress.com",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-our-native-garden-nursery--3608146-14691461",
+    "id": "vic-our-native-garden-nursery--3611715-14690618",
     "name": "Our Native Garden Nursery",
-    "lat": -36.08146,
-    "lng": 146.91461,
+    "lat": -36.1171546,
+    "lng": 146.9061803,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "29 Kane Rd, Wodonga VIC 3690",
-    "phone": "0418 579 331",
-    "email": "ongnursery@gmail.com",
-    "website": "http://www.ournativegarden.com.au/",
-    "opening_hours": null
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-oztrees-nursery-irrewarra--3826730-14366655",
-    "name": "OzTrees Nursery",
+    "name": "OzTrees Nursery, Irrewarra",
     "lat": -38.2673028,
     "lng": 143.6665509,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "569 Warrowie Rd, Irrewarra VIC 3249",
-    "phone": "(03) 5233 6280",
-    "email": "sales@oztrees.com.au",
-    "website": "http://www.oztrees.com.au/",
-    "opening_hours": null
+    "description": "http://www.oztrees.com.au/",
+    "websites": [
+      "http://www.oztrees.com.au/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-park-lane-nursery-wangaratta--3636737-14633215",
+    "id": "vic-park-lane-nursery-wangaratta--3633628-14631263",
     "name": "Park Lane Nursery, Wangaratta",
-    "lat": -36.36737,
-    "lng": 146.33215,
+    "lat": -36.336277,
+    "lng": 146.312629,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "95 Park Ln, Wangaratta VIC 3677",
-    "phone": "(03) 5721 6955",
-    "email": "enquiries@parklanenursery.com.au",
-    "website": "https://www.parklanenursery.com.au/",
-    "opening_hours": "Mon-Fri 9:00am - 4:30pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-regen-nurseries--3776269-14532570",
-    "name": "Regen Nurseries",
-    "lat": -37.76269,
-    "lng": 145.3257,
+    "id": "vic-prom-view-nursery-fish-creek--3869362-14608475",
+    "name": "Prom View Nursery, Fish Creek",
+    "lat": -38.6936167,
+    "lng": 146.0847537,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "1 Alan Bird Dr, Bangholme VIC 3175",
-    "phone": "(03) 9775 0612",
-    "email": "hello@regennurseries.com.au",
-    "website": "https://regennurseries.com.au",
-    "opening_hours": "Mon-Fri 7:00am - 3:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-regen-nurseries--3806841-14517035",
+    "name": "Regen Nurseries",
+    "lat": -38.0684091,
+    "lng": 145.1703501,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "Email: hello@regennurseries.com.au",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-rochester-native-nursery--3632954-14469041",
@@ -708,11 +771,11 @@
     "lng": 144.6904103,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "6690/6708 Northern Hwy, Rochester VIC 3561",
-    "phone": "(03) 5484 3777",
-    "email": null,
-    "website": "https://rochesternursery.com.au",
-    "opening_hours": "Mon-Fri 8:00am - 4:30pm, Sat 9:00am - 2:00pm"
+    "description": "http://www.rochesternursery.com.au/",
+    "websites": [
+      "http://www.rochesternursery.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-sandy-creek-trees-allans-flat--3629661-14695666",
@@ -721,37 +784,57 @@
     "lng": 146.956655,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "416 Gap Flat Rd, Allans Flat VIC 3691",
-    "phone": "(02) 6027 1497",
-    "email": "info@sandycreektrees.com.au",
-    "website": "http://sandycreektrees.com.au/",
-    "opening_hours": "By appointment"
+    "description": "http://sandycreektrees.com.au/",
+    "websites": [
+      "http://sandycreektrees.com.au/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-snowgum-nursery--3760416-14510340",
+    "id": "vic-snowgum-nursery--3705214-14608509",
     "name": "Snowgum Nursery",
-    "lat": -37.60416,
-    "lng": 145.1034,
+    "lat": -37.0521391,
+    "lng": 146.0850869,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "120 High St, Mansfield VIC 3722",
-    "phone": "(03) 5775 1100",
-    "email": "snowgumnursery@bigpond.com",
-    "website": "https://www.snowgumnursery.com.au",
-    "opening_hours": "Mon-Sun 9:30am - 5:30pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-southern-dandenongs-community-nursery--3793739-14535515",
+    "id": "vic-southern-dandenongs-community-nursery--3792497-14533430",
     "name": "Southern Dandenongs Community Nursery",
-    "lat": -37.93739,
-    "lng": 145.35515,
+    "lat": -37.9249724,
+    "lng": 145.3342961,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "271 Mt Morton Rd, Belgrave Heights VIC 3160",
-    "phone": "(03) 9754 6962",
-    "email": "sthndandenongscommunitynursery@gmail.com",
-    "website": "http://www.sdcn.org.au",
-    "opening_hours": "Tue 9:00am - 1:00pm, Fri 9:00am - 1:00pm, Sun 9:00am - 12:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-suntuff-natives--3751632-14447744",
+    "name": "Suntuff Natives",
+    "lat": -37.5163219,
+    "lng": 144.4774411,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "http://www.suntuffnatives.com.au/",
+    "websites": [
+      "http://www.suntuffnatives.com.au/"
+    ],
+    "phone": null
+  },
+  {
+    "id": "vic-sunvalley-plants-nursery-langwarrin--3814028-14522672",
+    "name": "Sunvalley Plants Nursery, Langwarrin",
+    "lat": -38.140283,
+    "lng": 145.226723,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-tallarook-trees--3709447-14510822",
@@ -760,89 +843,92 @@
     "lng": 145.108218,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "22 Lodge St, Tallarook, VIC 3659",
-    "phone": "0422 625 973",
-    "email": "tallarooktrees@yahoo.com.au",
-    "website": null,
-    "opening_hours": null
+    "description": "Contact Phone\t0422 625 973<br>Contact Email\ttallarooktrees@yahoo.com.au",
+    "websites": [],
+    "phone": "0422 625 973"
+  },
+  {
+    "id": "vic-treehome-nursery-teesdale--3802872-14404241",
+    "name": "Treehome Nursery, Teesdale",
+    "lat": -38.02872,
+    "lng": 144.042414,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "https://www.treehomenursery.com.au/",
+    "websites": [
+      "https://www.treehomenursery.com.au/"
+    ],
+    "phone": null
   },
   {
     "id": "vic-valley-of-1000-hills-nursery--3725743-14515643",
     "name": "Valley of 1000 Hills Nursery",
-    "lat": -37.25743,
-    "lng": 145.15643,
+    "lat": -37.2574334,
+    "lng": 145.1564261,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "150 Reid Rd, Reedy Creek VIC 3658",
-    "phone": "(03) 5784 9286",
-    "email": "voath@bordernet.com.au",
-    "website": null,
-    "opening_hours": "By appointment"
+    "description": "150 Reid Rd, Reedy Creek<br>David & Helen Laurie<br>Supplying indigenous tubes stocks<br>Open April-November Saturdays 10am-5pm or by appointment. <br>Phone: 03 5784 9286",
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-vaughan-s-australian-plants-pomonal--3719870-14261079",
     "name": "Vaughan's Australian Plants, Pomonal",
-    "lat": -37.1987,
+    "lat": -37.198697,
     "lng": 142.61079,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "3322 Ararat-Halls Gap Rd, Pomonal VIC 3381",
-    "phone": "0412 632 767",
-    "email": "vaughans.plants@jollymac.com.au",
-    "website": null,
-    "opening_hours": "Mon-Sun 10:00am - 3:00pm"
+    "description": "Ph. 0412632767 or e-mail vaughans.plants@jollymac.com.au",
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-victorian-alps-nursery--3673004-14713437",
+    "id": "vic-victorian-alps-nursery--3660747-14678730",
     "name": "Victorian Alps Nursery",
-    "lat": -36.73004,
-    "lng": 147.13437,
+    "lat": -36.6074679,
+    "lng": 146.7873008,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "5338 Great Alpine Rd, Bright VIC 3741",
-    "phone": "0408 151 130",
-    "email": "victorianalpsnursery@alpineresorts.vic.gov.au",
-    "website": "https://rmb.mthotham.com.au/Our-Services/Victorian-Alps-Nursery",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-victorian-indigenous-nurseries-co-operat--3777473-14501250",
-    "name": "Victorian Indigenous Nurseries Co-operative (VINC)",
-    "lat": -37.77473,
-    "lng": 145.0125,
+    "id": "vic-victorian-indigenous-nurseries-co-operat--3779307-14501145",
+    "name": "Victorian Indigenous Nurseries Co-Operative, Fairfield",
+    "lat": -37.793075,
+    "lng": 145.011452,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "Yarra Bend Rd, Fairfield, VIC 3078",
-    "phone": "(03) 9482 1710",
-    "email": "retail@vinc.org.au",
-    "website": "https://www.vinc.org.au",
-    "opening_hours": "Mon, Tue, Fri 10:00am - 3:00pm; Sat 9:00am - 4:00pm"
+    "description": "http://www.vinc.net.au/",
+    "websites": [
+      "http://www.vinc.net.au/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-wail-nursery--3659223-14214691",
-    "name": "Dalki Garringa Native Nursery",
-    "lat": -36.59223,
-    "lng": 142.14691,
+    "id": "vic-wail-nursery--3650614-14208489",
+    "name": "Wail Nursery",
+    "lat": -36.5061377,
+    "lng": 142.0848875,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "127 Wail Nursery Rd, Wail VIC 3401",
-    "phone": " (03) 5389 1733",
-    "email": null,
-    "website": "http://www.wailnursery.com.au/",
-    "opening_hours": "Mon-Fri 10:00am - 4:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-west-coast-indigenous-nurseries-newcomb--3817213-14440225",
-    "name": "Westcoast Indigenous Nursery",
-    "lat": -38.17213,
-    "lng": 144.440225,
+    "name": "West Coast Indigenous Nurseries, Newcomb",
+    "lat": -38.172132,
+    "lng": 144.402246,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "50 Coppards Rd, Newcomb VIC 3219",
-    "phone": "0425 752 648",
-    "email": null,
-    "website": null,
-    "opening_hours": "By appointment"
+    "description": "(03) 5261 5773<br>0425 752 648<br>graemes@pipeline.com.au<br>http://www.environmentbellarine.org.au/cb_pages/indigenous_nurseries.php",
+    "websites": [
+      "http://www.environmentbellarine.org.au/cb_pages/indigenous_nurseries.php"
+    ],
+    "phone": null
   },
   {
     "id": "vic-western-plains-flora--3757338-14479652",
@@ -851,63 +937,79 @@
     "lng": 144.7965243,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "628 Wildwood Rd, Wildwood VIC 3429",
-    "phone": "(03) 9740 3178",
-    "email": "admin@wpflora.com.au",
-    "website": null,
-    "opening_hours": "Mon-Fri 8:00am - 4:00pm"
+    "description": "http://naturewest.org.au/indignurseries/322-westernplainsflora",
+    "websites": [
+      "http://naturewest.org.au/indignurseries/322-westernplainsflora"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-wild-mint-acres--3758153-14387611",
+    "id": "vic-wild-mint-acres--3702541-14598770",
     "name": "Wild Mint Acres",
-    "lat": -37.58153,
-    "lng": 143.87611,
+    "lat": -37.0254082,
+    "lng": 145.9876977,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "54 Greens Rd, Maindample VIC 3723",
-    "phone": "0475 352 121",
-    "email": "nursery@wildmintacres.com.au",
-    "website": "https://www.wildmintacres.com.au",
-    "opening_hours": "Fri-Sun 9:00am - 4:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-wildseed-nursery-gippsland--3821039-14631320",
+    "id": "vic-wildseed-nursery-gippsland--3779374-14778019",
     "name": "Wildseed Nursery Gippsland",
-    "lat": -38.21039,
-    "lng": 146.3132,
+    "lat": -37.7937354,
+    "lng": 147.7801917,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "345 Stephenson Rd, Nicholson VIC 3882",
-    "phone": " 0419 099 925",
-    "email": "wildseed.office@gmail.com ",
-    "website": "https://www.wildseednursery.com.au",
-    "opening_hours": "By appointment"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-willum-warrain-aboriginal-bush-nursery--3831124-14518485",
-    "name": "Willum Warrain Aboriginal Bush Nursery",
-    "lat": -38.3112423,
-    "lng": 145.1848545,
+    "id": "vic-wildtech-nursery-glenmaggie--3784353-14668613",
+    "name": "Wildtech Nursery, Glenmaggie",
+    "lat": -37.84353,
+    "lng": 146.686127,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "10 Pound Rd, Hastings, VIC 3915",
-    "phone": "(03) 5979 1391",
-    "email": null,
-    "website": "https://www.willumwarrain.org.au",
-    "opening_hours": "Mon-Fri 9:00am - 4:00pm"
+    "description": "https://www.wildtechnursery.com.au/<br>Not open to the public: online orders only",
+    "websites": [
+      "https://www.wildtechnursery.com.au/"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-yarra-valley-ecoss--3775983-14546682",
+    "id": "vic-wimmera-native-nursery-dimboola--3643784-14201742",
+    "name": "Wimmera Native Nursery, Dimboola",
+    "lat": -36.437841,
+    "lng": 142.017415,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": "www.nativeshop.com.au<br>5% discount for APS Vic members",
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-wombat-native-plants--3740472-14421802",
+    "name": "Wombat Native Plants",
+    "lat": -37.4047246,
+    "lng": 144.2180163,
+    "kind": "nursery",
+    "folder": "Native Nurseries",
+    "description": null,
+    "websites": [],
+    "phone": null
+  },
+  {
+    "id": "vic-yarra-valley-ecoss--3777464-14564776",
     "name": "Yarra Valley ECOSS",
-    "lat": -37.75983,
-    "lng": 145.46682,
+    "lat": -37.7746447,
+    "lng": 145.6477624,
     "kind": "nursery",
     "folder": "Native Nurseries",
-    "address": "711 Old Warburton Rd, Wesburn VIC 3799",
-    "phone": "0407 123 456",
-    "email": "nursery@ecoss.org.au",
-    "website": "https://ecoss.org.au/nursery/",
-    "opening_hours": "Tue, Wed, Fri 9:00am - 3:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-australian-botanic-gardens-shepparton--3639917-14537727",
@@ -916,115 +1018,99 @@
     "lng": 145.3772712,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Botanic Gardens Ave, Kialla VIC 3631",
-    "phone": "(03) 5832 9700",
-    "email": null,
-    "website": "http://greatershepparton.com.au/community/recreation/parks-playgrounds-skateparks/botanic-gardens",
-    "opening_hours": "Daily 24 hours"
+    "description": "http://greatershepparton.com.au/community/recreation/parks-playgrounds-skateparks/botanic-gardens",
+    "websites": [
+      "http://greatershepparton.com.au/community/recreation/parks-playgrounds-skateparks/botanic-gardens"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-australian-inland-botanic-gardens-mildura--3417676-14221764",
+    "id": "vic-australian-inland-botanic-gardens-mildur--3413608-14214764",
     "name": "Australian Inland Botanic Gardens, Mildura",
-    "lat": -34.17676,
-    "lng": 142.21764,
+    "lat": -34.136078,
+    "lng": 142.1476364,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "1183 River Road, Buronga, NSW 2739",
-    "phone": "0408 604 879",
-    "email": null,
-    "website": "https://aibgmw.org/",
-    "opening_hours": "Mon-Fri 8:30am - 4:00pm, Sat-Sun 10:00am - 4:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-australian-native-garden-parkville--3779836-14496229",
+    "id": "vic-australian-native-garden-parkville--3779193-14495713",
     "name": "Australian Native Garden, Parkville",
-    "lat": -37.79836,
-    "lng": 144.96229,
+    "lat": -37.7919307,
+    "lng": 144.9571323,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "1 Gatehouse St, Parkville VIC 3052",
-    "phone": null,
-    "email": null,
-    "website": "https://www.melbourne.vic.gov.au/royal-park",
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-euroa-arboretum--3674681-14555811",
+    "id": "vic-euroa-arboretum--3676944-14554829",
     "name": "Euroa Arboretum",
-    "lat": -36.74681,
-    "lng": 145.55811,
+    "lat": -36.7694395,
+    "lng": 145.5482893,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Euroa Main Road, 76 Hume Fwy, Euroa VIC 3666",
-    "phone": "0429 127 399",
-    "email": null,
-    "website": "https://euroaarboretum.com.au/",
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-gargarro-botanic-garden--3634458-14490807",
+    "id": "vic-gargarro-botanic-garden--3640030-14498047",
     "name": "Gargarro Botanic Garden",
-    "lat": -36.34458,
-    "lng": 144.90807,
+    "lat": -36.4003019,
+    "lng": 144.9804698,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "481 Winter Road, Girgarre VIC 3624",
-    "phone": "0429 438 220",
-    "email": null,
-    "website": "https://www.gargarrobotanicgarden.com.au",
-    "opening_hours": null
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-george-pentland-botanic-gardens-frankston--3814896-14513101",
+    "id": "vic-george-pentland-botanic-gardens-franksto--3815285-14512886",
     "name": "George Pentland Botanic Gardens, Frankston",
-    "lat": -38.14896,
-    "lng": 145.13101,
+    "lat": -38.15285,
+    "lng": 145.1288621,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "41N Williams Street, Frankston VIC 3199",
-    "phone": "1300 322 322",
-    "email": "info@frankston.vic.gov.au",
-    "website": "https://www.frankston.vic.gov.au/Things-To-Do/Parks-and-Reserves/Frankston/George-Pentland-Botanic-Gardens",
-    "opening_hours": "Daily 7:00am - 6:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-halls-gap-botanical-gardens--3714244-14251266",
+    "id": "vic-halls-gap-botanical-gardens--3713776-14251584",
     "name": "Halls Gap Botanical Gardens",
-    "lat": -37.14244,
-    "lng": 142.51266,
+    "lat": -37.1377563,
+    "lng": 142.515837,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Halls Gap Botanic Garden,  School Rd,  Halls Gap 3381",
-    "phone": "+61 419 571 506",
-    "email": null,
-    "website": null,
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-healesville-sanctuary--3768340-14553240",
+    "id": "vic-healesville-sanctuary--3768161-14553123",
     "name": "Healesville Sanctuary",
-    "lat": -37.6834,
-    "lng": 145.5324,
+    "lat": -37.6816118,
+    "lng": 145.5312326,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Glen Eadie Ave, Healesville VIC 3777",
-    "phone": "1300 966 784",
-    "email": "hs@zoo.org.au",
-    "website": "https://www.zoo.org.au/healesville",
-    "opening_hours": "Daily 9:00am - 5:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-james-swan-reserve-warrnambool--3838423-14248550",
-    "name": "Swan Reserve, Warrnambool",
-    "lat": -38.38423,
-    "lng": 142.4855,
+    "id": "vic-james-swan-reserve-warrnambool--3837954-14248469",
+    "name": "James Swan Reserve, Warrnambool",
+    "lat": -38.3795382,
+    "lng": 142.4846922,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Warrnambool, VIC 3280",
-    "phone": null,
-    "email": null,
-    "website": "https://wbgardens.com.au/the-gardens/swan-reserve",
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-karwarra-australian-plant-garden--3781621-14538071",
@@ -1033,63 +1119,65 @@
     "lng": 145.3807068,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Kalorama Memorial Reserve 1190-, 1192 Mount Dandenong Tourist Rd, Kalorama VIC 3766",
-    "phone": "(03) 9728 4256",
-    "email": null,
-    "website": "www.yarraranges.vic.gov.au/karwarra",
-    "opening_hours": "Tue-Fri 10:00am - 4:00pm; Sat-Sun 1:00pm - 4:00pm"
+    "description": "https://www.yarraranges.vic.gov.au/Lists/Parks-Facilities/Karwarra-Australian-Plant-Garden",
+    "websites": [
+      "https://www.yarraranges.vic.gov.au/Lists/Parks-Facilities/Karwarra-Australian-Plant-Garden"
+    ],
+    "phone": null
   },
   {
-    "id": "vic-kevin-hoffman-walk-lara--3802166-14441097",
+    "id": "vic-kevin-hoffman-walk-lara--3802082-14440367",
     "name": "Kevin Hoffman Walk, Lara",
-    "lat": -38.02166,
-    "lng": 144.41097,
+    "lat": -38.0208154,
+    "lng": 144.4036655,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "65 Walkers Rd, Lara VIC 3212",
-    "phone": null,
-    "email": null,
-    "website": null,
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-lake-esmond-botanical-garden-ballarat--3757134-14385966",
+    "id": "vic-lake-esmond-botanical-garden-ballarat--3757500-14387466",
     "name": "Lake Esmond Botanical Garden, Ballarat",
-    "lat": -37.57134,
-    "lng": 143.85966,
+    "lat": -37.5749975,
+    "lng": 143.8746569,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Lake Esmond, Canadian VIC 3350",
-    "phone": null,
-    "email": null,
-    "website": null,
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-maranoa-gardens-balwyn--3781216-14507722",
+    "id": "vic-maranoa-gardens-balwyn--3780950-14509138",
     "name": "Maranoa Gardens, Balwyn",
-    "lat": -37.81216,
-    "lng": 145.07722,
+    "lat": -37.8095024,
+    "lng": 145.0913847,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Parring Rd, Balwyn VIC 3103",
-    "phone": null,
-    "email": null,
-    "website": "https://www.boroondara.vic.gov.au/maranoa-botanic-gardens",
-    "opening_hours": "Mon-Fri 7:30am - 4:00pm; Sat-Sun 10:00am - 5:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-melton-botanic-garden--3769736-14457497",
+    "id": "vic-melton-botanic-garden--3769113-14458951",
     "name": "Melton Botanic Garden",
-    "lat": -37.69736,
-    "lng": 144.57497,
+    "lat": -37.6911275,
+    "lng": 144.5895058,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "46 Lakewood Boulevard, Melton VIC 3337",
-    "phone": null,
-    "email": "friends@fmbg.org.au",
-    "website": "https://www.melton.vic.gov.au/Out-n-About/Leisure-Sport-Recreation/Parks-and-Trails/Parks-Recreation/Melton-Botanic-Garden",
-    "opening_hours": "Daily 24 hours"
+    "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4rLN8eFJViLwnEcTX8D1Ka9VfpZLGBXkwJ9q5g-bZoSQeRsGCkzcEnCdMQ5uynmXp7GiUdxxm2I8OvQQRoXPjcbpozQO7knThZkKNaWpQgB3yJhmcgiDGkMDcrFnztBE7PXQFLbw84vCSDbYdYXUZJWmmiaH7MxjkJStRMWaPlyVrfcjpH8a2c5KBJO7QZbwyVNLTZVCHNkQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6MUoIhIRYeOCaKGCvHNPrZ8F_8Ww2Apg1ILh4_HQjcHTsrLAuLUSNHUrtZumSTjVKUTzbhpZjym-V2lsPaIJ00a-hqImXsuLtlVhwEcq8_FTxiV8u2WWbFiARVh19N52aLEyhN4Eo5Btp9YVmL86X6kaamJOclEVu-4gkRvmmV9hWI1axJ9NJIN_E-uHStk19TkXOIJXx59g?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X70vQoqrkj0OImoMK95vA3LsHxGCtFtcCmBqZnT_khos8eS0sI59rKxVqtZpCgWTvXlKFr8LFq3IzlsrtupNWHwe1B2zHMxBxGykpv_LIxjOy-pUMA0xST5uG6-If0mNF5KuCnLm9_n0AkoKDQLnKsZqiO6dxzI3DsWXmIaCClRccTWeVaHooBW-C193xoRohqzkaM7pSpAuQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7wz0q4WvMNX0RH-cy7IUc7Bzmj2eJ5vj8V8EimxTthMSSJtjUxW8prDIHOh4Dn9OyH_-hHmR0qJhtwLW_IBxvaie59g0g7GqY4xlJXLI39BJBm4QeMamdAf0FiuWOF-RRqaUkwPyg6lvCrAZHXvfbO855WcRZHomYnEwzRn-7ryPHWXLl4ZKTTmBYCCMdRxtTQ1mqMGXh1UA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4tXLTNz4TcFNFtnIT2dHSP8M6w-dD_1KCt7bEX24Z_j0Mt6tN8mviIOh62pJItB6rbTr0UHhCQmZwtLlalTDhwCn16DAnKAZGFG9ar44MDd4j5XMPWLGAb4V0FURmtcCBMT9PDtCGvZ4Rkvi67wGibmjGrWG7qxHrLdxSE_MDNycLdqUtVZahD8VmsJCgVOEseZ5RK53vXog?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X47E80zYgpFRGlBVg3_6fforycZF-_86Naoi63PrqcL0PaFcz7zKhM02d2I8sRC1dNqy1h5xPxVPn_KlCk8o8wNKXOWIpN2BHaXN5PcZ5whZ-DnGVXEUTLyoVhtxdOsNWb8wj6IxeFFCIS2xpw1brDuPWiPJTGa9SSoYHyfpIz22JbUcNYdxVC7_cy29i1vOJwwIeK8avZ--g?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4BLuHr4cl3lrntT22hSTikHka8YzhnBNt6rR2sIMOdUXL6nWGNipX4MafmYIq8ow2_0E85FY-eo8b-S6wkmSqRQeE_IeL241_jfCb9AtuGwB3-cCuCdpcNZ38u6BBg5XNMWp_OhWdv8uRsPud6O2p-1ptr_pZDBE1WVsqz1g0-441kCauHQ74dW2UBZ_8hbvHcL7OT0GeHGg?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5BEcZQGALDTlZ_5t-PCazgr8eSk5LvXKCXpdqR5Dct-4AAJflPHUq5XJLhDX4XyCtH1Y1USfvFOhchgpnP6v9GiYe9tWzvZ4NE0tDGALX3JIM04AiheRbgTDgYP38tPdNHHL3HxrkxMsoGLjaAGMoT6PXdU5XXnuyKaMnGfTMs-6TNi_skFBtot7UOezOokGZOusN6QVk2Ow?fife=s16383\" height=\"200\" width=\"auto\" /><br><br><img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7H33tvCDEdVZx141_IGMeExASTSQu27MvZO9QUmC6rX1Gm4GjFwRqrnaaolQOiHyVey1cVdw3r_D6vxR_OXfX47cz_FpjR8nOjZmhu6u77DkAjd5idMQ2_TP8_nDy64sstRVKlk_2SHvqmQLMyVWRKs_QSkaEzZBEuU-juMdjPbMEjA03hcAH-ffEB59L7kfCBiPyKHBSuzw?fife=s16383\" height=\"200\" width=\"auto\" />",
+    "websites": [
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4rLN8eFJViLwnEcTX8D1Ka9VfpZLGBXkwJ9q5g-bZoSQeRsGCkzcEnCdMQ5uynmXp7GiUdxxm2I8OvQQRoXPjcbpozQO7knThZkKNaWpQgB3yJhmcgiDGkMDcrFnztBE7PXQFLbw84vCSDbYdYXUZJWmmiaH7MxjkJStRMWaPlyVrfcjpH8a2c5KBJO7QZbwyVNLTZVCHNkQ?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6MUoIhIRYeOCaKGCvHNPrZ8F_8Ww2Apg1ILh4_HQjcHTsrLAuLUSNHUrtZumSTjVKUTzbhpZjym-V2lsPaIJ00a-hqImXsuLtlVhwEcq8_FTxiV8u2WWbFiARVh19N52aLEyhN4Eo5Btp9YVmL86X6kaamJOclEVu-4gkRvmmV9hWI1axJ9NJIN_E-uHStk19TkXOIJXx59g?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X70vQoqrkj0OImoMK95vA3LsHxGCtFtcCmBqZnT_khos8eS0sI59rKxVqtZpCgWTvXlKFr8LFq3IzlsrtupNWHwe1B2zHMxBxGykpv_LIxjOy-pUMA0xST5uG6-If0mNF5KuCnLm9_n0AkoKDQLnKsZqiO6dxzI3DsWXmIaCClRccTWeVaHooBW-C193xoRohqzkaM7pSpAuQ?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7wz0q4WvMNX0RH-cy7IUc7Bzmj2eJ5vj8V8EimxTthMSSJtjUxW8prDIHOh4Dn9OyH_-hHmR0qJhtwLW_IBxvaie59g0g7GqY4xlJXLI39BJBm4QeMamdAf0FiuWOF-RRqaUkwPyg6lvCrAZHXvfbO855WcRZHomYnEwzRn-7ryPHWXLl4ZKTTmBYCCMdRxtTQ1mqMGXh1UA?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4tXLTNz4TcFNFtnIT2dHSP8M6w-dD_1KCt7bEX24Z_j0Mt6tN8mviIOh62pJItB6rbTr0UHhCQmZwtLlalTDhwCn16DAnKAZGFG9ar44MDd4j5XMPWLGAb4V0FURmtcCBMT9PDtCGvZ4Rkvi67wGibmjGrWG7qxHrLdxSE_MDNycLdqUtVZahD8VmsJCgVOEseZ5RK53vXog?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X47E80zYgpFRGlBVg3_6fforycZF-_86Naoi63PrqcL0PaFcz7zKhM02d2I8sRC1dNqy1h5xPxVPn_KlCk8o8wNKXOWIpN2BHaXN5PcZ5whZ-DnGVXEUTLyoVhtxdOsNWb8wj6IxeFFCIS2xpw1brDuPWiPJTGa9SSoYHyfpIz22JbUcNYdxVC7_cy29i1vOJwwIeK8avZ--g?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4BLuHr4cl3lrntT22hSTikHka8YzhnBNt6rR2sIMOdUXL6nWGNipX4MafmYIq8ow2_0E85FY-eo8b-S6wkmSqRQeE_IeL241_jfCb9AtuGwB3-cCuCdpcNZ38u6BBg5XNMWp_OhWdv8uRsPud6O2p-1ptr_pZDBE1WVsqz1g0-441kCauHQ74dW2UBZ_8hbvHcL7OT0GeHGg?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5BEcZQGALDTlZ_5t-PCazgr8eSk5LvXKCXpdqR5Dct-4AAJflPHUq5XJLhDX4XyCtH1Y1USfvFOhchgpnP6v9GiYe9tWzvZ4NE0tDGALX3JIM04AiheRbgTDgYP38tPdNHHL3HxrkxMsoGLjaAGMoT6PXdU5XXnuyKaMnGfTMs-6TNi_skFBtot7UOezOokGZOusN6QVk2Ow?fife=s16383",
+      "https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7H33tvCDEdVZx141_IGMeExASTSQu27MvZO9QUmC6rX1Gm4GjFwRqrnaaolQOiHyVey1cVdw3r_D6vxR_OXfX47cz_FpjR8nOjZmhu6u77DkAjd5idMQ2_TP8_nDy64sstRVKlk_2SHvqmQLMyVWRKs_QSkaEzZBEuU-juMdjPbMEjA03hcAH-ffEB59L7kfCBiPyKHBSuzw?fife=s16383"
+    ],
+    "phone": null
   },
   {
     "id": "vic-mount-martha-park--3829697-14500112",
@@ -1098,49 +1186,41 @@
     "lng": 145.0011169,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "121 Bradford Rd, Mount Martha VIC 3934",
-    "phone": null,
-    "email": null,
-    "website": "https://www.mornpen.vic.gov.au/Activities/Parks-Reserves/Mount-Martha-Public-Park",
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-peter-francis-points-arboretum-coleraine--3760798-14168475",
     "name": "Peter Francis Points Arboretum, Coleraine",
     "lat": -37.6079844,
-    "lng": 141.68475,
+    "lng": 141.684745,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Points Rd, Coleraine VIC 3315",
-    "phone": null,
-    "email": null,
-    "website": "https://www.parks.vic.gov.au/places-to-see/sites/peter-francis-points-arboretum",
-    "opening_hours": "Daily 24 hours"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
     "id": "vic-royal-botanic-gardens-victoria-cranbourn--3813095-14526923",
     "name": "Royal Botanic Gardens Victoria - Cranbourne Gardens",
-    "lat": -38.13095,
-    "lng": 145.26923,
+    "lat": -38.1309465,
+    "lng": 145.2692332,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "Corner Ballarto Rd and Botanic Dr, Cranbourne VIC 3977",
-    "phone": "(03) 5990 2200",
-    "email": "rbgc@rbg.vic.gov.au",
-    "website": "https://www.rbg.vic.gov.au/cranbourne-gardens/",
-    "opening_hours": "Daily 9:00am - 5:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   },
   {
-    "id": "vic-wilson-botanic-park-berwick--3802958-14534722",
-    "name": "Wilson Botanic Park, Berwick",
-    "lat": -38.02958,
-    "lng": 145.34722,
+    "id": "vic-wilson-botanic-park-berwick--3802753-14533674",
+    "name": "Wilson Botanic Park Berwick",
+    "lat": -38.0275344,
+    "lng": 145.336743,
     "kind": "public_garden",
     "folder": "Native Public Gardens",
-    "address": "668 Princes Hwy, Berwick VIC 3806",
-    "phone": "(03) 9705 5599",
-    "email": "wbpb@casey.vic.gov.au",
-    "website": "https://www.casey.vic.gov.au/wilson-botanic-park-berwick",
-    "opening_hours": "Daily 7:00am - 8:00pm"
+    "description": null,
+    "websites": [],
+    "phone": null
   }
 ]

@@ -31,7 +31,7 @@ export const plants: Plant[] = [
     companionsBad: ['Trees (climbing damage)', 'Structures'],
     seasonalNote: 'Declared weed in parts of Australia; do not plant.',
     seasons: ['Year-round', 'Outdoor'],
-    tags: ['Environmental weed'],
+    tags: ['Invasive', 'Weed'],
   },
   {
     id: '3',
