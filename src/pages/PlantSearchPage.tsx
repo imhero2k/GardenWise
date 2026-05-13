@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { IconSearch } from '../components/Icons'
+import { LocationPromptBanner } from '../components/LocationPromptBanner'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import { WildlifeFilter } from '../components/WildlifeFilter'
 import { useLocationArea } from '../context/LocationContext'
@@ -586,6 +587,8 @@ export function PlantSearchPage() {
         </div>
         <SeedCartHeaderLink />
       </header>
+
+      <LocationPromptBanner surface="plantme" />
 
       <section style={{ marginBottom: 'var(--space-xl)' }} aria-labelledby="rds-heading">
         <h2 id="rds-heading" style={{ fontSize: '1.1rem', marginBottom: 'var(--space-sm)' }}>

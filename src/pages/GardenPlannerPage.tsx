@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IconSearch } from '../components/Icons'
 import { FeatureIcon } from '../components/FeatureIcons'
+import { LocationPromptBanner } from '../components/LocationPromptBanner'
 import { PlantFormIcon } from '../components/PlantFormIcon'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import {
@@ -1117,6 +1118,8 @@ export function GardenPlannerPage() {
           </p>
         ) : null}
       </header>
+
+      <LocationPromptBanner surface="planner" />
 
       <section className="card card-body garden-goal-panel" aria-label="Garden goal">
         <div className="garden-goal-panel__label">Garden goal</div>
