@@ -10,7 +10,25 @@ import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import { useLocationArea } from '../context/LocationContext'
 import { useSeedCart } from '../context/useSeedCart'
 import type { SeedCartItemV1 } from '../context/seedCartTypes'
-import { LF_CODE_LABELS } from '../lib/lfCodeLabels'
+
+const LF_CODE_LABELS: Record<string, string> = {
+  MS: 'Medium Shrub',
+  SS: 'Small Shrub',
+  T: 'Tree',
+  MH: 'Medium Herb',
+  PS: 'Prostrate Shrub',
+  SH: 'Small Herb',
+  GF: 'Ground Fern',
+  LH: 'Large Herb',
+  EP: 'Epiphyte',
+  MTG: 'Medium Tufted Grass',
+  SC: 'Scrambler / Climber',
+  LTG: 'Large Tufted Grass',
+  MNG: 'Medium Non-tufted Grass',
+  LNG: 'Large Non-tufted Grass',
+  TTG: 'Tiny Tufted Grass',
+  HG: 'Herbaceous Groundcover',
+}
 
 function formatAddedAt(iso: string): string {
   const d = new Date(iso)
@@ -113,7 +131,7 @@ function SeedCartCard({
             margin: '0.35rem 0 0',
           }}
         >
-          {lf ? <>Plant type: {lf}</> : null}
+          {lf ? <>Life form: {lf}</> : null}
           {lf && added ? ' · ' : ''}
           {added ? <>Added {added}</> : null}
         </p>

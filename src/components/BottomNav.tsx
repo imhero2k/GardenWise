@@ -11,11 +11,11 @@ const homeLinkClass = ({ isActive }: { isActive: boolean }) =>
 type MenuItem = { to: string; label: string }
 
 const WEED_MENU: MenuItem[] = [
-  { to: '/weed#weed-checker', label: 'Weed checker' },
   { to: '/weed#top-weeds', label: 'Top weeds' },
+  { to: '/weed#weed-checker', label: 'Weed checker' },
+  { to: '/weed#prohibited', label: 'State prohibited weeds' },
   { to: '/weed#rules', label: 'General rules' },
   { to: '/weed#disposal', label: 'Disposal guide' },
-  { to: '/weed#prohibited', label: 'State prohibited weeds' },
 ]
 
 const LEARN_MENU: MenuItem[] = [

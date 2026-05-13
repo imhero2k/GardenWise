@@ -5,7 +5,6 @@ import { parseWildlifeCategories } from './db.mjs'
 import { queryRecommendations } from './recommendations.mjs'
 import { queryRegionWeeds } from './weeds.mjs'
 import { queryTopWeeds } from './topWeeds.mjs'
-import { queryPlantListedInBioregion, queryWeedLookupByName } from './weedLookup.mjs'
 import { queryPlantDetails } from './plantDetails.mjs'
 import { queryPlannerRecommendations } from './plannerRecommendations.mjs'
 import { isFirebaseAdminConfigured, verifyFirebaseIdToken } from './firebaseAdmin.mjs'
@@ -170,50 +169,6 @@ app.use(
   }),
 )
 
-/**
- * Pl@ntNet proxy — browser calls same-origin `/api/...`; server forwards to my-api.plantnet.org
- * (avoids Pl@ntNet "Origin not allowed" CORS on direct browser calls).
- * Env: PLANTNET_API_KEY or VITE_PLANTNET_API_KEY (server loads `.env.local` via `server/index.mjs`).
- */
-app.post('/api/plantnet/identify', express.json({ limit: '35mb' }), async (req, res) => {
-  const key =
-    String(process.env.PLANTNET_API_KEY ?? '').trim() ||
-    String(process.env.VITE_PLANTNET_API_KEY ?? '').trim()
-  if (!key) {
-    return res.status(503).json({
-      error:
-        'PlantNet key not configured on API server (set PLANTNET_API_KEY or VITE_PLANTNET_API_KEY in .env.local for the API process)',
-    })
-  }
-  const imageBase64 = req.body?.imageBase64
-  const organ =
-    typeof req.body?.organ === 'string' && req.body.organ.trim() ? req.body.organ.trim() : 'leaf'
-  if (typeof imageBase64 !== 'string' || !imageBase64.trim()) {
-    return res.status(400).json({ error: 'JSON body must include imageBase64 (base64 string)' })
-  }
-  let buf
-  try {
-    buf = Buffer.from(String(imageBase64).replace(/\s+/g, ''), 'base64')
-  } catch {
-    return res.status(400).json({ error: 'Invalid base64 image' })
-  }
-  if (!buf.length) return res.status(400).json({ error: 'Empty image buffer' })
-
-  const upstreamUrl = `https://my-api.plantnet.org/v2/identify/all?api-key=${encodeURIComponent(key)}`
-  try {
-    const blob = new Blob([buf], { type: 'image/jpeg' })
-    const fd = new FormData()
-    fd.append('images', blob, 'image.jpg')
-    fd.append('organs', organ)
-    const upstream = await fetch(upstreamUrl, { method: 'POST', body: fd })
-    const text = await upstream.text()
-    res.status(upstream.status).type('application/json').send(text)
-  } catch (err) {
-    console.error('[plantnet]', err)
-    res.status(502).json({ error: err instanceof Error ? err.message : 'PlantNet request failed' })
-  }
-})
-
 app.use(express.json({ limit: '600kb' }))
 
 app.get('/api/health', (_req, res) => {
@@ -277,35 +232,6 @@ app.get(
       q: parseQ(req.query.q),
     })
     res.json(data)
-  }),
-)
-
-/** Match `plant` + `weed_info` by scientific name (from weed checker / ID tools). */
-app.get(
-  '/api/weeds/lookup',
-  wrap('weeds/lookup', async (req, res) => {
-    const name = parseQ(req.query.name) || parseQ(req.query.q)
-    if (!name) {
-      return res.status(400).json({ error: 'Query parameter name (or q) is required' })
-    }
-    const match = await queryWeedLookupByName(getPool(), name)
-    if (!match) {
-      return res.json({ match: null })
-    }
-    let inBioregion = null
-    const lat = Number(req.query.lat)
-    const lng = Number(req.query.lng)
-    if (
-      Number.isFinite(lat) &&
-      Number.isFinite(lng) &&
-      lat >= -90 &&
-      lat <= 90 &&
-      lng >= -180 &&
-      lng <= 180
-    ) {
-      inBioregion = await queryPlantListedInBioregion(getPool(), lng, lat, match.id)
-    }
-    res.json({ match: { ...match, inBioregion } })
   }),
 )
 
