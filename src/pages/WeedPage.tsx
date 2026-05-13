@@ -1476,6 +1476,7 @@ export function WeedPage() {
           </div>
         </div>
       )}
-    </>
+      </div>
+    </div>
   )
 }

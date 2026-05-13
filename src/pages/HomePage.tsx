@@ -1,6 +1,15 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import type { CSSProperties } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import {
+  IconBook,
+  IconLeaf,
+  IconMap,
+  IconPlanner,
+  IconSearch,
+  IconSeedling,
+} from '../components/Icons'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 import waratahImg from '../assets/hero/waratah.png'
 import wattleImg from '../assets/hero/wattle.png'
 import bottlebrushImg from '../assets/hero/bottlebrush.png'
@@ -51,7 +60,7 @@ const HOME_QUICK_PATHS: { to: string; title: string; blurb: string; icon: ReactN
     to: '/beginners',
     title: 'Beginner guides',
     blurb: 'Step-by-step help for your first native-friendly patch.',
-    icon: <IconSprout />,
+    icon: <IconSeedling />,
   },
   {
     to: '/learn#native',
@@ -449,12 +458,10 @@ function HomeNativeBenefitCard({ item, index }: { item: NativePlantBenefit; inde
       tabIndex={0}
       style={item.image ? { ...benefitBackgroundStyle(item.image), ...delayStyle } : delayStyle}
     >
-      <div className="home-native-benefits__inner">
-        <div className="home-native-benefits__head">
-          <span className="home-native-benefits__title">{item.title}</span>
-        </div>
-        <p className="home-native-benefits__body">{item.body}</p>
-      </div>
+      <span className="home-native-benefits__index" aria-hidden="true">
+        {index + 1}
+      </span>
+      <p className="home-native-benefits__text">{item.text}</p>
     </article>
   )
 }
@@ -569,6 +576,11 @@ export function HomePage() {
         </div>
       </section>
 
+      <section className="section-block home-quick-paths" aria-labelledby="home-quick-paths-heading">
+        <HomeQuickPathsIntro />
+        <HomeQuickPathLoop />
+      </section>
+
       <section className="section-block home-impact" aria-labelledby="home-impact-heading">
         <h2 id="home-impact-heading">Why invasive species matter</h2>
         <div className="home-impact__layout">
@@ -602,16 +614,8 @@ export function HomePage() {
           </aside>
           <div className="home-impact__stats">
             <div className="learn-stats">
-              {INVASIVE_IMPACT_STATS.map((s) => (
-                <article key={s.value} className="learn-stat learn-stat--alt">
-                  <p className="learn-stat__value">{s.value}</p>
-                  <p className="learn-stat__label">{s.label}</p>
-                  <p className="learn-stat__source">
-                    <a href={s.href} target="_blank" rel="noopener noreferrer">
-                      {s.source}
-                    </a>
-                  </p>
-                </article>
+              {INVASIVE_IMPACT_STATS.map((s, i) => (
+                <HomeImpactStatCard key={s.value} stat={s} index={i} />
               ))}
             </div>
             <p
@@ -647,17 +651,7 @@ export function HomePage() {
         <div className="home-native-benefits">
           <div className="home-native-benefits__grid" role="list">
             {NATIVE_PLANT_BENEFITS.map((item, i) => (
-              <article
-                key={item.text}
-                className={`card home-native-benefits__box${item.image ? ' home-native-benefits__box--has-bg' : ''}`}
-                role="listitem"
-                style={item.image ? benefitBackgroundStyle(item.image) : undefined}
-              >
-                <span className="home-native-benefits__index" aria-hidden="true">
-                  {i + 1}
-                </span>
-                <p className="home-native-benefits__text">{item.text}</p>
-              </article>
+              <HomeNativeBenefitCard key={item.text} item={item} index={i} />
             ))}
           </div>
           <p className="home-native-benefits__footnote">
