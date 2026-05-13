@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 export type ScrollRevealVariant =
   | 'fade-up'
@@ -11,19 +11,27 @@ export type ScrollRevealVariant =
 /**
  * Adds `reveal-on-scroll` classes; toggles visible when the element enters the viewport.
  * Respects `prefers-reduced-motion: reduce`.
+ *
+ * Uses a callback ref as `elementRef` (not `ref`) so callers avoid `react-hooks/refs`
+ * false positives when combining ref + className in JSX.
  */
 export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
   variant: ScrollRevealVariant = 'fade-up',
 ) {
-  const ref = useRef<T | null>(null)
   const [visible, setVisible] = useState(false)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
-  useEffect(() => {
-    const el = ref.current
+  const ref = useCallback((el: T | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+      observerRef.current = null
+    }
     if (!el) return
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setVisible(true)
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      queueMicrotask(() => {
+        setVisible(true)
+      })
       return
     }
 
@@ -37,13 +45,13 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
       { rootMargin: '0px 0px -6% 0px', threshold: 0.06 },
     )
 
+    observerRef.current = obs
     obs.observe(el)
-    return () => obs.disconnect()
   }, [])
 
   const revealClass = `reveal-on-scroll reveal-on-scroll--${variant}${
     visible ? ' reveal-on-scroll--visible' : ''
   }`
 
-  return { ref, revealClass, visible }
+  return { elementRef: ref, revealClass, visible }
 }

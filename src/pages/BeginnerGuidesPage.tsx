@@ -10,7 +10,7 @@ export function BeginnerGuidesPage() {
     const raw = location.hash.replace(/^#/, '')
     if (!raw) return
     navigate(`/beginners/${raw}`, { replace: true })
-  }, [location.hash, location.pathname])
+  }, [location.hash, location.pathname, navigate])
 
   const stepLinkClass = ({ isActive }: { isActive: boolean }) =>
     `beginners-sidenav__link${isActive ? ' beginners-sidenav__link--active' : ''}`

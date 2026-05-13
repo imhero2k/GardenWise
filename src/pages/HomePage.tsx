@@ -76,9 +76,9 @@ const HOME_QUICK_PATHS: { to: string; title: string; blurb: string; icon: ReactN
 ]
 
 function HomeQuickPathsIntro() {
-  const { ref, revealClass } = useScrollReveal<HTMLDivElement>('fade-up')
+  const { elementRef, revealClass } = useScrollReveal<HTMLDivElement>('fade-up')
   return (
-    <div ref={ref} className={`home-quick-paths__intro ${revealClass}`.trim()}>
+    <div ref={elementRef} className={`home-quick-paths__intro ${revealClass}`.trim()}>
       <p className="eyebrow home-quick-paths__eyebrow">Explore RootVio</p>
       <h2 id="home-quick-paths-heading" className="home-quick-paths__title">
         Where do you want to start?
@@ -140,9 +140,11 @@ function HomeQuickPathLoop() {
       ? 1
       : 3,
   )
-  const { ref: revealRef, revealClass } = useScrollReveal<HTMLDivElement>('fade-up')
+  const { elementRef: revealRef, revealClass } = useScrollReveal<HTMLDivElement>('fade-up')
 
-  copiesRef.current = copies
+  useEffect(() => {
+    copiesRef.current = copies
+  }, [copies])
 
   useEffect(() => {
     const onPointerMove = (e: PointerEvent) => {
@@ -177,7 +179,10 @@ function HomeQuickPathLoop() {
     if (w > 0) segmentW.current = w
   }, [copies])
 
-  remeasureRef.current = remeasure
+  useEffect(() => {
+    remeasureRef.current = remeasure
+  }, [remeasure])
+
   const runAfterScrollQuiet = useCallback((fn: () => void) => {
     isSyncing.current = true
     requestAnimationFrame(() => {
@@ -421,11 +426,11 @@ function HomeImpactStatCard({
   stat: (typeof INVASIVE_IMPACT_STATS)[number]
   index: number
 }) {
-  const { ref, revealClass } = useScrollReveal<HTMLElement>('rise-scale')
+  const { elementRef, revealClass } = useScrollReveal<HTMLElement>('rise-scale')
   const delayStyle = { '--reveal-delay': `${index * 90}ms` } as CSSProperties
   return (
     <article
-      ref={ref}
+      ref={elementRef}
       className={`learn-stat learn-stat--alt ${revealClass}`.trim()}
       style={delayStyle}
     >
@@ -441,11 +446,11 @@ function HomeImpactStatCard({
 }
 
 function HomeNativeBenefitCard({ item, index }: { item: NativePlantBenefit; index: number }) {
-  const { ref, revealClass } = useScrollReveal<HTMLElement>('rise-scale')
+  const { elementRef, revealClass } = useScrollReveal<HTMLElement>('rise-scale')
   const delayStyle = { '--reveal-delay': `${index * 75}ms` } as CSSProperties
   return (
     <article
-      ref={ref}
+      ref={elementRef}
       className={`card home-native-benefits__box${item.image ? ' home-native-benefits__box--has-bg' : ''} ${revealClass}`.trim()}
       role="listitem"
       tabIndex={0}
@@ -516,11 +521,16 @@ function HomeImpactWeedRotator() {
 }
 
 export function HomePage() {
-  const impactTitleReveal = useScrollReveal<HTMLDivElement>('fade-up')
-  const impactBodyReveal = useScrollReveal<HTMLDivElement>('slide-right')
-  const impactAsideReveal = useScrollReveal<HTMLElement>('slide-left')
-  const impactMoreReveal = useScrollReveal<HTMLParagraphElement>('fade-in')
-  const benefitsTitleReveal = useScrollReveal<HTMLHeadingElement>('fade-up')
+  const { elementRef: impactTitleRef, revealClass: impactTitleRevealClass } =
+    useScrollReveal<HTMLDivElement>('fade-up')
+  const { elementRef: impactBodyRef, revealClass: impactBodyRevealClass } =
+    useScrollReveal<HTMLDivElement>('slide-right')
+  const { elementRef: impactAsideRef, revealClass: impactAsideRevealClass } =
+    useScrollReveal<HTMLElement>('slide-left')
+  const { elementRef: impactMoreRef, revealClass: impactMoreRevealClass } =
+    useScrollReveal<HTMLParagraphElement>('fade-in')
+  const { elementRef: benefitsTitleRef, revealClass: benefitsTitleRevealClass } =
+    useScrollReveal<HTMLHeadingElement>('fade-up')
 
   return (
     <>
@@ -580,8 +590,8 @@ export function HomePage() {
       <section className="section-block home-impact" aria-labelledby="home-impact-heading">
         <div className="home-impact__layout">
           <div
-            ref={impactTitleReveal.ref}
-            className={`home-impact__lead ${impactTitleReveal.revealClass}`.trim()}
+            ref={impactTitleRef}
+            className={`home-impact__lead ${impactTitleRevealClass}`.trim()}
           >
             <h2 id="home-impact-heading" className="home-impact__heading">
               Why environmental weeds matter
@@ -592,8 +602,8 @@ export function HomePage() {
             </p>
           </div>
           <div
-            className={`home-impact__body ${impactBodyReveal.revealClass}`.trim()}
-            ref={impactBodyReveal.ref}
+            className={`home-impact__body ${impactBodyRevealClass}`.trim()}
+            ref={impactBodyRef}
           >
             <p>
               Choosing native alternatives helps protect the environment, and every garden contributes
@@ -601,9 +611,9 @@ export function HomePage() {
             </p>
           </div>
           <aside
-            className={`home-impact__aside ${impactAsideReveal.revealClass}`.trim()}
+            className={`home-impact__aside ${impactAsideRevealClass}`.trim()}
             aria-label="Examples of environmental weeds"
-            ref={impactAsideReveal.ref}
+            ref={impactAsideRef}
           >
             <HomeImpactWeedRotator />
           </aside>
@@ -614,8 +624,8 @@ export function HomePage() {
               ))}
             </div>
             <p
-              className={`home-impact__more ${impactMoreReveal.revealClass}`.trim()}
-              ref={impactMoreReveal.ref}
+              className={`home-impact__more ${impactMoreRevealClass}`.trim()}
+              ref={impactMoreRef}
             >
               <Link to="/learn#environmental-weeds" className="home-impact__more-link">
                 Read more on environmental weeds
@@ -634,8 +644,8 @@ export function HomePage() {
       <section className="section-block home-benefits-block" aria-labelledby="home-benefits-heading">
         <h2
           id="home-benefits-heading"
-          ref={benefitsTitleReveal.ref}
-          className={benefitsTitleReveal.revealClass}
+          ref={benefitsTitleRef}
+          className={benefitsTitleRevealClass}
         >
           Benefits of native plants
         </h2>

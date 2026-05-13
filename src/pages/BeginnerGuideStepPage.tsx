@@ -6,16 +6,16 @@ export function BeginnerGuideStepPage() {
   const { id } = useParams()
   const location = useLocation()
 
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [location.pathname])
+
   const tutorial = getTutorialById(id)
   if (!tutorial) return <Navigate to="/beginners" replace />
 
   const idx = TUTORIALS.findIndex((t) => t.id === tutorial.id)
   const prev = idx > 0 ? TUTORIALS[idx - 1] : null
   const next = idx >= 0 && idx < TUTORIALS.length - 1 ? TUTORIALS[idx + 1] : null
-
-  useLayoutEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
-  }, [location.pathname])
 
   const stepLinkClass = ({ isActive }: { isActive: boolean }) =>
     `beginners-sidenav__link${isActive ? ' beginners-sidenav__link--active' : ''}`

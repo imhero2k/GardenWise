@@ -1,7 +1,8 @@
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 export function AboutPage() {
-  const missionReveal = useScrollReveal<HTMLElement>('fade-up')
+  const { elementRef: missionSectionRef, revealClass: missionRevealClass } =
+    useScrollReveal<HTMLElement>('fade-up')
 
   return (
     <>
@@ -21,8 +22,8 @@ export function AboutPage() {
       </section>
 
       <section
-        className={`about-band about-band--mission ${missionReveal.revealClass}`.trim()}
-        ref={missionReveal.ref}
+        className={`about-band about-band--mission ${missionRevealClass}`.trim()}
+        ref={missionSectionRef}
         aria-labelledby="about-mission-heading"
       >
         <div className="about-band__inner">
