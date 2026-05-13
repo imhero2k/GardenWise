@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { CSSProperties, ReactNode } from 'react'
-import { useScrollReveal } from '../hooks/useScrollReveal'
-import { IconBook, IconLeaf, IconMap, IconPlanner, IconSearch, IconSprout } from '../components/Icons'
+import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 import waratahImg from '../assets/hero/waratah.png'
 import wattleImg from '../assets/hero/wattle.png'
 import bottlebrushImg from '../assets/hero/bottlebrush.png'
@@ -18,7 +16,7 @@ import weedRotatorGorse from '../assets/home/weed-rotator-gorse.png'
 const WEED_EXAMPLE_SLIDES: { src: string; alt: string }[] = [
   {
     src: weedRotatorKhaki,
-    alt: 'Low-growing environmental weed with spiky white flower clusters among grass.',
+    alt: 'Low-growing invasive weed with spiky white flower clusters among grass.',
   },
   {
     src: weedRotatorThistle,
@@ -368,7 +366,7 @@ const INVASIVE_IMPACT_STATS: {
   },
   {
     value: '$24.5B',
-    label: 'Estimated yearly cost of environmental weeds to Australia — plants are the largest share.',
+    label: 'Estimated yearly cost of invasive species to Australia — plants are the largest share.',
     source: 'CSIRO (NeoBiota, 2021)',
     href: 'https://www.csiro.au/',
   },
@@ -381,8 +379,7 @@ const INVASIVE_IMPACT_STATS: {
 ]
 
 type NativePlantBenefit = {
-  title: string
-  body: string
+  text: string
   /** Optional full-bleed background (more can be added later). */
   image?: string
 }
@@ -398,23 +395,19 @@ function benefitBackgroundStyle(src: string): CSSProperties {
 
 const NATIVE_PLANT_BENEFITS: NativePlantBenefit[] = [
   {
-    title: 'Support local wildlife',
-    body: 'Pollinators, birds and soil life co-evolved with Victorian natives and thrive when those plants are in your garden.',
+    text: 'Support local pollinators, birds and soil life that co-evolved with Victorian flora.',
     image: benefitPollinatorsBg,
   },
   {
-    title: 'Save water',
-    body: 'Established natives survive on rainfall alone, cutting garden water use compared to exotic species.',
+    text: 'Often need less water and fertiliser once established — easier on your patch and runoff.',
     image: benefitKangarooPawBg,
   },
   {
-    title: 'Support the economy',
-    body: 'Australia’s natural landscapes support economic activity and jobs that flow through to households nationwide.',
+    text: 'Australia’s natural landscapes support economic activity and jobs that flow through to households nationwide.',
     image: benefitNaturalEconomyBg,
   },
   {
-    title: 'Low maintenance',
-    body: 'Choose the right plant for your garden and spend less time mowing, pruning and battling pests.',
+    text: 'Time in gardens and green spaces is linked to less stress, better mood, and better overall health.',
     image: benefitWellbeingBg,
   },
 ]
@@ -498,6 +491,9 @@ function HomeImpactWeedRotator() {
           />
         ))}
       </div>
+      <p className="home-impact-weeds-caption">
+        Plants like these can escape from gardens and damage native bushland.
+      </p>
       <p className="home-native-benefits__photo-credit">
         <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">
           Unsplash
@@ -534,11 +530,7 @@ export function HomePage() {
 
   return (
     <>
-      <section className="hero home-hero">
-        <div className="home-hero__ambient" aria-hidden="true">
-          <span className="home-hero__orb home-hero__orb--a" />
-          <span className="home-hero__orb home-hero__orb--b" />
-        </div>
+      <section className="hero fade-up">
         <div className="hero-slideshow" aria-hidden="true">
           {HERO_SLIDES.map((slide, i) => (
             <div
@@ -551,43 +543,34 @@ export function HomePage() {
           ))}
         </div>
         <div className="hero-inner">
-          <div className="hero-brand home-hero__rise home-hero__rise--d0">
+          <div className="hero-brand">
             <img src={logoImg} alt="" className="hero-brand__logo" aria-hidden="true" />
             <span className="hero-brand__text">RootVio</span>
           </div>
-          <p
-            className="eyebrow home-hero__rise home-hero__rise--d1"
-            style={{ color: 'rgba(255,255,255,0.85)' }}
-          >
+          <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.85)' }}>
             Sustainable gardening
           </p>
           <h1 className="hero-title">
-            <span className="hero-title__line home-hero__rise home-hero__rise--d2">Grow smart.</span>
-            <span className="hero-title__line home-hero__rise home-hero__rise--d3">
-              Garden responsibly.
-            </span>
+            <span className="hero-title__line">Grow smart.</span>
+            <span className="hero-title__line">Garden responsibly.</span>
           </h1>
-          <p className="home-hero__rise home-hero__rise--d4">
-            Every garden counts. RootVio empowers Victorian gardeners to grow local, remove
-            environmental weeds, and protect the biodiversity that makes this state extraordinary.
+          <p>
+            Plan with native-friendly choices, spot invasive species early, and build a garden that
+            supports local biodiversity.
           </p>
-          <div className="hero-cta-row home-hero__rise home-hero__rise--d5">
-            <Link to="/plants" className="btn btn-primary home-hero__cta-btn">
+          <div className="hero-cta-row">
+            <Link to="/plants" className="btn btn-primary">
               Start Gardening
             </Link>
-            <Link to="/weed#weed-checker" className="btn btn-secondary home-hero__cta-btn">
+            <Link to="/weed#weed-checker" className="btn btn-secondary">
               Weed checker
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="home-quick-paths section-block" aria-labelledby="home-quick-paths-heading">
-        <HomeQuickPathsIntro />
-        <HomeQuickPathLoop />
-      </section>
-
       <section className="section-block home-impact" aria-labelledby="home-impact-heading">
+        <h2 id="home-impact-heading">Why invasive species matter</h2>
         <div className="home-impact__layout">
           <div
             ref={impactTitleRef}
@@ -619,8 +602,16 @@ export function HomePage() {
           </aside>
           <div className="home-impact__stats">
             <div className="learn-stats">
-              {INVASIVE_IMPACT_STATS.map((s, i) => (
-                <HomeImpactStatCard key={s.value} stat={s} index={i} />
+              {INVASIVE_IMPACT_STATS.map((s) => (
+                <article key={s.value} className="learn-stat learn-stat--alt">
+                  <p className="learn-stat__value">{s.value}</p>
+                  <p className="learn-stat__label">{s.label}</p>
+                  <p className="learn-stat__source">
+                    <a href={s.href} target="_blank" rel="noopener noreferrer">
+                      {s.source}
+                    </a>
+                  </p>
+                </article>
               ))}
             </div>
             <p
@@ -656,9 +647,23 @@ export function HomePage() {
         <div className="home-native-benefits">
           <div className="home-native-benefits__grid" role="list">
             {NATIVE_PLANT_BENEFITS.map((item, i) => (
-              <HomeNativeBenefitCard key={item.title} item={item} index={i} />
+              <article
+                key={item.text}
+                className={`card home-native-benefits__box${item.image ? ' home-native-benefits__box--has-bg' : ''}`}
+                role="listitem"
+                style={item.image ? benefitBackgroundStyle(item.image) : undefined}
+              >
+                <span className="home-native-benefits__index" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <p className="home-native-benefits__text">{item.text}</p>
+              </article>
             ))}
           </div>
+          <p className="home-native-benefits__footnote">
+            <Link to="/learn#native">Native plants 101 on the Learn page</Link> ties these ideas to
+            Victoria’s <em>Biodiversity 2037</em> goals.
+          </p>
           <p className="home-native-benefits__photo-credit">Kangaroo paw photograph: John Jennings.</p>
           <p className="home-native-benefits__photo-credit">
             <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">

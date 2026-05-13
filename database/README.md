@@ -19,26 +19,27 @@ All data used in this project comes from public sources. Please download each da
 
 ### 1. Bioregions and EVC Benchmarks
 
-- **Source**: [https://www.environment.vic.gov.au/biodiversity/bioregions-and-evc-benchmarks](https://www.environment.vic.gov.au/biodiversity/bioregions-and-evc-benchmarks)
+- **Source**: <https://www.environment.vic.gov.au/biodiversity/bioregions-and-evc-benchmarks>
 - **Description**: Victoria is divided into 28 bioregions, each containing multiple EVCs (Ecological Vegetation Classes). For this project we have selected the 6 EVCs most suitable for garden environments:
 
-  | EVC ID  | Name                   |
-  | ------- | ---------------------- |
-  | EVC 3   | Damp Sands Woodland    |
-  | EVC 48  | Heathy Woodland        |
-  | EVC 55  | Plains Grassy Woodland |
-  | EVC 61  | Box Ironbark Forest    |
-  | EVC 132 | Plains Grassland       |
-  | EVC 175 | Grassy Woodland        |
+  | EVC ID | Name |
+  |---|---|
+  | EVC 3 | Damp Sands Woodland |
+  | EVC 48 | Heathy Woodland |
+  | EVC 55 | Plains Grassy Woodland |
+  | EVC 61 | Box Ironbark Forest |
+  | EVC 132 | Plains Grassland |
+  | EVC 175 | Grassy Woodland |
 
 - **Usage**: A pre-processed CSV file based on the selected EVCs is already provided under `data/processed/`. If you wish to use a different set of EVCs, you can replace this CSV with your own file in the same format, sourced from the link above.
 
 ### 2. Victorian Bioregions Shapefile
 
-- **Source**: [https://datashare.maps.vic.gov.au/search?md=3508ad58-e66b-50e4-9717-0338845ded77](https://datashare.maps.vic.gov.au/search?md=3508ad58-e66b-50e4-9717-0338845ded77)
+- **Source**: <https://datashare.maps.vic.gov.au/search?md=3508ad58-e66b-50e4-9717-0338845ded77>
 - **Dataset**: Victorian Bioregions – Mapped at 1:100,000 (version 3.0, May 2004)
 - **Download format**: Please choose the **SHP** format.
 - **Import command** (example — adjust the file path, database name, username, and password to match your environment):
+
   ```bash
   ogr2ogr \
     -f "PostgreSQL" PG:"host=localhost port=5432 dbname=mydb user=postgres password=yourpassword" \
@@ -49,6 +50,7 @@ All data used in this project comes from public sources. Please download each da
     -lco GEOMETRY_NAME=boundary \
     -overwrite
   ```
+
   Key parameters:
   - `-nln bioregion_raw` — name of the imported table
   - `-nlt PROMOTE_TO_MULTI` — promotes geometries to MultiPolygon
@@ -56,8 +58,9 @@ All data used in this project comes from public sources. Please download each da
 
 ### 3. AusTraits Plant Trait Data
 
-- **Source**: [https://zenodo.org/records/15718081](https://zenodo.org/records/15718081)
+- **Source**: <https://zenodo.org/records/15718081>
 - **Description**: AusTraits is a database of Australian plant traits. Two preprocessing steps are required to produce the CSV used by the ETL pipeline:
+
   ```bash
   # Step 1: Run the IT2 script to produce plants_enriched_final.csv
   python scripts/IT2.py
@@ -68,8 +71,9 @@ All data used in this project comes from public sources. Please download each da
 
 ### 4. Advisory List of Environmental Weeds in Victoria
 
-- **Source**: [https://www.environment.vic.gov.au/__data/assets/excel_doc/0027/563607/Advisory-list-of-environmental-weeds-in-Victoria_2022.xlsx](https://www.environment.vic.gov.au/__data/assets/excel_doc/0027/563607/Advisory-list-of-environmental-weeds-in-Victoria_2022.xlsx)
+- **Source**: <https://www.environment.vic.gov.au/__data/assets/excel_doc/0027/563607/Advisory-list-of-environmental-weeds-in-Victoria_2022.xlsx>
 - **Preprocessing**: Convert the Excel file to CSV using the following Python snippet:
+
   ```python
   import pandas as pd
 
@@ -123,7 +127,6 @@ SELECT COUNT(*) FROM weed_info;
 
 ## Troubleshooting
 
-- `**ogr2ogr: command not found**` — Install GDAL (macOS: `brew install gdal`; Ubuntu: `sudo apt install gdal-bin`).
+- **`ogr2ogr: command not found`** — Install GDAL (macOS: `brew install gdal`; Ubuntu: `sudo apt install gdal-bin`).
 - **PostGIS extension not enabled** — Run `CREATE EXTENSION postgis;` in the target database before importing the shapefile.
 - **SRID mismatch** — The raw shapefile uses SRID 7844 (GDA2020). The `-t_srs EPSG:4326` flag in the `ogr2ogr` command above handles the reprojection automatically. If you import via another tool, make sure to apply the same coordinate transformation.
-

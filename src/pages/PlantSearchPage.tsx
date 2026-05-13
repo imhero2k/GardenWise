@@ -189,7 +189,6 @@ function RdsPlantCard({
             {blurb}
           </p>
         )}
-
         <p style={{ fontSize: '0.78rem', color: 'var(--color-primary)', margin: 'var(--space-sm) 0 0' }}>
           View details
         </p>
@@ -347,7 +346,6 @@ function DbPlantDetailContent({
           </a>
         </p>
       )}
-
       <WildlifeSection state={detail} />
       <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
         Short descriptions and photos may come from Wikipedia and iNaturalist when not stored in your database.
@@ -714,19 +712,17 @@ export function PlantSearchPage() {
         {coords && !rdsError && rdsPlants.length > 0 && (
           <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              {canPrevRds && (
-                <button
-                  type="button"
-                  className="btn btn-ghost pagination-step-btn"
-                  disabled={rdsLoading}
-                  onClick={() => setRdsOffset((o) => Math.max(0, o - RDS_PAGE_SIZE))}
-                >
-                  Previous page
-                </button>
-              )}
               <button
                 type="button"
-                className="btn btn-ghost pagination-step-btn"
+                className="btn btn-ghost"
+                disabled={!canPrevRds || rdsLoading}
+                onClick={() => setRdsOffset((o) => Math.max(0, o - RDS_PAGE_SIZE))}
+              >
+                Previous page
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
                 disabled={!canNextRds || rdsLoading}
                 onClick={() => setRdsOffset((o) => o + RDS_PAGE_SIZE)}
               >

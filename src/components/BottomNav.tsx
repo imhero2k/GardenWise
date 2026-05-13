@@ -1,14 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import {
-  IconAbout,
-  IconBook,
-  IconHome,
-  IconLeaf,
-  IconMap,
-  IconPlanner,
-  IconSearch,
-  IconSprout,
-} from './Icons'
+import { IconBook, IconHome, IconLeaf, IconMap, IconPlanner, IconSearch } from './Icons'
 import logoImg from '../assets/logo.png'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -27,16 +18,9 @@ const WEED_MENU: MenuItem[] = [
   { to: '/weed#prohibited', label: 'State prohibited weeds' },
 ]
 
-const BEGINNER_MENU: MenuItem[] = [
-  { to: '/beginners/your-space', label: 'Read your garden' },
-  { to: '/beginners/establish-potted', label: 'Establish potted plant' },
-  { to: '/beginners/mulching', label: 'Mulching guide' },
-  { to: '/beginners/watering-guide', label: 'Watering guide' },
-]
-
 const LEARN_MENU: MenuItem[] = [
   { to: '/learn#native', label: 'Native plants 101' },
-  { to: '/learn#environmental-weeds', label: 'Weeds 101 (environmental weeds)' },
+  { to: '/learn#invasive', label: 'Weeds 101 (invasive plants)' },
 ]
 
 function NavMenu({ items }: { items: MenuItem[] }) {
@@ -61,44 +45,31 @@ export function BottomNav() {
           <IconHome />
           <span>Home</span>
         </NavLink>
-        <div className="bottom-nav__right" aria-label="Primary links">
-          <NavLink to="/plants" className={linkClass}>
-            <IconSearch />
-            <span>PlantMe</span>
+        <NavLink to="/plants" className={linkClass}>
+          <IconSearch />
+          <span>PlantMe</span>
+        </NavLink>
+        <div className="bottom-nav__item bottom-nav__item--has-menu">
+          <NavLink to="/weed" className={linkClass}>
+            <IconLeaf />
+            <span>Weeds</span>
           </NavLink>
-          <div className="bottom-nav__item bottom-nav__item--has-menu">
-            <NavLink to="/weed" className={linkClass}>
-              <IconLeaf />
-              <span>Weeds</span>
-            </NavLink>
-            <NavMenu items={WEED_MENU} />
-          </div>
-          <NavLink to="/planner" className={linkClass}>
-            <IconPlanner />
-            <span>Planner</span>
+          <NavMenu items={WEED_MENU} />
+        </div>
+        <NavLink to="/planner" className={linkClass}>
+          <IconPlanner />
+          <span>Planner</span>
+        </NavLink>
+        <NavLink to="/map" className={linkClass}>
+          <IconMap />
+          <span>Map</span>
+        </NavLink>
+        <div className="bottom-nav__item bottom-nav__item--has-menu">
+          <NavLink to="/learn" className={linkClass}>
+            <IconBook />
+            <span>Learn</span>
           </NavLink>
-          <NavLink to="/map" className={linkClass}>
-            <IconMap />
-            <span>Map</span>
-          </NavLink>
-          <div className="bottom-nav__item bottom-nav__item--has-menu">
-            <NavLink to="/beginners" className={linkClass} title="Beginner gardening tutorials">
-              <IconSprout />
-              <span>Basics</span>
-            </NavLink>
-            <NavMenu items={BEGINNER_MENU} />
-          </div>
-          <div className="bottom-nav__item bottom-nav__item--has-menu">
-            <NavLink to="/learn" className={linkClass}>
-              <IconBook />
-              <span>Learn</span>
-            </NavLink>
-            <NavMenu items={LEARN_MENU} />
-          </div>
-          <NavLink to="/about" className={linkClass}>
-            <IconAbout />
-            <span>About</span>
-          </NavLink>
+          <NavMenu items={LEARN_MENU} />
         </div>
       </div>
     </nav>

@@ -49,10 +49,10 @@ export function SiteFooter() {
             <Link to="/learn#native">Native plants</Link>
           </li>
           <li>
-            <Link to="/learn#environmental-weeds">Environmental weeds</Link>
+            <Link to="/learn#invasive">Environmental weeds</Link>
           </li>
           <li>
-            <Link to="/beginners">Beginner tutorials</Link>
+            <FooterMuted>Gardening tutorial</FooterMuted>
           </li>
         </FooterCol>
         <FooterCol title="Connect">
@@ -60,7 +60,7 @@ export function SiteFooter() {
             <FooterMuted>Council support</FooterMuted>
           </li>
           <li>
-            <Link to="/about">About us</Link>
+            <FooterMuted>About us</FooterMuted>
           </li>
         </FooterCol>
       </nav>
