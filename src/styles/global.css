@@ -4161,3 +4161,169 @@ button.planner-feature-banner__more {
     justify-content: flex-end;
   }
 }
+
+/* Printable shopping list — portal-rendered under <body>, hidden on screen,
+   revealed and styled for paper when the corresponding "print" button
+   activates it (via data-print-doc-active="true"). */
+.print-doc {
+  display: none;
+}
+
+@media print {
+  /* Hide everything that isn't the active print doc. The doc is portaled
+     directly under <body> so this selector is reliable. */
+  body > *:not(.print-doc[data-print-doc-active='true']) {
+    display: none !important;
+  }
+  .print-doc[data-print-doc-active='true'] {
+    display: block !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 1.4cm 1.6cm 1.8cm;
+  }
+}
+
+.print-doc {
+  color: #1a1a1a;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #ffffff;
+  padding: 1cm 1.2cm 1.4cm;
+  max-width: 100%;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.print-doc__head {
+  border-bottom: 2px solid #2e7d32;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.print-doc__brand {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #2e7d32;
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.print-doc__title {
+  font-size: 1.55rem;
+  margin: 0.15rem 0 0.1rem;
+  color: #1b5e20;
+}
+
+.print-doc__subtitle {
+  color: #555;
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+}
+
+.print-doc__date {
+  color: #777;
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.print-doc__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1.6rem;
+  row-gap: 0.3rem;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.print-doc__meta-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.print-doc__meta-row dt {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  min-width: 6.5rem;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.print-doc__meta-row dd {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #222;
+}
+
+.print-doc__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.print-doc__table thead {
+  background: #f1f5ef;
+  border-bottom: 2px solid #2e7d32;
+}
+
+.print-doc__table th {
+  text-align: left;
+  padding: 0.5rem 0.55rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #1b5e20;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.print-doc__table td {
+  padding: 0.5rem 0.55rem;
+  border-bottom: 1px solid #dcdcdc;
+  vertical-align: top;
+}
+
+.print-doc__sci {
+  font-style: italic;
+  color: #555;
+}
+
+.print-doc__num {
+  text-align: right;
+  width: 10%;
+  white-space: nowrap;
+}
+
+.print-doc__footer {
+  margin-top: 1.4rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid #c8c8c8;
+  font-size: 0.78rem;
+  color: #555;
+}
+
+.print-doc__footer p {
+  margin: 0.2rem 0;
+}
+
+.print-doc__brandline {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 0.1em;
+  color: #2e7d32;
+}
+
+@media print {
+  .print-doc__table tr {
+    page-break-inside: avoid;
+  }
+  .print-doc__head,
+  .print-doc__meta,
+  .print-doc__footer {
+    page-break-inside: avoid;
+  }
+}

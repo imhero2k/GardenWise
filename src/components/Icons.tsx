@@ -514,6 +514,45 @@ export function IconWeatherRainy({ className }: { className?: string }) {
   )
 }
 
+/** Printer icon for "Print / Save as PDF" actions. */
+export function IconPrinter({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M7 4h10v5H7V4z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <rect
+        x="3.5"
+        y="9"
+        width="17"
+        height="9"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M7 14h10v6H7v-6z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        fill="currentColor"
+        fillOpacity="0.08"
+      />
+      <circle cx="17" cy="12" r="0.9" fill="currentColor" />
+    </svg>
+  )
+}
+
 /**
  * Wildlife — perched songbird silhouette. Used in the "Attracts wildlife"
  * filter and the plant detail dialog. Renders in `currentColor` so callers

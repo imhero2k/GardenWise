@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { IconBin, IconSeedling } from '../components/Icons'
+import { IconBin, IconPrinter, IconSeedling } from '../components/Icons'
+import {
+  PrintableShoppingList,
+  usePrintable,
+  type PrintItem,
+} from '../components/PrintableShoppingList'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
+import { useLocationArea } from '../context/LocationContext'
 import { useSeedCart } from '../context/useSeedCart'
 import type { SeedCartItemV1 } from '../context/seedCartTypes'
 
@@ -153,7 +159,17 @@ function SeedCartCard({
 
 export function SeedCartPage() {
   const { items, remove, clear, count } = useSeedCart()
+  const { areaLabel, placeLabel } = useLocationArea()
   const [confirmClear, setConfirmClear] = useState(false)
+  const printable = usePrintable()
+
+  const printItems: PrintItem[] = items.map((it) => ({
+    commonName: it.commonName ?? null,
+    scientificName: it.scientificName ?? null,
+    kind: it.lfCode ? LF_CODE_LABELS[it.lfCode] ?? it.lfCode : null,
+    qty: 1,
+    note: it.lfCode ? `LF ${it.lfCode}` : null,
+  }))
 
   return (
     <>
@@ -215,13 +231,25 @@ export function SeedCartPage() {
             }}
           >
             {!confirmClear ? (
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => setConfirmClear(true)}
-              >
-                Clear all
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={printable.print}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                  aria-label="Print or save seed cart as PDF"
+                >
+                  <IconPrinter />
+                  Print / Save as PDF
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => setConfirmClear(true)}
+                >
+                  Clear all
+                </button>
+              </>
             ) : (
               <>
                 <span
@@ -273,6 +301,18 @@ export function SeedCartPage() {
           </p>
         </section>
       )}
+
+      <PrintableShoppingList
+        docRef={printable.ref}
+        title="Seed shopping list"
+        subtitle="Plants saved from PlantMe to take to your nursery"
+        meta={[
+          { label: 'Location', value: placeLabel ?? areaLabel },
+          { label: 'Items', value: String(count) },
+        ]}
+        items={printItems}
+        columns={{ qty: true, kind: true, note: true }}
+      />
     </>
   )
 }

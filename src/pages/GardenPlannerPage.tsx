@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { IconSearch } from '../components/Icons'
+import { IconPrinter, IconSearch } from '../components/Icons'
 import { FeatureIcon } from '../components/FeatureIcons'
 import { LocationPromptBanner } from '../components/LocationPromptBanner'
 import { PlantFormIcon } from '../components/PlantFormIcon'
+import {
+  PrintableShoppingList,
+  usePrintable,
+  type PrintItem,
+} from '../components/PrintableShoppingList'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import {
   GardenPlannerScene,
@@ -790,7 +795,7 @@ function recommendationGroupById(
 }
 
 export function GardenPlannerPage() {
-  const { coords, areaLabel } = useLocationArea()
+  const { coords, areaLabel, placeLabel } = useLocationArea()
   const [widthStr, setWidthStr] = useState(String(DEFAULT_WIDTH))
   const [depthStr, setDepthStr] = useState(String(DEFAULT_DEPTH))
   const gardenWidth = clampDim(widthStr, DEFAULT_WIDTH)
@@ -905,6 +910,47 @@ export function GardenPlannerPage() {
 
   const pendingSpec = pendingSpecId ? specsById[pendingSpecId] ?? null : null
   const counts = useMemo(() => placedCounts(placed, specsById), [placed, specsById])
+  const printable = usePrintable()
+  /**
+   * Aggregate placements into a vendor-friendly list: one row per unique
+   * spec with a quantity column. Plants (PlantSpec) and features
+   * (FeatureSpec) are both included so the user has a single shopping list.
+   */
+  const printItems = useMemo<PrintItem[]>(() => {
+    const byId = new Map<string, { spec: AnySpec; qty: number }>()
+    for (const p of placed) {
+      const spec = specsById[p.specId]
+      if (!spec) continue
+      const entry = byId.get(p.specId)
+      if (entry) entry.qty += 1
+      else byId.set(p.specId, { spec, qty: 1 })
+    }
+    return Array.from(byId.values())
+      .map(({ spec, qty }) => {
+        if (isFeatureSpec(spec)) {
+          return {
+            commonName: spec.commonName,
+            scientificName: null,
+            kind: `Feature · ${FEATURE_CATEGORY_LABEL[spec.category]}`,
+            qty,
+            note: spec.description,
+          }
+        }
+        return {
+          commonName: spec.commonName,
+          scientificName: spec.scientificName,
+          kind: FORM_LABEL[spec.form],
+          qty,
+          note: `${spec.matureWidth}×${spec.matureHeight}m mature`,
+        }
+      })
+      .sort((a, b) => {
+        const ak = (a.kind ?? '').startsWith('Feature') ? 1 : 0
+        const bk = (b.kind ?? '').startsWith('Feature') ? 1 : 0
+        if (ak !== bk) return ak - bk
+        return (a.commonName ?? '').localeCompare(b.commonName ?? '')
+      })
+  }, [placed, specsById])
   const currentGoal = GOAL_OPTIONS.find((option) => option.id === goal) ?? GOAL_OPTIONS[0]
   const currentActiveGroupId = activeGroupId(goal, counts)
   const progressItems = goalProgressItems(goal, counts)
@@ -1101,22 +1147,49 @@ export function GardenPlannerPage() {
 
   return (
     <div className="garden-planner-page">
-      <header className="page-header">
-        <p className="eyebrow">Plan</p>
-        <h1>Garden planner</h1>
-        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Build a planting layout around a habitat goal, then use the planner to test spacing and
-          structure before the database-backed recommendations are connected.
-        </p>
-        {layoutSyncCaption ? (
-          <p
-            role="status"
-            aria-live="polite"
-            style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}
-          >
-            {layoutSyncCaption}
+      <header
+        className="page-header"
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 'var(--space-md)',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ flex: '1 1 320px', minWidth: 0 }}>
+          <p className="eyebrow">Plan</p>
+          <h1>Garden planner</h1>
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+            Build a planting layout around a habitat goal, then use the planner to test spacing and
+            structure before the database-backed recommendations are connected.
           </p>
-        ) : null}
+          {layoutSyncCaption ? (
+            <p
+              role="status"
+              aria-live="polite"
+              style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}
+            >
+              {layoutSyncCaption}
+            </p>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          className="btn btn-ghost"
+          onClick={printable.print}
+          disabled={placed.length === 0}
+          aria-label="Print or save garden plant list as PDF"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}
+          title={
+            placed.length === 0
+              ? 'Place plants or features to enable printing'
+              : 'Print or save the planting list as PDF'
+          }
+        >
+          <IconPrinter />
+          Print list / PDF
+        </button>
       </header>
 
       <LocationPromptBanner surface="planner" />
@@ -1884,6 +1957,24 @@ export function GardenPlannerPage() {
           </p>
         </section>
       )}
+
+      <PrintableShoppingList
+        docRef={printable.ref}
+        title="Garden planting list"
+        subtitle={`Goal: ${currentGoal.label}`}
+        meta={[
+          { label: 'Location', value: placeLabel ?? areaLabel },
+          {
+            label: 'Garden size',
+            value: `${gardenWidth} × ${gardenDepth} m`,
+          },
+          { label: 'Items', value: String(placed.length) },
+          { label: 'Unique species', value: String(printItems.length) },
+        ]}
+        items={printItems}
+        columns={{ qty: true, kind: true, note: true }}
+        footer="Take this list to your local Victorian indigenous nursery. Quantities reflect the planner layout; spacing and substitutions can be adjusted on advice from your nursery."
+      />
     </div>
   )
 }
