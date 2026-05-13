@@ -28,6 +28,23 @@ export type TopWeedsResponse = {
   q?: string | null
 }
 
+export type WeedLookupMatch = {
+  id: string
+  scientificName: string
+  commonName: string | null
+  lfCode: string | null
+  riskRating: string | null
+  riskScore: number | null
+  weedStatusVic: string | null
+  isWons: boolean
+  matchKind: 'exact' | 'scientific_prefix'
+  inBioregion: boolean | null
+}
+
+export type WeedLookupResponse = {
+  match: WeedLookupMatch | null
+}
+
 function apiBase(): string {
   const raw = import.meta.env.VITE_API_BASE_URL
   return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
@@ -109,5 +126,36 @@ export async function fetchTopWeeds(
     hasMore: j.hasMore ?? false,
     q: j.q ?? null,
   }
+}
+
+export async function fetchWeedLookup(
+  scientificName: string,
+  options?: { lat?: number; lng?: number; signal?: AbortSignal },
+): Promise<WeedLookupResponse> {
+  const name = String(scientificName ?? '').trim()
+  if (!name) return { match: null }
+  const base = apiBase()
+  const qs = new URLSearchParams({ name })
+  const lat = options?.lat
+  const lng = options?.lng
+  if (typeof lat === 'number' && Number.isFinite(lat) && typeof lng === 'number' && Number.isFinite(lng)) {
+    qs.set('lat', String(lat))
+    qs.set('lng', String(lng))
+  }
+  const path = `/api/weeds/lookup?${qs.toString()}`
+  const url = base ? `${base}${path}` : path
+  const r = await fetch(url, { signal: options?.signal })
+  if (!r.ok) {
+    let msg = `Request failed (${r.status})`
+    try {
+      const j = (await r.json()) as { error?: string }
+      if (j.error) msg = j.error
+    } catch {
+      /* ignore */
+    }
+    throw new Error(msg)
+  }
+  const j = (await r.json()) as Partial<WeedLookupResponse>
+  return { match: j.match ?? null }
 }
 

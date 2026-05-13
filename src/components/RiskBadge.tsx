@@ -10,7 +10,7 @@ export function RiskBadge({ level }: { level: RiskLevel }) {
   const cls =
     level === 'Low' ? 'badge-low' : level === 'Medium' ? 'badge-medium' : 'badge-high'
   return (
-    <span className={`badge ${cls}`} title={`Invasive risk: ${level}`}>
+    <span className={`badge ${cls}`} title={`Environmental weed risk: ${level}`}>
       {labels[level]}
     </span>
   )

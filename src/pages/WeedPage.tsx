@@ -11,11 +11,14 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 import { IconBin, IconBook, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import { IconSearch } from '../components/Icons'
+import { useLocationArea } from '../context/LocationContext'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
 import { enrichPlantByScientificName } from '../lib/plantEnrichment'
+import { identifyWithPlantNet } from '../lib/plantnet'
 import type { PredictResponse } from '../lib/predict'
 import { predictPlantFromBase64 } from '../lib/predict'
-import { fetchTopWeeds, type RegionWeed } from '../lib/weedsApi'
+import { labelLfCode } from '../lib/lfCodeLabels'
+import { fetchTopWeeds, fetchWeedLookup, type RegionWeed, type WeedLookupMatch } from '../lib/weedsApi'
 import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
@@ -81,11 +84,20 @@ async function fileToDataUrl(file: File): Promise<string> {
   })
 }
 
-function PredictionResultCard({ result }: { result: PredictResponse }) {
+function PredictionResultCard({
+  result,
+  weedLookupPending,
+  weedLookupMatch,
+}: {
+  result: PredictResponse
+  weedLookupPending: boolean
+  weedLookupMatch: WeedLookupMatch | null
+}) {
   const tier = getConfidenceTier(result.confidence)
   const theme = CONFIDENCE_TIER[tier]
   const pct = Math.round(result.confidence * 10000) / 100
   const barPct = Math.min(100, Math.max(0, result.confidence * 100))
+  const sourceLabel = result.source === 'plantnet' ? 'PlantNet fallback' : null
 
   const [enrichment, setEnrichment] = useState<PlantEnrichment | null>(null)
   const [enrichState, setEnrichState] = useState<'loading' | 'done' | 'error'>('loading')
@@ -126,22 +138,42 @@ function PredictionResultCard({ result }: { result: PredictResponse }) {
         }}
       >
         <h2 style={{ margin: 0, color: theme.accent }}>Likely match</h2>
-        <span
-          style={{
-            display: 'inline-block',
-            padding: '0.35rem 0.85rem',
-            borderRadius: 999,
-            fontSize: '0.78rem',
-            fontWeight: 700,
-            letterSpacing: '0.02em',
-            textTransform: 'uppercase',
-            background: theme.badgeBg,
-            color: theme.badgeColor,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-          }}
-        >
-          {theme.label}
-        </span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', alignItems: 'center' }}>
+          {sourceLabel && (
+            <span
+              style={{
+                display: 'inline-block',
+                padding: '0.35rem 0.7rem',
+                borderRadius: 999,
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                letterSpacing: '0.02em',
+                textTransform: 'uppercase',
+                background: 'rgba(255,255,255,0.75)',
+                color: theme.accent,
+                border: `1px solid ${theme.accent}40`,
+              }}
+            >
+              {sourceLabel}
+            </span>
+          )}
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '0.35rem 0.85rem',
+              borderRadius: 999,
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+              background: theme.badgeBg,
+              color: theme.badgeColor,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            }}
+          >
+            {theme.label}
+          </span>
+        </div>
       </div>
       <p style={{ fontWeight: 700, marginBottom: 'var(--space-sm)', fontSize: '1.15rem', color: 'var(--color-text)' }}>
         {result.label}
@@ -203,6 +235,88 @@ function PredictionResultCard({ result }: { result: PredictResponse }) {
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Class index</div>
           <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>{result.class_index}</div>
         </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: 'var(--space-md)',
+          padding: 'var(--space-md)',
+          borderRadius: 'var(--radius-md)',
+          background: 'rgba(255,255,255,0.5)',
+          border: '1px solid rgba(0,0,0,0.08)',
+        }}
+      >
+        <h3 style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)', color: theme.accent }}>
+          Weed database
+        </h3>
+        {weedLookupPending && (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            Checking our environmental weeds list…
+          </p>
+        )}
+        {!weedLookupPending && weedLookupMatch && (
+          <>
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>
+              {weedLookupMatch.matchKind === 'scientific_prefix'
+                ? 'Close name match — verify the full scientific name matches your plant.'
+                : 'Listed in our environmental weeds data.'}
+            </p>
+            <p style={{ fontWeight: 700, margin: '0 0 0.25rem', fontSize: '1rem', color: 'var(--color-text)' }}>
+              {weedLookupMatch.commonName || weedLookupMatch.scientificName}
+            </p>
+            {weedLookupMatch.commonName && (
+              <p style={{ fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>
+                {weedLookupMatch.scientificName}
+              </p>
+            )}
+            <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.88rem', color: 'var(--color-text)', lineHeight: 1.55 }}>
+              {labelLfCode(weedLookupMatch.lfCode) && (
+                <li>
+                  <strong>Growth form:</strong> {labelLfCode(weedLookupMatch.lfCode)}
+                </li>
+              )}
+              {weedLookupMatch.riskRating && (
+                <li>
+                  <strong>Risk (dataset):</strong> {weedLookupMatch.riskRating}
+                </li>
+              )}
+              {weedLookupMatch.weedStatusVic && (
+                <li>
+                  <strong>Victorian status:</strong> {weedLookupMatch.weedStatusVic}
+                </li>
+              )}
+              {weedLookupMatch.isWons && (
+                <li>
+                  <strong>Weed of National Significance</strong> (WoNS)
+                </li>
+              )}
+              {!labelLfCode(weedLookupMatch.lfCode) &&
+                !weedLookupMatch.riskRating &&
+                !weedLookupMatch.weedStatusVic &&
+                !weedLookupMatch.isWons && (
+                  <li>Listed as an environmental weed; extra fields are not filled in the dataset for this row.</li>
+                )}
+              {weedLookupMatch.inBioregion === true && (
+                <li>Also appears in recommendations for your mapped bioregion.</li>
+              )}
+              {weedLookupMatch.inBioregion === false && (
+                <li>Not linked to your mapped bioregion in this dataset (it may still occur nearby).</li>
+              )}
+            </ul>
+            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
+              Disposal categories on this page (aquatic, woody, etc.) are chosen by you — they are not inferred from the database.
+            </p>
+          </>
+        )}
+        {!weedLookupPending && !weedLookupMatch && (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            No entry in our environmental weeds database for this name. It may still be regulated — confirm with your state biosecurity authority.{' '}
+            <a href="#disposal" style={{ fontWeight: 600, color: theme.accent }}>
+              Disposal guide
+            </a>{' '}
+            can still help by how the plant grows.
+          </p>
+        )}
       </div>
 
       <div
@@ -492,21 +606,6 @@ function TopWeedDetailContent({
           <li>
             <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
           </li>
-          {weed.riskScore != null && (
-            <li>
-              <strong>Risk score:</strong> {weed.riskScore}
-            </li>
-          )}
-          {weed.isWons && (
-            <li>
-              <strong style={{ color: 'var(--color-danger)' }}>WoNS</strong> — Weed of National Significance
-            </li>
-          )}
-          {weed.weedStatusVic && (
-            <li>
-              <strong>Status (Vic):</strong> {weed.weedStatusVic}
-            </li>
-          )}
         </ul>
       </div>
       {summary ? (
@@ -648,10 +747,10 @@ const PROHIBITED_WEEDS: { name: string; chinese: string; emoji: string; imgUrl: 
   { name: 'Lagarosiphon', chinese: '', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
   { name: 'Knotweed', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
   { name: 'Mesquite', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
-  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but extremely invasive grass. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
+  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but a serious environmental weed. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
   { name: 'Parthenium Weed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
   { name: 'Branched Broomrape', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
-  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient invasive; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
+  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient lineage and a serious environmental weed; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
   { name: 'Camel Thorn', chinese: '', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
   { name: 'Karoo & Giraffe Thorn', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
   { name: 'Poverty Weed', chinese: '', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
@@ -668,6 +767,7 @@ const GENERAL_RULES = [
 
 export function WeedPage() {
   const location = useLocation()
+  const { coords } = useLocationArea()
   const inputId = useId()
   const [state, setState] = useState<AnalysisState>('idle')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -675,6 +775,8 @@ export function WeedPage() {
   const [error, setError] = useState<string | null>(null)
   const [imageInfo, setImageInfo] = useState<{ bytes: number; base64Chars: number } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const [weedLookupMatch, setWeedLookupMatch] = useState<WeedLookupMatch | null>(null)
+  const [weedLookupPending, setWeedLookupPending] = useState(false)
 
   const [topWeeds, setTopWeeds] = useState<RegionWeed[]>([])
   const [topWeedsLoading, setTopWeedsLoading] = useState(false)
@@ -798,6 +900,8 @@ export function WeedPage() {
     setError(null)
     setResult(null)
     setImageInfo(null)
+    setWeedLookupMatch(null)
+    setWeedLookupPending(false)
 
     try {
       const dataUrl = await fileToDataUrl(file)
@@ -812,7 +916,18 @@ export function WeedPage() {
       setImageInfo({ bytes: approxBytes, base64Chars: trimmed.length })
 
       const pred = await predictPlantFromBase64(trimmed, controller.signal)
-      setResult(pred)
+      const baseResult: PredictResponse = { ...pred, source: 'model' }
+
+      if (baseResult.confidence < 0.6) {
+        try {
+          const plantNet = await identifyWithPlantNet(dataUrl, controller.signal)
+          setResult(plantNet ?? baseResult)
+        } catch {
+          setResult(baseResult)
+        }
+      } else {
+        setResult(baseResult)
+      }
       setState('done')
     } catch (err) {
       if (controller.signal.aborted) return
@@ -821,26 +936,73 @@ export function WeedPage() {
     }
   }
 
+  useEffect(() => {
+    if (state !== 'done' || !result?.label?.trim()) {
+      setWeedLookupMatch(null)
+      setWeedLookupPending(false)
+      return
+    }
+    const ac = new AbortController()
+    setWeedLookupPending(true)
+    fetchWeedLookup(result.label, {
+      lat: coords?.lat,
+      lng: coords?.lng,
+      signal: ac.signal,
+    })
+      .then((res) => {
+        if (ac.signal.aborted) return
+        setWeedLookupMatch(res.match)
+      })
+      .catch(() => {
+        if (ac.signal.aborted) return
+        setWeedLookupMatch(null)
+      })
+      .finally(() => {
+        if (!ac.signal.aborted) setWeedLookupPending(false)
+      })
+    return () => ac.abort()
+  }, [state, result?.label, coords?.lat, coords?.lng])
+
   const showTopWeedsGrid = !topWeedsError && (topWeedsLoading || topWeeds.length > 0)
   const topWeedSlots: (RegionWeed | null)[] = showTopWeedsGrid
     ? Array.from({ length: TOP_WEEDS_PAGE_SIZE }, (_, i) => topWeeds[i] ?? null)
     : []
 
   return (
-    <>
+    <div className="weed-layout">
+      <aside className="weed-sidenav" aria-label="Weed page sections">
+        <p className="weed-sidenav__title">On this page</p>
+        <a className="weed-sidenav__link" href="#weed-checker">
+          Weed checker
+        </a>
+        <a className="weed-sidenav__link" href="#top-weeds">
+          Top weeds
+        </a>
+        <a className="weed-sidenav__link" href="#rules">
+          General rules
+        </a>
+        <a className="weed-sidenav__link" href="#disposal">
+          Disposal guide
+        </a>
+        <a className="weed-sidenav__link" href="#prohibited">
+          Prohibited weeds
+        </a>
+      </aside>
+
+      <div className="weed-layout__main">
       <header className="page-header">
-        <p className="eyebrow">Weeds</p>
-        <h1>Weed help</h1>
+          <p className="eyebrow">Weeds</p>
+          <h1>Weed help</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Identify risky plants, reduce spread, and dispose of material responsibly.
+            Identify risky plants, reduce spread, and dispose of material responsibly.
         </p>
       </header>
 
-      <Link to="/learn#invasive" className="weed-learn-link">
+      <Link to="/learn#environmental-weeds" className="weed-learn-link">
         <span className="weed-learn-link__icon"><IconBook /></span>
         <span className="weed-learn-link__text">
           <strong>Why does this matter?</strong> Read{' '}
-          <em>Invasive plants in your garden</em> in Native plants 101.
+          <em>Environmental weeds in your garden</em> in Native plants 101.
         </span>
         <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
       </Link>
@@ -854,16 +1016,7 @@ export function WeedPage() {
             </div>
             <div>
               <h3>Weed checker</h3>
-              <p>Scan or upload a plant to check invasive risk — same as Plant Safety Check on Home.</p>
-            </div>
-          </a>
-          <a href="#prohibited" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconPrevent />
-            </div>
-            <div>
-              <h3>Prohibited weeds</h3>
-              <p>State prohibited weeds in Victoria you must not remove — report them immediately.</p>
+              <p>Scan or upload a plant to check environmental weed risk — same as Plant Safety Check on Home.</p>
             </div>
           </a>
           <a href="#rules" className="feature-tile">
@@ -884,8 +1037,77 @@ export function WeedPage() {
               <p>Select your weed type for tailored safe removal and disposal instructions.</p>
             </div>
           </a>
+          <a href="#prohibited" className="feature-tile">
+            <div className="feature-tile__icon">
+              <IconPrevent />
+            </div>
+            <div>
+              <h3>Prohibited weeds</h3>
+              <p>State prohibited weeds in Victoria you must not remove — report them immediately.</p>
+            </div>
+          </a>
         </div>
       </div>
+
+      <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
+        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
+          Upload a photo or use your camera — we will identify the plant and return a confidence score.
+        </p>
+
+      <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          onChange={handleFile}
+        />
+        <IconCamera />
+        <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
+        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+            JPG or PNG — sent to the prediction API
+        </p>
+      </label>
+
+        {previewUrl && (
+          <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
+            <h3 style={{ marginBottom: 'var(--space-md)', fontSize: '1rem' }}>Selected image</h3>
+            <img
+              src={previewUrl}
+              alt="Uploaded plant preview"
+              style={{ width: '100%', maxHeight: 340, objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
+            />
+            {imageInfo && (
+              <p style={{ margin: 'var(--space-md) 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                Payload: ~{Math.round(imageInfo.bytes / 1024)} KB ({imageInfo.base64Chars.toLocaleString()} base64 chars)
+              </p>
+            )}
+          </div>
+        )}
+
+      {state === 'analyzing' && (
+        <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
+            Analysing image…
+        </p>
+      )}
+
+        {state === 'error' && error && (
+        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
+            <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn't analyse that image</h3>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
+          </div>
+        )}
+
+        {state === 'done' && result && (
+          <PredictionResultCard
+            key={result.label}
+            result={result}
+            weedLookupPending={weedLookupPending}
+            weedLookupMatch={weedLookupMatch}
+          />
+        )}
+      </WeedSection>
 
       <WeedSection id="top-weeds" title="Top weeds (Victoria)">
         <div className="search-field" style={{ marginBottom: 'var(--space-md)' }}>
@@ -965,14 +1187,7 @@ export function WeedPage() {
                       <span>
                         <strong>Risk:</strong> {w.riskRating ?? 'Unknown'}
                       </span>
-                      {w.isWons && <span style={{ color: 'var(--color-danger)', fontWeight: 800 }}>WoNS</span>}
-                      {w.riskScore != null && <span style={{ color: 'var(--color-text-muted)' }}>score {w.riskScore}</span>}
                     </div>
-                    {w.weedStatusVic ? (
-                      <p className="top-weed-card__status">{w.weedStatusVic}</p>
-                    ) : (
-                      <p className="top-weed-card__status top-weed-card__status--empty" aria-hidden="true" />
-                    )}
                     {blurb ? <p className="top-weed-card__blurb top-weed-card__blurb--filled">{blurb}</p> : (
                       <p className="top-weed-card__blurb top-weed-card__blurb--reserve" aria-hidden="true" />
                     )}
@@ -987,17 +1202,19 @@ export function WeedPage() {
         {showTopWeedsGrid && topWeeds.length > 0 && (
           <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {topWeedsOffset > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-ghost pagination-step-btn"
+                  disabled={topWeedsLoading}
+                  onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
+                >
+                  Previous page
+                </button>
+              )}
               <button
                 type="button"
-                className="btn btn-ghost"
-                disabled={topWeedsOffset <= 0 || topWeedsLoading}
-                onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
-              >
-                Previous page
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost pagination-step-btn"
                 disabled={!topWeedsHasMore || topWeedsLoading}
                 onClick={() => setTopWeedsOffset((o) => o + TOP_WEEDS_PAGE_SIZE)}
               >
@@ -1012,96 +1229,6 @@ export function WeedPage() {
         )}
       </WeedSection>
 
-      <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
-        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
-          Upload a photo or use your camera — we will identify the plant and return a confidence score.
-        </p>
-
-      <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
-        <input
-          id={inputId}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="sr-only"
-          onChange={handleFile}
-        />
-        <IconCamera />
-        <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-            JPG or PNG — sent to the prediction API
-        </p>
-      </label>
-
-        {previewUrl && (
-          <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
-            <h3 style={{ marginBottom: 'var(--space-md)', fontSize: '1rem' }}>Selected image</h3>
-            <img
-              src={previewUrl}
-              alt="Uploaded plant preview"
-              style={{ width: '100%', maxHeight: 340, objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
-            />
-            {imageInfo && (
-              <p style={{ margin: 'var(--space-md) 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                Payload: ~{Math.round(imageInfo.bytes / 1024)} KB ({imageInfo.base64Chars.toLocaleString()} base64 chars)
-              </p>
-            )}
-          </div>
-        )}
-
-      {state === 'analyzing' && (
-        <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', color: 'var(--color-text-muted)' }}>
-            Analysing image…
-        </p>
-      )}
-
-        {state === 'error' && error && (
-        <div className="card card-body fade-up" style={{ marginTop: 'var(--space-lg)' }}>
-            <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1rem' }}>Couldn't analyse that image</h3>
-            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{error}</p>
-          </div>
-        )}
-
-        {state === 'done' && result && <PredictionResultCard key={result.label} result={result} />}
-      </WeedSection>
-
-      {/* ── Prohibited weeds ── */}
-      <WeedSection id="prohibited" title="State prohibited weeds" eyebrow="Do not remove yourself">
-        <div style={{ background: 'rgba(230,81,0,0.07)', border: '1px solid rgba(230,81,0,0.22)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md) var(--space-lg)', marginBottom: 'var(--space-lg)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)' }}>
-          <span style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: 2 }}>⚠️</span>
-          <div>
-            <h3 style={{ color: '#92400e', marginBottom: 'var(--space-xs)', fontSize: '1rem' }}>Can I remove this weed myself?</h3>
-            <p style={{ fontSize: '0.88rem', color: '#78350f', margin: 0 }}>
-              The following weeds are <strong>State Prohibited Weeds</strong> in Victoria. You must <strong>not</strong> attempt to remove them yourself — report them to the Department of Energy, Environment and Climate Action immediately.
-            </p>
-            <a href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-xs)', marginTop: 'var(--space-sm)', background: 'var(--color-warning)', color: '#fff', padding: '0.45rem 1rem', borderRadius: 999, fontSize: '0.83rem', fontWeight: 600, textDecoration: 'none' }}>
-              Report a State Prohibited Weed →
-            </a>
-          </div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 'var(--space-md)' }}>
-          {PROHIBITED_WEEDS.map((w) => (
-            <button key={w.name} onClick={() => setModalWeed({ name: w.name, desc: w.desc })}
-              style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface)', cursor: 'pointer', padding: 0, overflow: 'hidden', transition: 'transform var(--transition), box-shadow var(--transition), border-color var(--transition)', textAlign: 'left' }}
-              onMouseEnter={(e) => { const el = e.currentTarget; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = 'var(--shadow-hover)'; el.style.borderColor = 'var(--color-accent)' }}
-              onMouseLeave={(e) => { const el = e.currentTarget; el.style.transform = ''; el.style.boxShadow = ''; el.style.borderColor = 'var(--color-border)' }}
-            >
-              <div style={{ position: 'relative', height: 90, overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
-                <img src={w.imgUrl} alt={w.name} loading="lazy" referrerPolicy="no-referrer"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
-                />
-                <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>{w.emoji}</div>
-              </div>
-              <div style={{ padding: '0.5rem 0.75rem' }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3 }}>{w.name}</div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{w.chinese}</div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </WeedSection>
-
       {/* ── General rules ── */}
       <WeedSection id="rules" title="General rules" eyebrow="Always apply">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)', fontSize: '0.88rem' }}>
@@ -1111,8 +1238,26 @@ export function WeedPage() {
           {GENERAL_RULES.map((rule, i) => {
             const open = openRules.has(i)
             return (
-              <div key={i} style={{ border: `1px solid ${open ? 'var(--color-accent)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', overflow: 'hidden', transition: 'border-color var(--transition)' }}>
-                <button onClick={() => toggleRule(i)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-md)', padding: 'var(--space-md)', background: 'var(--color-surface)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+              <div
+                key={i}
+                className={`weed-rules-accordion-item${open ? ' weed-rules-accordion-item--open' : ''}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleRule(i)}
+                  className="weed-rules-accordion-item__trigger"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-md)',
+                    padding: 'var(--space-md)',
+                    background: 'var(--color-surface)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
                   <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{rule.emoji}</span>
                   <span style={{ flex: 1, fontWeight: 600, fontSize: '0.95rem', color: 'var(--color-text)' }}>{rule.title}</span>
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--transition)' }}>▼</span>
@@ -1137,8 +1282,20 @@ export function WeedPage() {
           {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
             const active = selectedType === type
             return (
-              <button key={type} onClick={() => handleTypeSelect(type)}
-                style={{ border: `2px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', padding: 0, background: active ? 'rgba(46,125,50,0.08)' : 'var(--color-surface)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'stretch', transition: 'all var(--transition)', boxShadow: active ? '0 0 0 3px rgba(46,125,50,0.15)' : 'none', textAlign: 'center', overflow: 'hidden' }}
+              <button
+                key={type}
+                type="button"
+                className={`weed-disposal-type-btn${active ? ' weed-disposal-type-btn--active' : ''}`}
+                onClick={() => handleTypeSelect(type)}
+                style={{
+                  padding: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  textAlign: 'center',
+                  overflow: 'hidden',
+                }}
               >
                 <div style={{ position: 'relative', height: 80, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
                   <img src={imgUrl} alt="" loading="lazy" referrerPolicy="no-referrer"
@@ -1190,7 +1347,7 @@ export function WeedPage() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-md)' }}>
+              <div className="weed-disposal-columns">
                 <div style={{ background: 'rgba(230,81,0,0.06)', border: '1px solid rgba(230,81,0,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
                   <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-warning)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>⚡ What makes it risky</h4>
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
@@ -1223,7 +1380,49 @@ export function WeedPage() {
         })()}
       </WeedSection>
 
-      <footer
+      {/* ── Prohibited weeds ── */}
+      <WeedSection id="prohibited" title="State prohibited weeds" eyebrow="Do not remove yourself">
+        <div style={{ background: 'rgba(230,81,0,0.07)', border: '1px solid rgba(230,81,0,0.22)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md) var(--space-lg)', marginBottom: 'var(--space-lg)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)' }}>
+          <span style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: 2 }}>⚠️</span>
+          <div>
+            <h3 style={{ color: '#92400e', marginBottom: 'var(--space-xs)', fontSize: '1rem' }}>Can I remove this weed myself?</h3>
+            <p style={{ fontSize: '0.88rem', color: '#78350f', margin: 0 }}>
+              The following weeds are <strong>State Prohibited Weeds</strong> in Victoria. You must <strong>not</strong> attempt to remove them yourself — report them to the Department of Energy, Environment and Climate Action immediately.
+            </p>
+            <a
+              href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="weed-report-cta"
+            >
+              Report a State Prohibited Weed →
+            </a>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 'var(--space-md)' }}>
+          {PROHIBITED_WEEDS.map((w) => (
+            <button key={w.name} onClick={() => setModalWeed({ name: w.name, desc: w.desc })}
+              style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface)', cursor: 'pointer', padding: 0, overflow: 'hidden', transition: 'transform var(--transition), box-shadow var(--transition), border-color var(--transition)', textAlign: 'left' }}
+              onMouseEnter={(e) => { const el = e.currentTarget; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = 'var(--shadow-hover)'; el.style.borderColor = 'var(--color-accent)' }}
+              onMouseLeave={(e) => { const el = e.currentTarget; el.style.transform = ''; el.style.boxShadow = ''; el.style.borderColor = 'var(--color-border)' }}
+            >
+              <div style={{ position: 'relative', height: 90, overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
+                <img src={w.imgUrl} alt={w.name} loading="lazy" referrerPolicy="no-referrer"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                />
+                <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>{w.emoji}</div>
+              </div>
+              <div style={{ padding: '0.5rem 0.75rem' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3 }}>{w.name}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{w.chinese}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </WeedSection>
+
+        <footer
         style={{
           marginTop: 'var(--space-xl)',
           paddingTop: 'var(--space-md)',
@@ -1237,7 +1436,7 @@ export function WeedPage() {
         <a href="https://weeds.org.au/" target="_blank" rel="noreferrer">Weeds Australia</a>
         {' '}and{' '}
         <a href="https://agriculture.vic.gov.au/biosecurity/weeds" target="_blank" rel="noreferrer">Agriculture Victoria</a>.
-      </footer>
+        </footer>
 
       {/* ── Top-weed detail dialog (mirrors PlantMe) ── */}
       <dialog
@@ -1287,6 +1486,7 @@ export function WeedPage() {
           </div>
         </div>
       )}
-    </>
+      </div>
+    </div>
   )
 }
