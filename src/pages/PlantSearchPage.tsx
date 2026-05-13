@@ -12,6 +12,7 @@ import {
   type WildlifeCategory,
 } from '../lib/recommendationsApi'
 import { fetchPlantDetail, type PlantDetail } from '../lib/plantDetailsApi'
+import { visualForType } from '../lib/wildlifeVisuals'
 import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
@@ -237,22 +238,55 @@ function WildlifeSection({ state }: { state: DetailFetchState }) {
         Attracts wildlife
       </h3>
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-sm)' }}>
-        {groups.map((g) => (
-          <li key={g.type}>
-            <p style={{ fontWeight: 600, fontSize: '0.88rem', margin: 0 }}>{g.type}</p>
-            {g.species.length > 0 && (
-              <p
+        {groups.map((g) => {
+          const visual = visualForType(g.type)
+          const Icon = visual?.Icon ?? null
+          return (
+            <li
+              key={g.type}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                columnGap: '0.6rem',
+                alignItems: 'start',
+              }}
+            >
+              <span
+                aria-hidden
                 style={{
-                  fontSize: '0.82rem',
-                  color: 'var(--color-text-muted)',
-                  margin: '0.1rem 0 0',
+                  display: 'inline-flex',
+                  width: 28,
+                  height: 28,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 8,
+                  background: visual
+                    ? `color-mix(in srgb, ${visual.color} 14%, transparent)`
+                    : 'var(--color-surface-muted, rgba(0,0,0,0.05))',
+                  color: visual?.color ?? 'var(--color-text-muted)',
+                  marginTop: 1,
+                  flexShrink: 0,
                 }}
               >
-                {g.species.join(' · ')}
-              </p>
-            )}
-          </li>
-        ))}
+                {Icon ? <Icon size={18} /> : null}
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ fontWeight: 600, fontSize: '0.88rem', margin: 0 }}>{g.type}</p>
+                {g.species.length > 0 && (
+                  <p
+                    style={{
+                      fontSize: '0.82rem',
+                      color: 'var(--color-text-muted)',
+                      margin: '0.1rem 0 0',
+                    }}
+                  >
+                    {g.species.join(' · ')}
+                  </p>
+                )}
+              </div>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

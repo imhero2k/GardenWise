@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IconSearch } from '../components/Icons'
 import { FeatureIcon } from '../components/FeatureIcons'
+import { PlantFormIcon } from '../components/PlantFormIcon'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import {
   GardenPlannerScene,
@@ -1465,11 +1466,7 @@ export function GardenPlannerPage() {
                                 />
                               </span>
                             ) : (
-                              <span
-                                className="garden-planner-catalog__swatch"
-                                style={{ background: spec.canopyColor }}
-                                aria-hidden
-                              />
+                              <PlantFormIcon form={spec.form} color={spec.canopyColor} size={36} />
                             )}
                             <span className="garden-planner-catalog__text">
                               <span className="garden-planner-catalog__name">
@@ -1520,11 +1517,7 @@ export function GardenPlannerPage() {
                         onClick={() => setPendingSpecId(active ? null : p.id)}
                         aria-pressed={active}
                       >
-                        <span
-                          className="garden-planner-catalog__swatch"
-                          style={{ background: p.canopyColor }}
-                          aria-hidden
-                        />
+                        <PlantFormIcon form={p.form} color={p.canopyColor} size={36} />
                         <span className="garden-planner-catalog__text">
                           <span className="garden-planner-catalog__name">{p.commonName}</span>
                           <span className="garden-planner-catalog__sci">{p.scientificName}</span>
@@ -1616,6 +1609,7 @@ export function GardenPlannerPage() {
                               )
                             }
                             const active = pendingSpecId === recommendationSpecId(plant)
+                            const recSpec = recommendationSpec(plant, group.id)
                             return (
                               <button
                                 key={plant.id}
@@ -1624,12 +1618,23 @@ export function GardenPlannerPage() {
                                 onClick={() => handleRecommendationSelect(plant, group.id)}
                                 aria-pressed={active}
                               >
-                                <span className="garden-goal-slots__plant-name">
-                                  {plant.commonName || plant.scientificName}
+                                <span className="garden-goal-slots__plant-head">
+                                  <PlantFormIcon
+                                    form={recSpec.form}
+                                    color={recSpec.canopyColor}
+                                    size={32}
+                                  />
+                                  <span className="garden-goal-slots__plant-headtext">
+                                    <span className="garden-goal-slots__plant-name">
+                                      {plant.commonName || plant.scientificName}
+                                    </span>
+                                    {plant.commonName && (
+                                      <span className="garden-goal-slots__plant-sci">
+                                        {plant.scientificName}
+                                      </span>
+                                    )}
+                                  </span>
                                 </span>
-                                {plant.commonName && (
-                                  <span className="garden-goal-slots__plant-sci">{plant.scientificName}</span>
-                                )}
                                 <span className="garden-goal-slots__plant-meta">
                                   {recommendationMeta(plant) || 'Database recommendation'}
                                 </span>

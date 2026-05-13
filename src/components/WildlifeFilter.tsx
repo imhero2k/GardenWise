@@ -2,6 +2,7 @@ import {
   WILDLIFE_CATEGORY_OPTIONS,
   type WildlifeCategory,
 } from '../lib/recommendationsApi'
+import { WILDLIFE_VISUALS } from '../lib/wildlifeVisuals'
 
 type Props = {
   value: ReadonlyArray<WildlifeCategory>
@@ -50,6 +51,8 @@ export function WildlifeFilter({
       <div className="chip-row" role="group" aria-label={legend}>
         {WILDLIFE_CATEGORY_OPTIONS.map((opt) => {
           const isOn = selected.has(opt.id)
+          const visual = WILDLIFE_VISUALS[opt.id]
+          const Icon = visual.Icon
           return (
             <button
               key={opt.id}
@@ -57,7 +60,22 @@ export function WildlifeFilter({
               className="chip"
               aria-pressed={isOn}
               onClick={() => toggle(opt.id)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}
             >
+              <span
+                aria-hidden
+                style={{
+                  display: 'inline-flex',
+                  color: visual.color,
+                  lineHeight: 0,
+                }}
+              >
+                <Icon size={16} />
+              </span>
               {opt.label}
             </button>
           )

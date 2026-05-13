@@ -3724,6 +3724,21 @@ button.planner-feature-banner__more {
   background: rgba(46, 125, 50, 0.08);
 }
 
+.garden-goal-slots__plant-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 0.1rem;
+}
+
+.garden-goal-slots__plant-headtext {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  min-width: 0;
+  flex: 1;
+}
+
 .garden-goal-slots__plant-name {
   color: var(--color-text);
   font-size: 0.9rem;

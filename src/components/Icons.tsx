@@ -513,3 +513,191 @@ export function IconWeatherRainy({ className }: { className?: string }) {
     </svg>
   )
 }
+
+/**
+ * Wildlife — perched songbird silhouette. Used in the "Attracts wildlife"
+ * filter and the plant detail dialog. Renders in `currentColor` so callers
+ * can tint per category.
+ */
+export function IconBird({
+  className,
+  size = 18,
+}: {
+  className?: string
+  size?: number
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <ellipse
+        cx="10.5"
+        cy="13.5"
+        rx="5.2"
+        ry="3.6"
+        fill="currentColor"
+        fillOpacity="0.18"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <circle
+        cx="15.4"
+        cy="10.6"
+        r="2.5"
+        fill="currentColor"
+        fillOpacity="0.22"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path d="M17.5 10.2 L 20.5 10.6 L 17.5 11.1 Z" fill="currentColor" />
+      <circle cx="15.9" cy="10.2" r="0.55" fill="currentColor" />
+      <path
+        d="M8.5 12.2 Q 12 13.4, 11 16.6"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M10 16.8 V 19.5 M 12.2 16.8 V 19.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+/**
+ * Wildlife — bee silhouette (stand-in for "Insects"). Striped body with two
+ * wings and antennae. Renders in `currentColor`.
+ */
+export function IconInsect({
+  className,
+  size = 18,
+}: {
+  className?: string
+  size?: number
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <ellipse
+        cx="8.5"
+        cy="10"
+        rx="2.8"
+        ry="1.7"
+        fill="currentColor"
+        fillOpacity="0.14"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <ellipse
+        cx="15.5"
+        cy="10"
+        rx="2.8"
+        ry="1.7"
+        fill="currentColor"
+        fillOpacity="0.14"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <ellipse
+        cx="12"
+        cy="14"
+        rx="4.6"
+        ry="3.8"
+        fill="currentColor"
+        fillOpacity="0.22"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9.3 12.2 V 15.8 M 12 11.4 V 16.6 M 14.7 12.2 V 15.8"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10.8 10.6 L 10 7.6 M 13.2 10.6 L 14 7.6"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <circle cx="10" cy="7.5" r="0.7" fill="currentColor" />
+      <circle cx="14" cy="7.5" r="0.7" fill="currentColor" />
+    </svg>
+  )
+}
+
+/**
+ * Wildlife — round-eared mammal silhouette (koala/possum-ish stand-in for
+ * "Mammals"). Renders in `currentColor`.
+ */
+export function IconMammal({
+  className,
+  size = 18,
+}: {
+  className?: string
+  size?: number
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle
+        cx="7.5"
+        cy="7"
+        r="2.1"
+        fill="currentColor"
+        fillOpacity="0.18"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <circle
+        cx="16.5"
+        cy="7"
+        r="2.1"
+        fill="currentColor"
+        fillOpacity="0.18"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <circle
+        cx="12"
+        cy="11.5"
+        r="5.2"
+        fill="currentColor"
+        fillOpacity="0.2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <ellipse cx="12" cy="13.2" rx="1.1" ry="0.85" fill="currentColor" />
+      <circle cx="9.8" cy="10.8" r="0.65" fill="currentColor" />
+      <circle cx="14.2" cy="10.8" r="0.65" fill="currentColor" />
+      <path
+        d="M10.6 14.6 Q 12 16, 13.4 14.6"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  )
+}
