@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { IconSearch } from '../components/Icons'
+import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import { WildlifeFilter } from '../components/WildlifeFilter'
 import { useLocationArea } from '../context/LocationContext'
+import { useSeedCart } from '../context/useSeedCart'
 import {
   fetchRecommendations,
   WILDLIFE_CATEGORY_OPTIONS,
@@ -57,6 +59,64 @@ function parseWildlifeParam(raw: string | null): WildlifeCategory[] {
   return out
 }
 
+
+/**
+ * Bookmark toggle button rendered as a sibling overlay (not a child) of the plant
+ * card. The card itself is a `<button>`; nesting another button is invalid HTML,
+ * so the parent grid cell becomes `position: relative` and this lives next to it.
+ */
+function SeedCartBookmarkButton({
+  plant,
+  imageForCart,
+}: {
+  plant: RecommendedPlant
+  imageForCart: string | null
+}) {
+  const { isInCart, toggle } = useSeedCart()
+  const saved = isInCart(plant.id)
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    toggle({
+      id: plant.id,
+      scientificName: plant.scientificName,
+      commonName: plant.commonName,
+      imageUrl: imageForCart,
+      lfCode: plant.lfCode ?? null,
+    })
+  }
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      aria-pressed={saved}
+      aria-label={saved ? 'Remove from seed cart' : 'Add to seed cart'}
+      title={saved ? 'Saved · click to remove' : 'Add to seed cart'}
+      style={{
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        zIndex: 2,
+        width: 40,
+        height: 40,
+        borderRadius: 999,
+        border: '1px solid rgba(0,0,0,0.08)',
+        background: saved ? 'var(--color-primary)' : 'rgba(255,255,255,0.94)',
+        color: saved ? '#fff' : 'var(--color-primary)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        boxShadow: saved
+          ? '0 2px 8px rgba(46, 125, 50, 0.35)'
+          : '0 1px 3px rgba(0,0,0,0.18)',
+        padding: 0,
+        transition: 'background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease',
+      }}
+    >
+      <SeedSproutIcon saved={saved} size={24} burst />
+    </button>
+  )
+}
 
 function RdsPlantCard({
   plant,
@@ -259,6 +319,82 @@ function DbPlantDetailContent({
   )
 }
 
+function SeedCartHeaderLink() {
+  const { count } = useSeedCart()
+  return (
+    <Link
+      to="/seed-cart"
+      className="btn btn-ghost"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.45rem',
+        padding: '0.4rem 0.75rem',
+      }}
+      aria-label={`Open seed cart (${count} item${count === 1 ? '' : 's'})`}
+    >
+      <SeedSproutIcon saved={count > 0} size={22} />
+      <span>Seed cart</span>
+      {count > 0 && (
+        <span
+          aria-hidden
+          style={{
+            minWidth: 22,
+            padding: '0 0.4rem',
+            height: 22,
+            borderRadius: 999,
+            background: 'var(--color-primary)',
+            color: '#fff',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {count}
+        </span>
+      )}
+    </Link>
+  )
+}
+
+function SeedCartDetailButton({
+  plant,
+  imageForCart,
+}: {
+  plant: RecommendedPlant
+  imageForCart: string | null
+}) {
+  const { isInCart, toggle } = useSeedCart()
+  const saved = isInCart(plant.id)
+  return (
+    <button
+      type="button"
+      className={saved ? 'btn btn-ghost' : 'btn btn-primary'}
+      onClick={() =>
+        toggle({
+          id: plant.id,
+          scientificName: plant.scientificName,
+          commonName: plant.commonName,
+          imageUrl: imageForCart,
+          lfCode: plant.lfCode ?? null,
+        })
+      }
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        marginTop: 'var(--space-md)',
+      }}
+      aria-pressed={saved}
+    >
+      <SeedSproutIcon saved={saved} size={22} burst />
+      <span>{saved ? 'Saved to seed cart' : 'Add to seed cart'}</span>
+    </button>
+  )
+}
+
 export function PlantSearchPage() {
   const { coords } = useLocationArea()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -400,9 +536,21 @@ export function PlantSearchPage() {
 
   return (
     <>
-      <header className="page-header">
-        <p className="eyebrow">PlantMe</p>
-        <h1>Search plants</h1>
+      <header
+        className="page-header"
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 'var(--space-md)',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <p className="eyebrow">PlantMe</p>
+          <h1 style={{ margin: 0 }}>Search plants</h1>
+        </div>
+        <SeedCartHeaderLink />
       </header>
 
       <section style={{ marginBottom: 'var(--space-xl)' }} aria-labelledby="rds-heading">
@@ -494,14 +642,22 @@ export function PlantSearchPage() {
         <div style={{ marginBottom: 'var(--space-md)' }} />
 
         <div className="plant-grid">
-          {rdsPlants.map((p) => (
-            <RdsPlantCard
-              key={p.id}
-              plant={p}
-              enrichment={rdsEnriched[p.id]}
-              onOpen={openDbPlantDetail}
-            />
-          ))}
+          {rdsPlants.map((p) => {
+            const enrichment = rdsEnriched[p.id]
+            const extra =
+              typeof enrichment === 'object' && enrichment !== null ? enrichment : undefined
+            const imageForCart = p.imageUrl?.trim() || extra?.imageUrl || null
+            return (
+              <div key={p.id} style={{ position: 'relative', display: 'flex' }}>
+                <RdsPlantCard
+                  plant={p}
+                  enrichment={enrichment}
+                  onOpen={openDbPlantDetail}
+                />
+                <SeedCartBookmarkButton plant={p} imageForCart={imageForCart} />
+              </div>
+            )
+          })}
         </div>
 
         {coords && !rdsError && rdsPlants.length > 0 && (
@@ -574,11 +730,25 @@ export function PlantSearchPage() {
           </header>
           <div className="plant-detail-dialog__body">
             {dbPlantDetail && (
-              <DbPlantDetailContent
-                plant={dbPlantDetail}
-                enrichment={rdsEnriched[dbPlantDetail.id]}
-                detail={detailState}
-              />
+              <>
+                <DbPlantDetailContent
+                  plant={dbPlantDetail}
+                  enrichment={rdsEnriched[dbPlantDetail.id]}
+                  detail={detailState}
+                />
+                {(() => {
+                  const enr = rdsEnriched[dbPlantDetail.id]
+                  const extra = typeof enr === 'object' && enr !== null ? enr : undefined
+                  const imageForCart =
+                    dbPlantDetail.imageUrl?.trim() || extra?.imageUrl || null
+                  return (
+                    <SeedCartDetailButton
+                      plant={dbPlantDetail}
+                      imageForCart={imageForCart}
+                    />
+                  )
+                })()}
+              </>
             )}
           </div>
         </div>

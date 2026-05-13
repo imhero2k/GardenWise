@@ -3162,8 +3162,9 @@ button.vicflora-card {
 
 /* ── Plants / Features segmented tabs ─────────────────────────── */
 .planner-catalog-tabs {
-  display: inline-flex;
+  display: flex;
   align-self: stretch;
+  width: 100%;
   padding: 0.25rem;
   margin: 0 0 var(--space-sm);
   background: rgba(46, 125, 50, 0.06);
@@ -3173,16 +3174,18 @@ button.vicflora-card {
 }
 
 .planner-catalog-tab {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   appearance: none;
   border: 0;
   background: transparent;
   color: var(--color-text-muted);
   font-weight: 600;
   font-size: 0.85rem;
-  padding: 0.4rem 0.85rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 999px;
   cursor: pointer;
+  white-space: nowrap;
   transition:
     background var(--transition),
     color var(--transition),

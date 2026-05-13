@@ -178,6 +178,68 @@ export function IconDroplet({ className }: { className?: string }) {
   )
 }
 
+export function IconBookmark({ className, filled }: { className?: string; filled?: boolean }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <path
+        d="M6 4h12a1 1 0 011 1v16l-7-4-7 4V5a1 1 0 011-1z"
+        fill={filled ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export function IconSeedling({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M12 21v-7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 14c-3 0-5-2-5-5 3 0 5 2 5 5z"
+        fill="currentColor"
+        opacity="0.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 14c3 0 5-2 5-5-3 0-5 2-5 5z"
+        fill="currentColor"
+        opacity="0.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 21h8"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export function IconHeart({ className, filled }: { className?: string; filled?: boolean }) {
   return (
     <svg

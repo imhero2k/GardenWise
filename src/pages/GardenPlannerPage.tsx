@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { IconSearch } from '../components/Icons'
 import { FeatureIcon } from '../components/FeatureIcons'
+import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import {
   GardenPlannerScene,
   type PlacedPlant,
@@ -9,6 +11,8 @@ import {
 import { isFirebaseAuthConfigured } from '../auth/firebase'
 import { useAuth } from '../context/useAuth'
 import { useLocationArea } from '../context/LocationContext'
+import { useSeedCart } from '../context/useSeedCart'
+import type { SeedCartItemV1 } from '../context/seedCartTypes'
 import { PLANT_SPECS, type PlantForm, type PlantSpec } from '../data/plantSpecs'
 import {
   FEATURE_SPECS,
@@ -647,9 +651,51 @@ function recommendationSpecId(plant: PlannerRecommendationPlant): string {
   return `db-${plant.id}`
 }
 
+function seedCartSpecId(item: SeedCartItemV1): string {
+  return `db-${item.id}`
+}
+
 function lfCodeProfile(lfCode: string | null): LfCodeProfile | null {
   if (!lfCode) return null
   return LF_CODE_PROFILES[lfCode.trim().toUpperCase()] ?? null
+}
+
+/** Fallback canopy dimensions per form when no LF profile is available. */
+const FALLBACK_FORM_DIMS: Record<
+  PlantForm,
+  Pick<PlantSpec, 'matureWidth' | 'matureHeight' | 'recommendedSpacing' | 'canopyColor'>
+> = {
+  tree: { matureWidth: 4, matureHeight: 8, recommendedSpacing: 4, canopyColor: '#4f7f3b' },
+  shrub: { matureWidth: 2, matureHeight: 2, recommendedSpacing: 1.8, canopyColor: '#789b4f' },
+  grass: { matureWidth: 0.8, matureHeight: 1, recommendedSpacing: 0.6, canopyColor: '#a6bc64' },
+  groundcover: { matureWidth: 0.8, matureHeight: 0.35, recommendedSpacing: 0.55, canopyColor: '#9ccf84' },
+  climber: { matureWidth: 1.8, matureHeight: 0.4, recommendedSpacing: 1.2, canopyColor: '#7189bc' },
+}
+
+/**
+ * Build a planner `PlantSpec` from a seed-cart item using the lfCode profile
+ * (or a per-form fallback when lfCode is missing). The resulting id matches
+ * the `db-<plantId>` convention so it serialises through `specsPatch` on save
+ * exactly like a planner-recommendations spec.
+ */
+function seedCartItemToSpec(item: SeedCartItemV1): PlantSpec {
+  const profile = lfCodeProfile(item.lfCode)
+  const form: PlantForm = profile?.form ?? 'shrub'
+  const dims = profile ?? FALLBACK_FORM_DIMS[form]
+  const commonName = item.commonName?.trim() || item.scientificName || 'Saved plant'
+  const scientificName = item.scientificName?.trim() || commonName
+  return {
+    id: seedCartSpecId(item),
+    commonName,
+    scientificName,
+    form,
+    sun: 'full',
+    matureWidth: dims.matureWidth,
+    matureHeight: dims.matureHeight,
+    recommendedSpacing: dims.recommendedSpacing,
+    canopyColor: dims.canopyColor,
+    note: 'Saved from PlantMe seed cart',
+  }
 }
 
 function hasGrowthForm(plant: PlannerRecommendationPlant, forms: string[]): boolean {
@@ -760,7 +806,7 @@ export function GardenPlannerPage() {
   const [plannerLoading, setPlannerLoading] = useState(false)
   const [plannerError, setPlannerError] = useState<string | null>(null)
   const [groupPages, setGroupPages] = useState<Record<string, number>>({})
-  const [catalogTab, setCatalogTab] = useState<'plants' | 'features'>('plants')
+  const [catalogTab, setCatalogTab] = useState<'plants' | 'features' | 'seedCart'>('plants')
   const [expandedFeatureId, setExpandedFeatureId] = useState<string | null>(null)
 
   const { state: authState } = useAuth()
@@ -793,9 +839,31 @@ export function GardenPlannerPage() {
     return m
   }, [])
 
+  const { items: seedCartItems } = useSeedCart()
+
+  /**
+   * Cart-derived specs. Each saved PlantMe item becomes a `db-<id>` PlantSpec
+   * via `seedCartItemToSpec()`, using lfCode for sizing when available. Merged
+   * BELOW `dbSpecsById` so a fresh planner-recommendations spec for the same id
+   * wins (it has more context like group hints).
+   */
+  const cartSpecsById = useMemo(() => {
+    const m: Record<string, PlantSpec> = {}
+    for (const it of seedCartItems) {
+      const spec = seedCartItemToSpec(it)
+      m[spec.id] = spec
+    }
+    return m
+  }, [seedCartItems])
+
   const specsById = useMemo<Record<string, AnySpec>>(
-    () => ({ ...localSpecsById, ...featureSpecsById, ...dbSpecsById }),
-    [localSpecsById, featureSpecsById, dbSpecsById],
+    () => ({
+      ...cartSpecsById,
+      ...localSpecsById,
+      ...featureSpecsById,
+      ...dbSpecsById,
+    }),
+    [cartSpecsById, localSpecsById, featureSpecsById, dbSpecsById],
   )
 
   const specsPatchForSave = useMemo(
@@ -1131,6 +1199,41 @@ export function GardenPlannerPage() {
             >
               Features
             </button>
+            <button
+              type="button"
+              role="tab"
+              className={`planner-catalog-tab${catalogTab === 'seedCart' ? ' active' : ''}`}
+              aria-selected={catalogTab === 'seedCart'}
+              onClick={() => setCatalogTab('seedCart')}
+              aria-label={
+                seedCartItems.length > 0
+                  ? `Seed cart, ${seedCartItems.length} saved`
+                  : 'Seed cart'
+              }
+              title={
+                seedCartItems.length > 0
+                  ? `Seed cart · ${seedCartItems.length} saved`
+                  : 'Seed cart'
+              }
+              style={{ position: 'relative' }}
+            >
+              Saved
+              {seedCartItems.length > 0 && catalogTab !== 'seedCart' && (
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: 5,
+                    right: 8,
+                    width: 8,
+                    height: 8,
+                    borderRadius: 999,
+                    background: 'var(--color-primary)',
+                    boxShadow: '0 0 0 2px var(--color-surface)',
+                  }}
+                />
+              )}
+            </button>
           </div>
 
           {catalogTab === 'features' ? (
@@ -1268,6 +1371,125 @@ export function GardenPlannerPage() {
                   )
                 })}
               </div>
+            </>
+          ) : catalogTab === 'seedCart' ? (
+            <>
+              {seedCartItems.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: 'var(--space-lg) var(--space-md)',
+                    display: 'grid',
+                    gap: 'var(--space-sm)',
+                    justifyItems: 'center',
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
+                  <span style={{ color: 'var(--color-primary)' }}>
+                    <SeedSproutIcon saved={false} size={32} />
+                  </span>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text)' }}>
+                    No saved plants yet
+                  </p>
+                  <p style={{ margin: 0, fontSize: '0.8rem' }}>
+                    Bookmark plants on PlantMe to plant them here.
+                  </p>
+                  <Link
+                    to="/plants"
+                    className="btn btn-primary"
+                    style={{ marginTop: 'var(--space-xs)' }}
+                  >
+                    Browse PlantMe
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <p
+                    className="garden-planner-sidebar-note"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    <span style={{ flex: 1 }}>
+                      <strong>
+                        {seedCartItems.length} saved{' '}
+                        {seedCartItems.length === 1 ? 'plant' : 'plants'}
+                      </strong>
+                      {' · '}Click one to start placing.
+                    </span>
+                    <Link
+                      to="/seed-cart"
+                      style={{
+                        fontSize: '0.78rem',
+                        color: 'var(--color-primary)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Manage →
+                    </Link>
+                  </p>
+                  <ul className="garden-planner-catalog" style={{ margin: 0 }}>
+                    {seedCartItems.map((it) => {
+                      const spec = cartSpecsById[seedCartSpecId(it)]
+                      if (!spec) return null
+                      const active = pendingSpecId === spec.id
+                      return (
+                        <li key={spec.id}>
+                          <button
+                            type="button"
+                            className={`garden-planner-catalog__item${active ? ' active' : ''}`}
+                            onClick={() => setPendingSpecId(active ? null : spec.id)}
+                            aria-pressed={active}
+                          >
+                            {it.imageUrl ? (
+                              <span
+                                aria-hidden
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                  borderRadius: 8,
+                                  overflow: 'hidden',
+                                  flexShrink: 0,
+                                  background: spec.canopyColor,
+                                  display: 'block',
+                                }}
+                              >
+                                <img
+                                  src={it.imageUrl}
+                                  alt=""
+                                  loading="lazy"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    display: 'block',
+                                  }}
+                                />
+                              </span>
+                            ) : (
+                              <span
+                                className="garden-planner-catalog__swatch"
+                                style={{ background: spec.canopyColor }}
+                                aria-hidden
+                              />
+                            )}
+                            <span className="garden-planner-catalog__text">
+                              <span className="garden-planner-catalog__name">
+                                {spec.commonName}
+                              </span>
+                              <span className="garden-planner-catalog__sci">
+                                {spec.scientificName}
+                              </span>
+                              <span className="garden-planner-catalog__meta">
+                                {FORM_LABEL[spec.form]} · {spec.matureWidth}×{spec.matureHeight}m
+                                {it.lfCode ? ` · LF ${it.lfCode}` : ''}
+                              </span>
+                            </span>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </>
+              )}
             </>
           ) : goal === 'free' ? (
             <>

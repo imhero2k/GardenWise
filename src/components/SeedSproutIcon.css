@@ -1,0 +1,132 @@
+/* Animated seed → sprout icon.
+ *
+ * State is driven by the `seed-sprout--saved` class on the root <svg>.
+ * Add `seed-sprout--just-toggled` briefly to play the bounce on click.
+ *
+ * Geometry note: leaves and stem use `transform-origin: 12 13` (the centre
+ * of the seed) so the sprout grows up out of the seed.
+ */
+
+.seed-sprout {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1.3);
+  transform-origin: center;
+}
+
+/* Soil mound — always visible, very subtle. */
+.seed-sprout__soil {
+  fill: currentColor;
+  opacity: 0.18;
+}
+
+/* Seed body — slightly darker when saved (covered by leaves anyway). */
+.seed-sprout__seed {
+  fill: currentColor;
+  opacity: 0.85;
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.3);
+  transform-origin: 12px 17.5px;
+}
+
+.seed-sprout--saved .seed-sprout__seed {
+  opacity: 0.55;
+  transform: translateY(1px);
+}
+
+/* Stem — drawn in via stroke-dashoffset when the sprout grows. */
+.seed-sprout__stem {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 9;
+  stroke-dashoffset: 9;
+  transition: stroke-dashoffset 0.35s ease-out;
+}
+
+.seed-sprout--saved .seed-sprout__stem {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.4s ease-out 0.05s;
+}
+
+/* Leaves — scale up from the seed centre with a slight bounce. */
+.seed-sprout__leaf {
+  fill: currentColor;
+  opacity: 0;
+  transform: scale(0.1) translateY(2px);
+  transform-origin: 12px 13px;
+  transform-box: fill-box;
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.25, 1.4),
+    opacity 0.25s ease-out;
+}
+
+.seed-sprout--saved .seed-sprout__leaf {
+  opacity: 0.9;
+  transform: scale(1) translateY(0);
+}
+
+/* Stagger the right leaf slightly after the left for a natural feel. */
+.seed-sprout--saved .seed-sprout__leaf--left {
+  transition-delay: 0.18s, 0.18s;
+}
+.seed-sprout--saved .seed-sprout__leaf--right {
+  transition-delay: 0.28s, 0.28s;
+}
+
+/* Tiny highlight dot on the seed — gives it character. */
+.seed-sprout__highlight {
+  fill: #fff;
+  opacity: 0.55;
+}
+
+/* One-shot bounce when the user toggles state. */
+@keyframes seed-sprout-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18); }
+  60%  { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+
+.seed-sprout--just-toggled {
+  animation: seed-sprout-pop 0.45s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+}
+
+/* A faint radial "puff" that bursts out on save. Sits behind the icon. */
+.seed-sprout-burst {
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(120, 200, 100, 0.45) 0%,
+    rgba(120, 200, 100, 0) 60%
+  );
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+@keyframes seed-sprout-burst {
+  0%   { opacity: 0;    transform: scale(0.5); }
+  35%  { opacity: 0.85; transform: scale(1);   }
+  100% { opacity: 0;    transform: scale(1.4); }
+}
+
+.seed-sprout-burst--active {
+  animation: seed-sprout-burst 0.55s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seed-sprout,
+  .seed-sprout__seed,
+  .seed-sprout__stem,
+  .seed-sprout__leaf {
+    transition-duration: 0.001s;
+  }
+  .seed-sprout--just-toggled,
+  .seed-sprout-burst--active {
+    animation: none;
+  }
+}
