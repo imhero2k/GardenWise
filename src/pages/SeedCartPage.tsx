@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { IconBin, IconPrinter, IconSeedling } from '../components/Icons'
 import {
   PrintableShoppingList,
-  usePrintable,
   type PrintItem,
 } from '../components/PrintableShoppingList'
+import { usePrintable } from '../hooks/usePrintable'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import { useLocationArea } from '../context/LocationContext'
 import { useSeedCart } from '../context/useSeedCart'

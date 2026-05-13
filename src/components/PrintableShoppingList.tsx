@@ -1,16 +1,16 @@
-import { useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 /**
  * Printable shopping/plant list rendered into a portal under `<body>`.
  *
  * On screen the document is hidden (`.print-doc` is `display: none`).
- * When the consumer calls `print()` from `usePrintable()`, the hook flips a
- * `data-print-doc-active="true"` attribute on the doc, calls
- * `window.print()`, and clears the attribute on `afterprint`. The
- * accompanying `@media print` rules hide the rest of the app and show only
- * the active doc, giving users a clean shopping list they can take to a
- * nursery or save as PDF via the browser's print dialog.
+ * When the consumer calls `print()` from `usePrintable()` (see
+ * `../hooks/usePrintable`), the hook flips a `data-print-doc-active="true"`
+ * attribute on the doc, calls `window.print()`, and clears the attribute on
+ * `afterprint`. The accompanying `@media print` rules hide the rest of the
+ * app and show only the active doc, giving users a clean shopping list
+ * they can take to a nursery or save as PDF via the browser's print
+ * dialog.
  */
 export type PrintItem = {
   commonName: string | null
@@ -122,27 +122,4 @@ export function PrintableShoppingList({
     </section>,
     document.body,
   )
-}
-
-/**
- * Hook that wires a ref to the printable doc and exposes a `print()` action
- * which temporarily activates the doc, calls `window.print()`, and cleans
- * the active flag on `afterprint`.
- */
-export function usePrintable() {
-  const ref = useRef<HTMLElement | null>(null)
-
-  const print = useCallback(() => {
-    const el = ref.current
-    if (!el) return
-    el.setAttribute('data-print-doc-active', 'true')
-    const cleanup = () => {
-      el.removeAttribute('data-print-doc-active')
-      window.removeEventListener('afterprint', cleanup)
-    }
-    window.addEventListener('afterprint', cleanup)
-    window.print()
-  }, [])
-
-  return { ref, print }
 }

@@ -6,9 +6,9 @@ import { LocationPromptBanner } from '../components/LocationPromptBanner'
 import { PlantFormIcon } from '../components/PlantFormIcon'
 import {
   PrintableShoppingList,
-  usePrintable,
   type PrintItem,
 } from '../components/PrintableShoppingList'
+import { usePrintable } from '../hooks/usePrintable'
 import { SeedSproutIcon } from '../components/SeedSproutIcon'
 import {
   GardenPlannerScene,
