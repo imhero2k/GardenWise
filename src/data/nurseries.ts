@@ -9,9 +9,11 @@ function rowToNursery(r: VicNurseryJsonRow): Nursery {
     lat: r.lat,
     lng: r.lng,
     kind: r.kind,
-    description: r.description,
-    websites: r.websites.length > 0 ? r.websites : undefined,
+    address: r.address ?? undefined,
     phone: r.phone ?? undefined,
+    email: r.email ?? undefined,
+    website: r.website ?? undefined,
+    openingHours: r.opening_hours ?? undefined,
   }
 }
 
