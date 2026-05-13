@@ -164,7 +164,7 @@ function RdsPlantCard({
         )}
         {plant.lfCode && (
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-xs) 0 0' }}>
-            Life form: {lfCodeLabel(plant.lfCode)}
+            Plant type: {lfCodeLabel(plant.lfCode)}
           </p>
         )}
         {loadingBlurb && (
@@ -326,7 +326,7 @@ function DbPlantDetailContent({
         {(plant.family || plant.lfCode) && (
           <ul className="plant-detail-dialog__meta">
             {plant.family && <li>Family: {plant.family}</li>}
-            {plant.lfCode && <li>Life form: {lfCodeLabel(plant.lfCode)}</li>}
+            {plant.lfCode && <li>Plant type: {lfCodeLabel(plant.lfCode)}</li>}
           </ul>
         )}
       </div>
@@ -588,6 +588,18 @@ export function PlantSearchPage() {
         <SeedCartHeaderLink />
       </header>
 
+      <p
+        style={{
+          margin: '0 0 var(--space-md)',
+          maxWidth: '40rem',
+          fontSize: '0.9rem',
+          lineHeight: 1.5,
+          color: 'var(--color-text-muted)',
+        }}
+      >
+        Save plants to your seed cart — you can place them in the garden planner, or print a list to take to the nursery.
+      </p>
+
       <LocationPromptBanner surface="plantme" />
 
       <section style={{ marginBottom: 'var(--space-xl)' }} aria-labelledby="rds-heading">
@@ -642,7 +654,7 @@ export function PlantSearchPage() {
               marginBottom: 'var(--space-xs)',
             }}
           >
-            Life form
+            Plant type
           </label>
           <select
             id="lf-code-filter"
@@ -660,7 +672,7 @@ export function PlantSearchPage() {
               font: 'inherit',
             }}
           >
-            <option value="">All life forms</option>
+            <option value="">All plant types</option>
             {LF_CODE_OPTIONS.map((option) => (
               <option key={option.code} value={option.code}>
                 {option.label}
@@ -736,7 +748,7 @@ export function PlantSearchPage() {
         {!rdsLoading && coords && !rdsError && rdsPlants.length === 0 && (
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--space-lg)' }}>
             {wildlife.length || rdsSearch.trim() || rdsLfCode
-              ? 'No plants match your filters. Try clearing the life form, wildlife filter, or search term.'
+              ? 'No plants match your filters. Try clearing the plant type, wildlife filter, or search term.'
               : 'No plants returned for this point. Check bioregion–plant links in the database, or widen your dataset.'}
           </p>
         )}
