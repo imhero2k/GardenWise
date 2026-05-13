@@ -492,21 +492,6 @@ function TopWeedDetailContent({
           <li>
             <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
           </li>
-          {weed.riskScore != null && (
-            <li>
-              <strong>Risk score:</strong> {weed.riskScore}
-            </li>
-          )}
-          {weed.isWons && (
-            <li>
-              <strong style={{ color: 'var(--color-danger)' }}>WoNS</strong> — Weed of National Significance
-            </li>
-          )}
-          {weed.weedStatusVic && (
-            <li>
-              <strong>Status (Vic):</strong> {weed.weedStatusVic}
-            </li>
-          )}
         </ul>
       </div>
       {summary ? (
@@ -648,10 +633,10 @@ const PROHIBITED_WEEDS: { name: string; chinese: string; emoji: string; imgUrl: 
   { name: 'Lagarosiphon', chinese: '', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
   { name: 'Knotweed', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
   { name: 'Mesquite', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
-  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but extremely invasive grass. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
+  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but a serious environmental weed. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
   { name: 'Parthenium Weed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
   { name: 'Branched Broomrape', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
-  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient invasive; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
+  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient lineage and a serious environmental weed; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
   { name: 'Camel Thorn', chinese: '', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
   { name: 'Karoo & Giraffe Thorn', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
   { name: 'Poverty Weed', chinese: '', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
@@ -827,20 +812,40 @@ export function WeedPage() {
     : []
 
   return (
-    <>
+    <div className="weed-layout">
+      <aside className="weed-sidenav" aria-label="Weed page sections">
+        <p className="weed-sidenav__title">On this page</p>
+        <a className="weed-sidenav__link" href="#top-weeds">
+          Top weeds
+        </a>
+        <a className="weed-sidenav__link" href="#weed-checker">
+          Weed checker
+        </a>
+        <a className="weed-sidenav__link" href="#prohibited">
+          Prohibited weeds
+        </a>
+        <a className="weed-sidenav__link" href="#rules">
+          General rules
+        </a>
+        <a className="weed-sidenav__link" href="#disposal">
+          Disposal guide
+        </a>
+      </aside>
+
+      <div className="weed-layout__main">
       <header className="page-header">
-        <p className="eyebrow">Weeds</p>
-        <h1>Weed help</h1>
+          <p className="eyebrow">Weeds</p>
+          <h1>Weed help</h1>
         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Identify risky plants, reduce spread, and dispose of material responsibly.
+            Identify risky plants, reduce spread, and dispose of material responsibly.
         </p>
       </header>
 
-      <Link to="/learn#invasive" className="weed-learn-link">
+      <Link to="/learn#environmental-weeds" className="weed-learn-link">
         <span className="weed-learn-link__icon"><IconBook /></span>
         <span className="weed-learn-link__text">
           <strong>Why does this matter?</strong> Read{' '}
-          <em>Invasive plants in your garden</em> in Native plants 101.
+          <em>Environmental weeds in your garden</em> in Native plants 101.
         </span>
         <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
       </Link>
@@ -854,7 +859,7 @@ export function WeedPage() {
             </div>
             <div>
               <h3>Weed checker</h3>
-              <p>Scan or upload a plant to check invasive risk — same as Plant Safety Check on Home.</p>
+              <p>Scan or upload a plant to check environmental weed risk — same as Plant Safety Check on Home.</p>
             </div>
           </a>
           <a href="#prohibited" className="feature-tile">
@@ -965,14 +970,7 @@ export function WeedPage() {
                       <span>
                         <strong>Risk:</strong> {w.riskRating ?? 'Unknown'}
                       </span>
-                      {w.isWons && <span style={{ color: 'var(--color-danger)', fontWeight: 800 }}>WoNS</span>}
-                      {w.riskScore != null && <span style={{ color: 'var(--color-text-muted)' }}>score {w.riskScore}</span>}
                     </div>
-                    {w.weedStatusVic ? (
-                      <p className="top-weed-card__status">{w.weedStatusVic}</p>
-                    ) : (
-                      <p className="top-weed-card__status top-weed-card__status--empty" aria-hidden="true" />
-                    )}
                     {blurb ? <p className="top-weed-card__blurb top-weed-card__blurb--filled">{blurb}</p> : (
                       <p className="top-weed-card__blurb top-weed-card__blurb--reserve" aria-hidden="true" />
                     )}
@@ -987,17 +985,19 @@ export function WeedPage() {
         {showTopWeedsGrid && topWeeds.length > 0 && (
           <div style={{ marginTop: 'var(--space-md)', textAlign: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {topWeedsOffset > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-ghost pagination-step-btn"
+                  disabled={topWeedsLoading}
+                  onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
+                >
+                  Previous page
+                </button>
+              )}
               <button
                 type="button"
-                className="btn btn-ghost"
-                disabled={topWeedsOffset <= 0 || topWeedsLoading}
-                onClick={() => setTopWeedsOffset((o) => Math.max(0, o - TOP_WEEDS_PAGE_SIZE))}
-              >
-                Previous page
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost pagination-step-btn"
                 disabled={!topWeedsHasMore || topWeedsLoading}
                 onClick={() => setTopWeedsOffset((o) => o + TOP_WEEDS_PAGE_SIZE)}
               >
@@ -1074,7 +1074,12 @@ export function WeedPage() {
             <p style={{ fontSize: '0.88rem', color: '#78350f', margin: 0 }}>
               The following weeds are <strong>State Prohibited Weeds</strong> in Victoria. You must <strong>not</strong> attempt to remove them yourself — report them to the Department of Energy, Environment and Climate Action immediately.
             </p>
-            <a href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-xs)', marginTop: 'var(--space-sm)', background: 'var(--color-warning)', color: '#fff', padding: '0.45rem 1rem', borderRadius: 999, fontSize: '0.83rem', fontWeight: 600, textDecoration: 'none' }}>
+            <a
+              href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="weed-report-cta"
+            >
               Report a State Prohibited Weed →
             </a>
           </div>
@@ -1111,8 +1116,26 @@ export function WeedPage() {
           {GENERAL_RULES.map((rule, i) => {
             const open = openRules.has(i)
             return (
-              <div key={i} style={{ border: `1px solid ${open ? 'var(--color-accent)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', overflow: 'hidden', transition: 'border-color var(--transition)' }}>
-                <button onClick={() => toggleRule(i)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-md)', padding: 'var(--space-md)', background: 'var(--color-surface)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+              <div
+                key={i}
+                className={`weed-rules-accordion-item${open ? ' weed-rules-accordion-item--open' : ''}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleRule(i)}
+                  className="weed-rules-accordion-item__trigger"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-md)',
+                    padding: 'var(--space-md)',
+                    background: 'var(--color-surface)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
                   <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{rule.emoji}</span>
                   <span style={{ flex: 1, fontWeight: 600, fontSize: '0.95rem', color: 'var(--color-text)' }}>{rule.title}</span>
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--transition)' }}>▼</span>
@@ -1137,8 +1160,20 @@ export function WeedPage() {
           {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
             const active = selectedType === type
             return (
-              <button key={type} onClick={() => handleTypeSelect(type)}
-                style={{ border: `2px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`, borderRadius: 'var(--radius-md)', padding: 0, background: active ? 'rgba(46,125,50,0.08)' : 'var(--color-surface)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'stretch', transition: 'all var(--transition)', boxShadow: active ? '0 0 0 3px rgba(46,125,50,0.15)' : 'none', textAlign: 'center', overflow: 'hidden' }}
+              <button
+                key={type}
+                type="button"
+                className={`weed-disposal-type-btn${active ? ' weed-disposal-type-btn--active' : ''}`}
+                onClick={() => handleTypeSelect(type)}
+                style={{
+                  padding: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  textAlign: 'center',
+                  overflow: 'hidden',
+                }}
               >
                 <div style={{ position: 'relative', height: 80, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
                   <img src={imgUrl} alt="" loading="lazy" referrerPolicy="no-referrer"
@@ -1190,7 +1225,7 @@ export function WeedPage() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-md)' }}>
+              <div className="weed-disposal-columns">
                 <div style={{ background: 'rgba(230,81,0,0.06)', border: '1px solid rgba(230,81,0,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
                   <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-warning)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>⚡ What makes it risky</h4>
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
@@ -1223,7 +1258,7 @@ export function WeedPage() {
         })()}
       </WeedSection>
 
-      <footer
+        <footer
         style={{
           marginTop: 'var(--space-xl)',
           paddingTop: 'var(--space-md)',
@@ -1237,7 +1272,7 @@ export function WeedPage() {
         <a href="https://weeds.org.au/" target="_blank" rel="noreferrer">Weeds Australia</a>
         {' '}and{' '}
         <a href="https://agriculture.vic.gov.au/biosecurity/weeds" target="_blank" rel="noreferrer">Agriculture Victoria</a>.
-      </footer>
+        </footer>
 
       {/* ── Top-weed detail dialog (mirrors PlantMe) ── */}
       <dialog
@@ -1287,6 +1322,7 @@ export function WeedPage() {
           </div>
         </div>
       )}
-    </>
+      </div>
+    </div>
   )
 }
