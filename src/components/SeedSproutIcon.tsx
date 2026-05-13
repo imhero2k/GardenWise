@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import './SeedSproutIcon.css'
 
 interface Props {
@@ -14,48 +14,63 @@ interface Props {
 /**
  * A creative, on-theme replacement for a bookmark icon: a buried seed that
  * sprouts two cotyledon leaves when the user "saves" a plant to their seed
- * cart. The transition is purely CSS so it's cheap and respects
- * `prefers-reduced-motion`.
+ * cart. The "just toggled" pop and the radial burst are one-shot CSS
+ * animations triggered by adding a class to the DOM via refs — kept out of
+ * React state so the `react-hooks/set-state-in-effect` rule is satisfied.
+ *
+ * The persistent `seed-sprout--saved` class is derived from the `saved` prop
+ * directly (no state), so React fully drives the steady-state styling.
+ *
+ * Respects `prefers-reduced-motion` via the CSS file.
  */
 export function SeedSproutIcon({ saved, className, size = 22, burst = false }: Props) {
-  const [justToggled, setJustToggled] = useState(false)
-  const [bursting, setBursting] = useState(false)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const burstRef = useRef<HTMLSpanElement>(null)
   const prevSavedRef = useRef(saved)
-  const popTimerRef = useRef<number | null>(null)
-  const burstTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     const prev = prevSavedRef.current
     prevSavedRef.current = saved
     if (prev === saved) return
 
-    setJustToggled(true)
-    if (popTimerRef.current !== null) window.clearTimeout(popTimerRef.current)
-    popTimerRef.current = window.setTimeout(() => setJustToggled(false), 500)
+    const timers: number[] = []
 
+    /* Bounce pop on the icon, every toggle. */
+    const svg = svgRef.current
+    if (svg) {
+      svg.classList.add('seed-sprout--just-toggled')
+      timers.push(
+        window.setTimeout(() => {
+          svg.classList.remove('seed-sprout--just-toggled')
+        }, 500),
+      )
+    }
+
+    /* Radial burst only when newly saved (not when un-saving). */
     if (burst && saved) {
-      setBursting(true)
-      if (burstTimerRef.current !== null) window.clearTimeout(burstTimerRef.current)
-      burstTimerRef.current = window.setTimeout(() => setBursting(false), 600)
+      const el = burstRef.current
+      if (el) {
+        el.classList.add('seed-sprout-burst--active')
+        timers.push(
+          window.setTimeout(() => {
+            el.classList.remove('seed-sprout-burst--active')
+          }, 600),
+        )
+      }
     }
 
     return () => {
-      if (popTimerRef.current !== null) window.clearTimeout(popTimerRef.current)
-      if (burstTimerRef.current !== null) window.clearTimeout(burstTimerRef.current)
+      for (const t of timers) window.clearTimeout(t)
     }
   }, [saved, burst])
 
-  const rootClass = [
-    'seed-sprout',
-    saved ? 'seed-sprout--saved' : '',
-    justToggled ? 'seed-sprout--just-toggled' : '',
-    className ?? '',
-  ]
+  const rootClass = ['seed-sprout', saved ? 'seed-sprout--saved' : '', className ?? '']
     .filter(Boolean)
     .join(' ')
 
   const svg = (
     <svg
+      ref={svgRef}
       className={rootClass}
       width={size}
       height={size}
@@ -97,13 +112,8 @@ export function SeedSproutIcon({ saved, className, size = 22, burst = false }: P
   if (!burst) return svg
 
   return (
-    <span
-      style={{ position: 'relative', display: 'inline-flex', lineHeight: 0 }}
-    >
-      <span
-        aria-hidden
-        className={`seed-sprout-burst${bursting ? ' seed-sprout-burst--active' : ''}`}
-      />
+    <span style={{ position: 'relative', display: 'inline-flex', lineHeight: 0 }}>
+      <span aria-hidden ref={burstRef} className="seed-sprout-burst" />
       {svg}
     </span>
   )
