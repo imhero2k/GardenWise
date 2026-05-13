@@ -35,7 +35,6 @@ export default function App() {
   return (
     <AuthProvider>
       <LocationProvider>
-<<<<<<< HEAD
         <SeedCartProvider>
           <BrowserRouter basename={routerBasename}>
             <Routes>
@@ -48,34 +47,16 @@ export default function App() {
                 <Route path="weed" element={<WeedPage />} />
                 <Route path="planner" element={<GardenPlannerPage />} />
                 <Route path="map" element={<NurseryMapPage />} />
+                <Route path="beginners" element={<BeginnerGuidesPage />} />
+                <Route path="beginners/:id" element={<BeginnerGuideStepPage />} />
                 <Route path="learn" element={<LearnPage />} />
+                <Route path="about" element={<AboutPage />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Routes>
           </BrowserRouter>
         </SeedCartProvider>
-=======
-        <BrowserRouter basename={routerBasename}>
-          <Routes>
-            <Route path="signin" element={<SignInPage />} />
-            <Route element={protectedLayout}>
-              <Route index element={<HomePage />} />
-              <Route path="plants" element={<PlantSearchPage />} />
-              <Route path="plants/:id" element={<PlantDetailPage />} />
-              <Route path="weed" element={<WeedPage />} />
-              <Route path="planner" element={<GardenPlannerPage />} />
-              <Route path="map" element={<NurseryMapPage />} />
-              <Route path="beginners" element={<BeginnerGuidesPage />} />
-              <Route path="beginners/:id" element={<BeginnerGuideStepPage />} />
-              <Route path="learn" element={<LearnPage />} />
-              <Route path="about" element={<AboutPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
->>>>>>> parent of b18b07f (Revert "Merge pull request #12 from imhero2k/jit")
       </LocationProvider>
     </AuthProvider>
   )
