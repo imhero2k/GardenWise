@@ -618,6 +618,32 @@ export function IconPrinter({ className }: { className?: string }) {
   )
 }
 
+/** Frost / snowflake — used in the frost alert banner. */
+export function IconFrost({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 2l-2 3h4l-2-3zM12 22l-2-3h4l-2 3zM2 12l3-2v4l-3-2zM22 12l-3-2v4l3-2z"
+        fill="currentColor"
+        opacity="0.5"
+      />
+    </svg>
+  )
+}
+
 /**
  * Wildlife — perched songbird silhouette. Used in the "Attracts wildlife"
  * filter and the plant detail dialog. Renders in `currentColor` so callers

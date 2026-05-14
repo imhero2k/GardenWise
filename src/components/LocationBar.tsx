@@ -2,9 +2,10 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useLocationArea } from '../context/LocationContext'
 import { useWeather } from '../hooks/useWeather'
+import { useFrostAlert } from '../hooks/useFrostAlert'
 import { geocodeAustralia } from '../lib/geocodeAu'
 import { getRegionCentroid } from '../lib/nearestRegion'
-import { IconPin, IconProfile } from './Icons'
+import { IconFrost, IconPin, IconProfile } from './Icons'
 import { WeatherMini } from './WeatherMini'
 
 const SOFT_DISMISS_KEY = 'rootvio-location-soft-dismiss-v1'
@@ -41,6 +42,7 @@ export function LocationBar() {
   }, [regionCode, coords])
 
   const weatherState = useWeather(weatherLat, weatherLng)
+  const frost = useFrostAlert(weatherLat, weatherLng)
 
   const [softDismissed, setSoftDismissed] = useState(readSoftDismissed)
 
@@ -164,6 +166,26 @@ export function LocationBar() {
             </div>
           ) : null}
 
+          {frost.state.status === 'frost' && !frost.dismissed && (() => {
+            const { minTempC, hoursUntil } = frost.state.data
+            const urgency = hoursUntil <= 6 ? 'urgent' : 'advance'
+            return (
+              <button
+                type="button"
+                className={`frost-badge frost-badge--${urgency}`}
+                onClick={frost.dismiss}
+                role="alert"
+                title={`${urgency === 'urgent' ? 'Frost imminent' : 'Frost alert'}: ${hoursUntil === 0 ? 'now' : `in ~${hoursUntil}h`}, low ${minTempC}°C. Tap to dismiss.`}
+              >
+                <IconFrost className="frost-badge__icon" />
+                <span className="frost-badge__label">
+                  {hoursUntil === 0 ? 'Frost now' : `Frost ~${hoursUntil}h`}
+                </span>
+                <span className="frost-badge__temp">{minTempC}°</span>
+              </button>
+            )
+          })()}
+
           <NavLink
             to="/profile"
             aria-label="Profile"
@@ -197,6 +219,7 @@ export function LocationBar() {
             )}
           </span>
         </div>
+
       </div>
 
       <dialog ref={dialogRef} className="location-dialog" aria-labelledby={titleId}>

@@ -11,6 +11,16 @@ export interface CurrentWeather {
   iconUrl?: string
 }
 
+export interface FrostWindow {
+  /** ISO-8601 hour the frost is expected to start (earliest hour <= threshold) */
+  startsAt: string
+  /** Lowest forecast temperature in the next 24 h */
+  minTempC: number
+  /** Hours from now until the frost window begins */
+  hoursUntil: number
+  provider: WeatherProvider
+}
+
 function getGoogleApiKey(): string | undefined {
   const k = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   return typeof k === 'string' && k.trim() ? k.trim() : undefined
@@ -125,4 +135,109 @@ export async function fetchCurrentWeather(
     }
   }
   return fetchOpenMeteo(lat, lng, signal)
+}
+
+const FROST_THRESHOLD_C = 2
+
+async function fetchGoogleFrostForecast(
+  lat: number,
+  lng: number,
+  apiKey: string,
+  signal?: AbortSignal,
+): Promise<FrostWindow | null> {
+  const u = new URL('https://weather.googleapis.com/v1/forecast/hours:lookup')
+  u.searchParams.set('key', apiKey)
+  u.searchParams.set('location.latitude', String(lat))
+  u.searchParams.set('location.longitude', String(lng))
+  u.searchParams.set('hours', '24')
+
+  const res = await fetch(u.toString(), { signal })
+  if (!res.ok) throw new Error(`Google forecast ${res.status}`)
+
+  const data = (await res.json()) as {
+    forecastHours?: Array<{
+      interval?: { startTime?: string }
+      temperature?: { degrees?: number }
+    }>
+  }
+
+  const hours = data.forecastHours
+  if (!hours?.length) return null
+
+  let minTemp = Infinity
+  let frostStart: string | undefined
+  const now = Date.now()
+
+  for (const h of hours) {
+    const deg = h.temperature?.degrees
+    const ts = h.interval?.startTime
+    if (deg == null || !ts) continue
+    if (deg < minTemp) minTemp = deg
+    if (deg <= FROST_THRESHOLD_C && !frostStart) frostStart = ts
+  }
+
+  if (!frostStart || minTemp > FROST_THRESHOLD_C) return null
+
+  const hoursUntil = Math.max(0, Math.round((new Date(frostStart).getTime() - now) / 3_600_000))
+  return { startsAt: frostStart, minTempC: Math.round(minTemp), hoursUntil, provider: 'google' }
+}
+
+async function fetchOpenMeteoFrostForecast(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<FrostWindow | null> {
+  const u = new URL('https://api.open-meteo.com/v1/forecast')
+  u.searchParams.set('latitude', String(lat))
+  u.searchParams.set('longitude', String(lng))
+  u.searchParams.set('hourly', 'temperature_2m')
+  u.searchParams.set('forecast_hours', '24')
+  u.searchParams.set('timezone', 'auto')
+
+  const res = await fetch(u.toString(), { signal })
+  if (!res.ok) throw new Error('Frost forecast unavailable')
+
+  const data = (await res.json()) as {
+    hourly?: { time?: string[]; temperature_2m?: number[] }
+  }
+
+  const times = data.hourly?.time
+  const temps = data.hourly?.temperature_2m
+  if (!times?.length || !temps?.length) return null
+
+  let minTemp = Infinity
+  let frostStart: string | undefined
+  const now = Date.now()
+
+  for (let i = 0; i < times.length; i++) {
+    const deg = temps[i]
+    if (deg == null) continue
+    if (deg < minTemp) minTemp = deg
+    if (deg <= FROST_THRESHOLD_C && !frostStart) frostStart = times[i]
+  }
+
+  if (!frostStart || minTemp > FROST_THRESHOLD_C) return null
+
+  const hoursUntil = Math.max(0, Math.round((new Date(frostStart).getTime() - now) / 3_600_000))
+  return { startsAt: frostStart, minTempC: Math.round(minTemp), hoursUntil, provider: 'openmeteo' }
+}
+
+/**
+ * Check whether frost (≤ 2 °C) is forecast in the next 24 hours.
+ * Returns a FrostWindow if yes, null if no frost expected.
+ */
+export async function fetchFrostForecast(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<FrostWindow | null> {
+  const key = getGoogleApiKey()
+  if (key) {
+    try {
+      return await fetchGoogleFrostForecast(lat, lng, key, signal)
+    } catch {
+      /* fall through */
+    }
+  }
+  return fetchOpenMeteoFrostForecast(lat, lng, signal)
 }
