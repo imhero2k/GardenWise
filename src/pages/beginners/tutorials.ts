@@ -1,3 +1,18 @@
+import establishDigHoleImg from '../../assets/beginners/establish-dig-hole-2x-width.png'
+import establishRemoveFromPotImg from '../../assets/beginners/establish-remove-from-pot.png'
+import establishRootBoundImg from '../../assets/beginners/establish-root-bound.png'
+import mulchClearOfStemImg from '../../assets/beginners/mulch-clear-of-stem.png'
+import mulchDepthImg from '../../assets/beginners/mulch-depth.png'
+import mulchTypesImg from '../../assets/beginners/mulch-types.png'
+import wateringAtBaseImg from '../../assets/beginners/watering-at-base.png'
+import wateringEarlyMorningImg from '../../assets/beginners/watering-early-morning.png'
+
+export type TutorialMedia = {
+  src: string
+  alt: string
+  caption: string
+}
+
 export type Tutorial = {
   id: string
   title: string
@@ -6,6 +21,8 @@ export type Tutorial = {
   steps: string[]
   tip?: string[]
   related?: { label: string; to: string }[]
+  /** Illustrated steps shown under the intro. */
+  media?: TutorialMedia[]
   mediaPlaceholders?: { label: string }[]
 }
 
@@ -69,10 +86,22 @@ export const TUTORIALS: Tutorial[] = [
       { label: 'Mulching guide', to: '/beginners/mulching' },
       { label: 'Watering guide', to: '/beginners/watering-guide' },
     ],
-    mediaPlaceholders: [
-      { label: 'Photo placeholder: digging the hole' },
-      { label: 'Photo placeholder: removing plant from pot' },
-      { label: 'Photo placeholder: placing and backfilling' },
+    media: [
+      {
+        src: establishRemoveFromPotImg,
+        alt: 'Hands tilting a pot and supporting the root ball as a plant is removed',
+        caption: 'Remove the plant from the pot while supporting the root ball — handle the soil mass, not the stem.',
+      },
+      {
+        src: establishDigHoleImg,
+        alt: 'Plant root ball above a planting hole about twice as wide as the pot',
+        caption: 'Dig a hole about twice the width of the pot so roots can spread into loosened soil.',
+      },
+      {
+        src: establishRootBoundImg,
+        alt: 'Root-bound plant with dense circling roots shaped like the pot',
+        caption: 'Example of a root-bound plant: roots fill the pot and circle tightly — tease gently before planting if needed.',
+      },
     ],
   },
   {
@@ -106,10 +135,25 @@ export const TUTORIALS: Tutorial[] = [
       'Inorganic mulch (gravel/pebbles) is long-lasting and tidy, but can heat up in full sun and will not add organic matter to the soil.',
       'Avoid piling mulch in “volcano” heaps around stems — even good mulch can cause problems if it stays wet against the plant base.',
     ],
-    mediaPlaceholders: [
-      { label: 'Photo placeholder: mulch types (organic vs inorganic)' },
-      { label: 'Photo placeholder: correct mulch depth' },
-      { label: 'Photo placeholder: keep mulch off stems' },
+    media: [
+      {
+        src: mulchTypesImg,
+        alt: 'Illustrations of straw, pine bark, coir, wood chips, black plastic weed mat, and gravel pebbles mulch',
+        caption:
+          'Common mulch types include straw, pine bark, coir, and wood chips (organic, they break down and feed soil over time) and black plastic weed mat or gravel (inorganic, longer lasting but do not improve soil).',
+      },
+      {
+        src: mulchDepthImg,
+        alt: 'Cross-section showing a plant with a layer of mulch several centimetres deep on the soil surface',
+        caption:
+          'Spread mulch evenly at about 5–8 cm depth (a little thinner for very fine mulches) so it covers the soil without matting down too thickly.',
+      },
+      {
+        src: mulchClearOfStemImg,
+        alt: 'Tree with mulch in a ring around the trunk, leaving a clear gap at the base of the stem',
+        caption:
+          'Keep mulch clear of trunks and stems — leave a gap so mulch does not sit wet against the plant base (avoid “mulch volcano” heaps).',
+      },
     ],
   },
   {
@@ -142,10 +186,19 @@ export const TUTORIALS: Tutorial[] = [
       },
     ],
     steps: [],
-    mediaPlaceholders: [
-      { label: 'Photo placeholder: finger soil check' },
-      { label: 'Photo placeholder: watering at the base' },
-      { label: 'Photo placeholder: deep soak vs quick sprinkle' },
+    media: [
+      {
+        src: wateringEarlyMorningImg,
+        alt: 'Clock showing 8 a.m. beside a shrub being watered at the base with a watering can',
+        caption:
+          'Water in the morning when you can — plants take up moisture before the heat of the day and leaves can dry quickly, which helps reduce disease.',
+      },
+      {
+        src: wateringAtBaseImg,
+        alt: 'Comparison of overhead watering on leaves marked wrong versus watering at the soil base marked correct',
+        caption:
+          'Aim water at the soil and root zone, not over the leaves — wet foliage wastes water and can encourage fungal problems; keep the base moist, not the canopy.',
+      },
     ],
   },
 ]

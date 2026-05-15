@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react'
 import { Link, NavLink, Navigate, useLocation, useParams } from 'react-router-dom'
+import { BeginnerTutorialMedia } from '../components/BeginnerTutorialMedia'
 import { getTutorialById, TUTORIALS } from './beginners/tutorials'
 
 export function BeginnerGuideStepPage() {
@@ -41,6 +42,7 @@ export function BeginnerGuideStepPage() {
           <p style={{ color: 'var(--color-text-muted)', margin: 0, maxWidth: '46rem' }}>
             {tutorial.intro}
           </p>
+          {tutorial.media?.length ? <BeginnerTutorialMedia media={tutorial.media} /> : null}
           {tutorial.mediaPlaceholders?.length ? (
             <div className="beginner-media" aria-label="Image placeholders">
               {tutorial.mediaPlaceholders.map((m) => (
