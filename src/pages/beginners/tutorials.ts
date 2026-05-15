@@ -14,13 +14,35 @@ export const TUTORIALS: Tutorial[] = [
     id: 'your-space',
     title: 'Read your garden',
     intro:
-      'Natives do best when you match plants to the sunlight, soil and space you already have — no fancy tests required.',
-    steps: [
-      'Watch how sun moves across a day: note full sun, part shade or deep shade for each bed or pot cluster.',
-      'Dig one spadeful of soil and feel it: grittily sandy, sticky clay or somewhere in between shapes watering and plant choice.',
-      'Measure bed or pot sizes and picture mature plant width so things are not crammed in two years’ time.',
-      'If you are in a cooler part of Victoria, notice frost-prone corners where tender species might struggle.',
+      'Before you choose plants, get a feel for where things are easy to tend, how light and drainage vary, and how you will water—so your natives sit where they can thrive without a fuss.',
+    sections: [
+      {
+        title: 'Convenience',
+        body: [
+          'Note the areas that are genuinely convenient: spots you see often, can reach with a short walk, and pass by regularly, because those are the best places for plants that need a bit more attention or frequent checks.',
+        ],
+      },
+      {
+        title: 'Sunshine',
+        body: [
+          'If you can, observe the garden every hour or every few hours through a day, or spread checks over several days, and record which patches sit in full sun versus shade and roughly how many hours of direct sun each area receives.',
+          'If hourly checks feel too demanding, checking at about 10 a.m., 1 p.m. and 4 p.m. still gives a useful snapshot of how light shifts across the yard.',
+        ],
+      },
+      {
+        title: 'Drainage',
+        body: [
+          'Dig a test hole about 15 cm deep and 40 cm wide, fill it with water, let it drain completely, then fill it again and watch how fast the second fill disappears: if it drops away in minutes the spot is well drained, if it takes around an hour it is moderately drained, and if water lingers for several hours the drainage is poor.',
+        ],
+      },
+      {
+        title: 'How to water',
+        body: [
+          'Think about whether you will realistically use a hose, a watering can, or an automated sprinkler for the size and layout of your garden, and let that choice guide where you cluster thirsty plants versus tough, low-care ones.',
+        ],
+      },
     ],
+    steps: [],
     tip: [
       'When in doubt, pick species labelled for your region in PlantMe — they tolerate typical local winters and dry spells better.',
     ],

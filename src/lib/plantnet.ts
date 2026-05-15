@@ -14,6 +14,9 @@ type PlantNetIdentifyResponse = {
   bestMatch?: string
 }
 
+/** Pl@ntNet Identify v2 — browser calls with CORS (key must be “exposed” + domain allowlisted in Pl@ntNet). */
+const PLANTNET_IDENTIFY_URL = 'https://my-api.plantnet.org/v2/identify/all'
+
 function apiBase(): string {
   const raw = import.meta.env.VITE_API_BASE_URL
   return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
@@ -93,13 +96,16 @@ async function identifyViaServerProxy(
   }
 }
 
-async function identifyViaViteDevProxy(
+/**
+ * Browser → Pl@ntNet (CORS). Requires `VITE_PLANTNET_API_KEY` and Pl@ntNet “expose key” + authorized domains.
+ */
+async function identifyViaPlantNetBrowser(
   imageDataUrl: string,
   apiKey: string,
   signal?: AbortSignal,
 ): Promise<PredictResponse | null> {
   const qs = `api-key=${encodeURIComponent(apiKey)}`
-  const url = `/dev/plantnet/v2/identify/all?${qs}`
+  const url = `${PLANTNET_IDENTIFY_URL}?${qs}`
 
   const fd = new FormData()
   fd.append('images', dataUrlToBlob(imageDataUrl), 'upload.jpg')
@@ -112,7 +118,7 @@ async function identifyViaViteDevProxy(
     const msg = e instanceof Error ? e.message : String(e)
     if (/load failed|failed to fetch|networkerror/i.test(msg)) {
       throw new Error(
-        'Could not reach Pl@ntNet. Run `npm run dev` (Vite proxy) and/or `npm run dev:api` with PLANTNET_API_KEY or VITE_PLANTNET_API_KEY in .env.local.',
+        'Could not reach Pl@ntNet from the browser. In the Pl@ntNet API key settings, add this site’s origin under “Authorized domains” (include http vs https), and ensure the key is exposed for client use.',
       )
     }
     throw e
@@ -134,8 +140,8 @@ async function identifyViaViteDevProxy(
 }
 
 /**
- * Prefer same-origin API proxy (no Pl@ntNet browser CORS). Falls back to Vite `/dev/plantnet` in dev
- * with VITE_PLANTNET_API_KEY when the API server is not running.
+ * Prefer direct browser → Pl@ntNet when `VITE_PLANTNET_API_KEY` is set (e.g. GitHub Actions build).
+ * Falls back to same-origin `/api/plantnet/identify` proxy when the browser call fails or no key is set.
  */
 export async function identifyWithPlantNet(
   imageDataUrl: string,
@@ -144,17 +150,17 @@ export async function identifyWithPlantNet(
   const base64 = stripDataUrlToBase64(imageDataUrl)
   if (!base64) return null
 
-  const viaServer = await identifyViaServerProxy(base64, signal)
-  if (viaServer) return viaServer
-
   const apiKey = getPlantNetApiKey()
-  if (!apiKey || !import.meta.env.DEV || import.meta.env.VITE_PLANTNET_DIRECT === 'true') {
-    return null
+  if (apiKey) {
+    try {
+      const direct = await identifyViaPlantNetBrowser(imageDataUrl, apiKey, signal)
+      if (direct) return direct
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        console.warn('[plantnet] browser direct failed, trying API proxy if configured', e)
+      }
+    }
   }
 
-  try {
-    return await identifyViaViteDevProxy(imageDataUrl, apiKey, signal)
-  } catch {
-    return null
-  }
+  return identifyViaServerProxy(base64, signal)
 }
