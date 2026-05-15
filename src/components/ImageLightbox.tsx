@@ -3,11 +3,14 @@ import { useCallback, useEffect, useId, useRef } from 'react'
 export function ImageLightbox({
   src,
   alt,
+  title,
   open,
   onClose,
 }: {
   src: string | null
   alt?: string
+  /** Dialog heading; defaults to "Image". */
+  title?: string
   open: boolean
   onClose: () => void
 }) {
@@ -40,7 +43,7 @@ export function ImageLightbox({
       <div className="plant-detail-dialog__inner">
         <header className="plant-detail-dialog__header">
           <h2 id={titleId} className="plant-detail-dialog__title">
-            Image
+            {title?.trim() || 'Image'}
           </h2>
           <button
             type="button"
