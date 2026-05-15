@@ -14,19 +14,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: () => '/testing/predict',
       },
-      // PlantNet Identify from browser (avoids CORS when calling my-api.plantnet.org directly)
-      '/dev/plantnet': {
-        target: 'https://my-api.plantnet.org',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/dev\/plantnet/, ''),
-        configure: (proxy) => {
-          proxy.on('proxyReq', (proxyReq) => {
-            // PlantNet rejects some browser Origins; server-to-server should not send a browser Origin.
-            proxyReq.removeHeader('origin')
-            proxyReq.removeHeader('referer')
-          })
-        },
-      },
       '/api': { target: 'http://localhost:3001', changeOrigin: true },
     },
   },

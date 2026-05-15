@@ -5,10 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_GOOGLE_MAPS_API_KEY?: string
   /** Optional override for weed prediction API URL. */
   readonly VITE_PREDICT_API_URL?: string
-  /** PlantNet Identify API key (client-side; used as fallback in weed scanner). */
+  /** PlantNet Identify API key (browser → my-api.plantnet.org; expose key + authorized domains in Pl@ntNet). */
   readonly VITE_PLANTNET_API_KEY?: string
-  /** Dev only: set `"true"` to call PlantNet directly (may hit CORS from localhost). */
-  readonly VITE_PLANTNET_DIRECT?: string
   /** Local development only: bypass Firebase route guard when set to "true". */
   readonly VITE_BYPASS_AUTH?: string
   /**
