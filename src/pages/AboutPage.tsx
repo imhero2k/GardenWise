@@ -84,6 +84,112 @@ export function AboutPage() {
         </div>
       </section>
 
+      <section
+        className="about-band about-band--sources"
+        aria-labelledby="about-sources-heading"
+      >
+        <div className="about-band__inner">
+          <div className="about-sources section-block">
+            <h2 id="about-sources-heading" className="about-values__title">
+              Data sources
+            </h2>
+            <p className="about-sources__lede">
+              RootVio combines several open Victorian datasets so recommendations stay
+              grounded in real ecological evidence.
+            </p>
+            <ol className="about-sources__list">
+              <li className="about-source">
+                <p className="about-source__title">Bioregions and EVC benchmarks</p>
+                <p className="about-source__body">
+                  We use Victoria’s 28 bioregions and their Ecological Vegetation Classes
+                  (EVCs) to match plant choices to local conditions, with a curated short
+                  list of garden-friendly EVCs: <em>EVC 3 Damp Sands Woodland</em>,
+                  <em> EVC 48 Heathy Woodland</em>, <em>EVC 55 Plains Grassy Woodland</em>,
+                  <em> EVC 61 Box Ironbark Forest</em>,
+                  <em> EVC 132 Plains Grassland</em>, and{' '}
+                  <em>EVC 175 Grassy Woodland</em>.
+                </p>
+                <a
+                  className="about-source__link"
+                  href="https://www.environment.vic.gov.au/biodiversity/bioregions-and-evc-benchmarks"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  DEECA – Bioregions and EVC benchmarks →
+                </a>
+              </li>
+
+              <li className="about-source">
+                <p className="about-source__title">
+                  Victorian Bioregions map (1:100,000)
+                </p>
+                <p className="about-source__body">
+                  The bioregion boundaries on the location picker come from the 2004
+                  state-wide GIS layer (version 3.0), which lets RootVio resolve any
+                  Victorian coordinate to its bioregion.
+                </p>
+                <a
+                  className="about-source__link"
+                  href="https://datashare.maps.vic.gov.au/search?md=3508ad58-e66b-50e4-9717-0338845ded77"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  DataVic – Victorian Bioregions 1:100,000 →
+                </a>
+              </li>
+
+              <li className="about-source">
+                <p className="about-source__title">AusTraits plant trait database</p>
+                <p className="about-source__body">
+                  Plant traits — growth form, mature size, flowering season, dispersal —
+                  power our planner and recommendations. We use the latest AusTraits release
+                  from Zenodo.
+                </p>
+                <a
+                  className="about-source__link"
+                  href="https://zenodo.org/records/15718081"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  AusTraits release on Zenodo →
+                </a>
+                <p className="about-source__cite">
+                  Cite:{' '}
+                  <a
+                    href="https://zenodo.org/records/5112001"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    Falster, D. <em>et al.</em> (2021){' '}
+                    <em>AusTraits: a curated plant trait database for the Australian flora</em>.
+                    Zenodo.
+                  </a>
+                </p>
+              </li>
+
+              <li className="about-source">
+                <p className="about-source__title">
+                  Advisory list of environmental weeds in Victoria
+                </p>
+                <p className="about-source__body">
+                  The Plant Safety Check flags species using the 2022 advisory list of
+                  environmental weeds, so gardeners can avoid plants known to spread into
+                  Victorian bushland.
+                </p>
+                <a
+                  className="about-source__link"
+                  href="https://www.environment.vic.gov.au/__data/assets/excel_doc/0027/563607/Advisory-list-of-environmental-weeds-in-Victoria_2022.xlsx"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  DEECA – Advisory list 2022 (XLSX) →
+                </a>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
       <section className="about-band about-band--values" aria-labelledby="about-values-heading">
         <div className="about-band__inner">
           <div className="about-values section-block">
