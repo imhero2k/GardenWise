@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useLocationArea } from '../context/LocationContext'
 import { useAuth } from '../context/useAuth'
 
+const GUEST_EMAIL = 'user123@mail.com'
+
 export function SignInPage() {
-  const { state, loginWithApple, loginWithEmail, loginWithGoogle, signUpWithEmail } = useAuth()
+  const { state, loginWithEmail, loginWithGoogle, signUpWithEmail } = useAuth()
   const { requestOpenLocationDialog } = useLocationArea()
   const navigate = useNavigate()
   const [localError, setLocalError] = useState<string | null>(null)
-  const [mode, setMode] = useState<'providers' | 'email-signin' | 'email-signup'>('providers')
+  const [mode, setMode] = useState<'guest' | 'signup'>('guest')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -27,32 +29,29 @@ export function SignInPage() {
     }
   }, [loginWithGoogle])
 
-  const handleApple = useCallback(async () => {
+  const handleGuestContinue = useCallback(async () => {
     setLocalError(null)
     try {
-      await loginWithApple()
+      if (!password) throw new Error('Enter your password')
+      await loginWithEmail(GUEST_EMAIL, password)
       requestOpenLocationDialog()
-    } catch (e) {
-      setLocalError(e instanceof Error ? e.message : 'Sign-in failed')
+    } catch (err) {
+      setLocalError(err instanceof Error ? err.message : 'Sign-in failed')
     }
-  }, [loginWithApple, requestOpenLocationDialog])
+  }, [loginWithEmail, password, requestOpenLocationDialog])
 
-  const handleEmail = useCallback(async () => {
+  const handleCreateAccount = useCallback(async () => {
     setLocalError(null)
     try {
       const e = email.trim()
       if (!e) throw new Error('Enter your email')
       if (!password) throw new Error('Enter your password')
-      if (mode === 'email-signup') {
-        await signUpWithEmail(e, password)
-      } else {
-        await loginWithEmail(e, password)
-      }
+      await signUpWithEmail(e, password)
       requestOpenLocationDialog()
     } catch (err) {
-      setLocalError(err instanceof Error ? err.message : 'Sign-in failed')
+      setLocalError(err instanceof Error ? err.message : 'Sign-up failed')
     }
-  }, [email, loginWithEmail, mode, password, signUpWithEmail, requestOpenLocationDialog])
+  }, [email, password, signUpWithEmail, requestOpenLocationDialog])
 
   return (
     <section className="auth-wrap auth-in">
@@ -66,7 +65,7 @@ export function SignInPage() {
 
       <div className="card auth-card auth-card--in">
         <div className="card-body">
-          {(localError || state.configured && state.error) && (
+          {(localError || (state.configured && state.error)) && (
             <div className="auth-alert auth-alert--error" role="alert" style={{ marginBottom: 'var(--space-md)' }}>
               <strong>Couldn’t sign in.</strong> {localError || (state.configured ? state.error : '')}
             </div>
@@ -80,125 +79,119 @@ export function SignInPage() {
 
           {state.configured && (
             <>
-              {mode === 'providers' && (
+              <button
+                type="button"
+                className="btn btn-primary btn-block"
+                onClick={() => void handleGoogle()}
+                disabled={state.loading}
+              >
+                {state.loading ? 'Checking session…' : 'Continue with Google'}
+              </button>
+
+              {mode === 'guest' && (
                 <>
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-block"
-                    onClick={() => void handleGoogle()}
-                    disabled={state.loading}
-                  >
-                    {state.loading ? 'Checking session…' : 'Continue with Google'}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-block"
-                    onClick={() => void handleApple()}
-                    disabled={state.loading}
-                    style={{ marginTop: 'var(--space-sm)' }}
-                  >
-                    Continue with Apple
-                  </button>
-
-                  <div className="auth-meta" style={{ marginTop: 'var(--space-md)' }}>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-block"
-                      onClick={() => setMode('email-signin')}
-                      disabled={state.loading}
-                    >
-                      Sign in with email
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-block"
-                      onClick={() => setMode('email-signup')}
-                      disabled={state.loading}
-                      style={{ marginTop: 'var(--space-xs)' }}
-                    >
-                      Create an account
-                    </button>
+                  <div className="auth-divider" aria-hidden>
+                    <span>or</span>
                   </div>
-                </>
-              )}
 
-              {mode !== 'providers' && (
-                <>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-                      Email
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="email"
-                        style={{
-                          width: '100%',
-                          marginTop: '0.35rem',
-                          padding: '0.7rem 0.9rem',
-                          borderRadius: 'var(--radius-md)',
-                          border: '1px solid var(--color-border)',
-                        }}
-                      />
-                    </label>
-                    <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                  <div className="auth-guest">
+                    <label className="auth-guest__field">
                       Password
                       <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        autoComplete={mode === 'email-signup' ? 'new-password' : 'current-password'}
-                        style={{
-                          width: '100%',
-                          marginTop: '0.35rem',
-                          padding: '0.7rem 0.9rem',
-                          borderRadius: 'var(--radius-md)',
-                          border: '1px solid var(--color-border)',
+                        autoComplete="current-password"
+                        placeholder="Enter password"
+                        disabled={state.loading}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') void handleGuestContinue()
                         }}
                       />
                     </label>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-block"
+                      onClick={() => void handleGuestContinue()}
+                      disabled={state.loading}
+                    >
+                      {state.loading ? 'Checking session…' : 'Guest continue'}
+                    </button>
                   </div>
 
                   <button
                     type="button"
-                    className="btn btn-primary btn-block"
-                    onClick={() => void handleEmail()}
-                    disabled={state.loading}
-                    style={{ marginTop: 'var(--space-md)' }}
-                  >
-                    {state.loading
-                      ? 'Checking session…'
-                      : mode === 'email-signup'
-                        ? 'Create account'
-                        : 'Sign in'}
-                  </button>
-
-                  <button
-                    type="button"
                     className="btn btn-ghost btn-block"
-                    onClick={() => setMode('providers')}
+                    onClick={() => {
+                      setMode('signup')
+                      setPassword('')
+                      setLocalError(null)
+                    }}
                     disabled={state.loading}
                     style={{ marginTop: 'var(--space-sm)' }}
                   >
-                    Back
+                    Create an account
                   </button>
                 </>
+              )}
+
+              {mode === 'signup' && (
+                <div className="auth-signup">
+                  <p className="auth-signup__heading">Create an account</p>
+                  <label className="auth-guest__field">
+                    Email
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      placeholder="you@example.com"
+                      disabled={state.loading}
+                    />
+                  </label>
+                  <label className="auth-guest__field">
+                    Password
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="new-password"
+                      placeholder="Choose a password"
+                      disabled={state.loading}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') void handleCreateAccount()
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-block"
+                    onClick={() => void handleCreateAccount()}
+                    disabled={state.loading}
+                  >
+                    {state.loading ? 'Creating account…' : 'Create account'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-block"
+                    onClick={() => {
+                      setMode('guest')
+                      setEmail('')
+                      setPassword('')
+                      setLocalError(null)
+                    }}
+                    disabled={state.loading}
+                    style={{ marginTop: 'var(--space-xs)' }}
+                  >
+                    Back
+                  </button>
+                </div>
               )}
 
               <div className="auth-meta">
                 <span>Encrypted sign-in · No password stored in the app</span>
               </div>
 
-              <div className="auth-actions">
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-block"
-                  onClick={() => navigate('/', { replace: true })}
-                >
-                  Back to Home
-                </button>
-              </div>
             </>
           )}
         </div>
