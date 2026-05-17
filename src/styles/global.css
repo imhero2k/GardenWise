@@ -684,6 +684,111 @@ img {
   background: color-mix(in srgb, var(--color-bg) 35%, #fff);
 }
 
+.about-band--sources {
+  background: color-mix(in srgb, var(--color-bg) 60%, #fff);
+}
+
+.about-sources {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+}
+
+.about-sources__lede {
+  margin: 0 0 var(--space-md);
+  max-width: 60ch;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.about-sources__list {
+  list-style: none;
+  counter-reset: source;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.about-source {
+  counter-increment: source;
+  position: relative;
+  padding: 1.1rem 1.15rem 1rem 2.6rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.about-source::before {
+  content: counter(source);
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.about-source__title {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.25;
+}
+
+.about-source__body {
+  margin: 0 0 0.7rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.about-source__body em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.about-source__link {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+.about-source__link:hover {
+  text-decoration: underline;
+}
+
+.about-source__cite {
+  margin: 0.6rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.about-source__cite a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+.about-source__cite a:hover {
+  color: var(--color-primary-dark);
+}
+
 .about-mission {
   padding: 0;
   margin: 0;
