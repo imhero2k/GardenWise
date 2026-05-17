@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLocationArea } from '../context/LocationContext'
 import { useAuth } from '../context/useAuth'
 
-const GUEST_EMAIL = 'user123@mail.com'
+const GUEST_EMAIL = 'user@mail.com'
 
 export function SignInPage() {
   const { state, loginWithEmail, loginWithGoogle, signUpWithEmail } = useAuth()
