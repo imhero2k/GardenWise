@@ -97,7 +97,7 @@ function PredictionResultCard({
   const theme = CONFIDENCE_TIER[tier]
   const pct = Math.round(result.confidence * 10000) / 100
   const barPct = Math.min(100, Math.max(0, result.confidence * 100))
-  const sourceLabel = result.source === 'plantnet' ? 'PlantNet fallback' : null
+  const sourceLabel = result.source === 'plantnet' ? 'Pl@ntNet identification' : null
 
   const [enrichment, setEnrichment] = useState<PlantEnrichment | null>(null)
   const [enrichState, setEnrichState] = useState<'loading' | 'done' | 'error'>('loading')
@@ -973,7 +973,7 @@ export function WeedPage() {
       <aside className="weed-sidenav" aria-label="Weed page sections">
         <p className="weed-sidenav__title">On this page</p>
         <a className="weed-sidenav__link" href="#weed-checker">
-          Weed checker
+          Plant identifier
         </a>
         <a className="weed-sidenav__link" href="#top-weeds">
           Top weeds
@@ -1015,8 +1015,8 @@ export function WeedPage() {
               <IconCamera />
             </div>
             <div>
-              <h3>Weed checker</h3>
-              <p>Scan or upload a plant to check environmental weed risk — same as Plant Safety Check on Home.</p>
+              <h3>Plant identifier</h3>
+              <p>Scan or upload a photo to identify the plant — same tool as on the home page.</p>
             </div>
           </a>
           <a href="#rules" className="feature-tile">
@@ -1049,7 +1049,7 @@ export function WeedPage() {
         </div>
       </div>
 
-      <WeedSection id="weed-checker" title="Weed checker" eyebrow="Identify">
+      <WeedSection id="weed-checker" title="Plant identifier" eyebrow="Identify">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
           Upload a photo or use your camera — we will identify the plant and return a confidence score.
         </p>
@@ -1278,7 +1278,7 @@ export function WeedPage() {
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)', fontSize: '0.88rem' }}>
           Select the category that best matches your weed to see tailored disposal instructions.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-sm)' }}>
+        <div className="weed-disposal-type-grid">
           {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
             const active = selectedType === type
             return (
@@ -1297,15 +1297,23 @@ export function WeedPage() {
                   overflow: 'hidden',
                 }}
               >
-                <div style={{ position: 'relative', height: 80, background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
-                  <img src={imgUrl} alt="" loading="lazy" referrerPolicy="no-referrer"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+                <div className="weed-disposal-type-btn__media">
+                  <img
+                    src={imgUrl}
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const img = e.currentTarget
+                      img.style.display = 'none'
+                      const fb = img.nextElementSibling as HTMLElement | null
+                      if (fb) fb.style.display = 'flex'
+                    }}
                   />
-                  <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem' }}>{icon}</div>
+                  <div className="weed-disposal-type-btn__media-fallback">{icon}</div>
                 </div>
-                <div style={{ padding: 'var(--space-sm)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: active ? 'var(--color-primary-dark)' : 'var(--color-text-muted)', lineHeight: 1.35 }}>{label}</span>
+                <div className="weed-disposal-type-btn__label-wrap">
+                  <span className="weed-disposal-type-btn__label">{label}</span>
                 </div>
               </button>
             )
@@ -1399,23 +1407,32 @@ export function WeedPage() {
             </a>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 'var(--space-md)' }}>
+        <div className="weed-prohibited-grid">
           {PROHIBITED_WEEDS.map((w) => (
-            <button key={w.name} onClick={() => setModalWeed({ name: w.name, desc: w.desc })}
-              style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface)', cursor: 'pointer', padding: 0, overflow: 'hidden', transition: 'transform var(--transition), box-shadow var(--transition), border-color var(--transition)', textAlign: 'left' }}
-              onMouseEnter={(e) => { const el = e.currentTarget; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = 'var(--shadow-hover)'; el.style.borderColor = 'var(--color-accent)' }}
-              onMouseLeave={(e) => { const el = e.currentTarget; el.style.transform = ''; el.style.boxShadow = ''; el.style.borderColor = 'var(--color-border)' }}
+            <button
+              key={w.name}
+              type="button"
+              className="weed-prohibited-card"
+              onClick={() => setModalWeed({ name: w.name, desc: w.desc })}
             >
-              <div style={{ position: 'relative', height: 90, overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(165,214,167,0.4) 100%)' }}>
-                <img src={w.imgUrl} alt={w.name} loading="lazy" referrerPolicy="no-referrer"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  onError={(e) => { const img = e.currentTarget; img.style.display = 'none'; const fb = img.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }}
+              <div className="weed-prohibited-card__media">
+                <img
+                  src={w.imgUrl}
+                  alt={w.name}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const img = e.currentTarget
+                    img.style.display = 'none'
+                    const fb = img.nextElementSibling as HTMLElement | null
+                    if (fb) fb.style.display = 'flex'
+                  }}
                 />
-                <div style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>{w.emoji}</div>
+                <div className="weed-prohibited-card__media-fallback">{w.emoji}</div>
               </div>
-              <div style={{ padding: '0.5rem 0.75rem' }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3 }}>{w.name}</div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{w.chinese}</div>
+              <div className="weed-prohibited-card__body">
+                <div className="weed-prohibited-card__name">{w.name}</div>
+                {w.chinese ? <div className="weed-prohibited-card__sub">{w.chinese}</div> : null}
               </div>
             </button>
           ))}

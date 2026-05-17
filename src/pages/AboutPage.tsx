@@ -172,7 +172,7 @@ export function AboutPage() {
                   Advisory list of environmental weeds in Victoria
                 </p>
                 <p className="about-source__body">
-                  The Plant Safety Check flags species using the 2022 advisory list of
+                  The plant identifier flags species using the 2022 advisory list of
                   environmental weeds, so gardeners can avoid plants known to spread into
                   Victorian bushland.
                 </p>

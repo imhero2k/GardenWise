@@ -6,7 +6,6 @@ import { IconBook, IconLeaf, IconMap, IconPlanner, IconSearch, IconSprout } from
 import waratahImg from '../assets/hero/waratah.png'
 import wattleImg from '../assets/hero/wattle.png'
 import bottlebrushImg from '../assets/hero/bottlebrush.png'
-import logoImg from '../assets/logo.png'
 import benefitPollinatorsBg from '../assets/home/benefit-pollinators-bg.png'
 import benefitKangarooPawBg from '../assets/home/benefit-kangaroo-paw-bg.png'
 import benefitNaturalEconomyBg from '../assets/home/benefit-natural-economy-bg.png'
@@ -45,8 +44,8 @@ const HOME_QUICK_PATHS: { to: string; title: string; blurb: string; icon: ReactN
   },
   {
     to: '/weed#weed-checker',
-    title: 'Plant safety check',
-    blurb: 'See if something in your garden could be an environmental weed.',
+    title: 'Plant identifier',
+    blurb: 'Upload a photo to identify a plant and see if it may be an environmental weed.',
     icon: <IconLeaf />,
   },
   {
@@ -551,32 +550,19 @@ export function HomePage() {
           ))}
         </div>
         <div className="hero-inner">
-          <div className="hero-brand home-hero__rise home-hero__rise--d0">
-            <img src={logoImg} alt="" className="hero-brand__logo" aria-hidden="true" />
-            <span className="hero-brand__text">RootVio</span>
-          </div>
-          <p
-            className="eyebrow home-hero__rise home-hero__rise--d1"
-            style={{ color: 'rgba(255,255,255,0.85)' }}
-          >
-            Sustainable gardening
-          </p>
-          <h1 className="hero-title">
-            <span className="hero-title__line home-hero__rise home-hero__rise--d2">Grow smart.</span>
-            <span className="hero-title__line home-hero__rise home-hero__rise--d3">
-              Garden responsibly.
-            </span>
+          <h1 className="hero-title home-hero__title home-hero__rise home-hero__rise--d0">
+            Grow smart. Garden responsibly.
           </h1>
-          <p className="home-hero__rise home-hero__rise--d4">
+          <p className="home-hero__rise home-hero__rise--d1">
             Every garden counts. RootVio empowers Victorian gardeners to grow local, remove
             environmental weeds, and protect the biodiversity that makes this state extraordinary.
           </p>
-          <div className="hero-cta-row home-hero__rise home-hero__rise--d5">
+          <div className="hero-cta-row home-hero__rise home-hero__rise--d2">
             <Link to="/plants" className="btn btn-primary home-hero__cta-btn">
               Start Gardening
             </Link>
             <Link to="/weed#weed-checker" className="btn btn-secondary home-hero__cta-btn">
-              Weed checker
+              Plant identifier
             </Link>
           </div>
         </div>

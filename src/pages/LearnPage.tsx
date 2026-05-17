@@ -370,7 +370,7 @@ export function LearnPage() {
             </li>
             <li>
               <strong>Identify what you already have.</strong>{' '}
-              <Link to="/weed#weed-checker">Snap a photo with the Weed checker</Link> if you&rsquo;re unsure whether a
+              <Link to="/weed#weed-checker">Snap a photo with the plant identifier</Link> if you&rsquo;re unsure whether a
               plant is risky.
             </li>
             <li>
@@ -392,7 +392,7 @@ export function LearnPage() {
           </ul>
           <div className="learn-cta__actions">
             <Link to="/weed#weed-checker" className="btn btn-primary">
-              Check a plant
+              Plant identifier
             </Link>
             <Link to="/weed#disposal" className="btn btn-secondary">
               Disposal guide
