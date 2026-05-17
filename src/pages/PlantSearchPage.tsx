@@ -13,7 +13,7 @@ import {
   type WildlifeCategory,
 } from '../lib/recommendationsApi'
 import { fetchPlantDetail, type PlantDetail } from '../lib/plantDetailsApi'
-import { visualForType } from '../lib/wildlifeVisuals'
+import { visualForType, WILDLIFE_VISUALS } from '../lib/wildlifeVisuals'
 import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
@@ -442,7 +442,6 @@ export function PlantSearchPage() {
   const [rdsPlants, setRdsPlants] = useState<RecommendedPlant[]>([])
   const [rdsRegionName, setRdsRegionName] = useState<string | null>(null)
   const [rdsSearch, setRdsSearch] = useState('')
-  const [rdsLfCode, setRdsLfCode] = useState('')
   const [rdsOffset, setRdsOffset] = useState(0)
   const [rdsLoading, setRdsLoading] = useState(false)
   const [rdsHasMore, setRdsHasMore] = useState(false)
@@ -496,7 +495,6 @@ export function PlantSearchPage() {
         pageSize: RDS_PAGE_SIZE,
         offset: rdsOffset,
         q: rdsSearch,
-        lfCode: rdsLfCode,
         wildlife,
       })
         .then((res) => {
@@ -518,16 +516,16 @@ export function PlantSearchPage() {
         })
     })
     return () => ac.abort()
-  }, [coords, rdsOffset, rdsSearch, rdsLfCode, wildlife])
+  }, [coords, rdsOffset, rdsSearch, wildlife])
 
   // When filters change, jump back to the first page.
   const lastResetKey = useRef<string>('')
   useEffect(() => {
-    const key = `${rdsSearch}::${rdsLfCode}::${wildlife.join(',')}`
+    const key = `${rdsSearch}::${wildlife.join(',')}`
     if (lastResetKey.current === key) return
     lastResetKey.current = key
     queueMicrotask(() => setRdsOffset(0))
-  }, [rdsSearch, rdsLfCode, wildlife])
+  }, [rdsSearch, wildlife])
 
   useEffect(() => {
     if (!dbPlantDetail) return
@@ -645,53 +643,12 @@ export function PlantSearchPage() {
           />
         </div>
 
-        <div style={{ marginBottom: 'var(--space-md)' }}>
-          <label
-            htmlFor="lf-code-filter"
-            style={{
-              display: 'block',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              color: 'var(--color-text-muted)',
-              marginBottom: 'var(--space-xs)',
-            }}
-          >
-            Plant type
-          </label>
-          <select
-            id="lf-code-filter"
-            value={rdsLfCode}
-            onChange={(e) => setRdsLfCode(e.target.value)}
-            disabled={rdsLoading && rdsPlants.length === 0}
-            style={{
-              width: '100%',
-              maxWidth: '24rem',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.75rem 0.9rem',
-              background: 'var(--color-surface)',
-              color: 'var(--color-text)',
-              font: 'inherit',
-            }}
-          >
-            <option value="">All plant types</option>
-            {LF_CODE_OPTIONS.map((option) => (
-              <option key={option.code} value={option.code}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <WildlifeFilter
           value={wildlife}
           onChange={handleWildlifeChange}
           disabled={rdsLoading && rdsPlants.length === 0}
           className="rds-wildlife-filter"
-          legend="Attracts wildlife"
         />
-        <div style={{ marginBottom: 'var(--space-md)' }} />
-
         <div className="plant-grid">
           {rdsPlants.map((p) => {
             const enrichment = rdsEnriched[p.id]
@@ -735,15 +692,9 @@ export function PlantSearchPage() {
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
               Page {Math.floor(rdsOffset / RDS_PAGE_SIZE) + 1}
-              {rdsSearch.trim() ? ` · filtering “${rdsSearch.trim()}”` : ''}
-              {rdsLfCode ? ` · ${lfCodeLabel(rdsLfCode)}` : ''}
+              {rdsSearch.trim() ? ` · search “${rdsSearch.trim()}”` : ''}
               {wildlife.length
-                ? ` · attracts ${wildlife
-                    .map(
-                      (id) =>
-                        WILDLIFE_CATEGORY_OPTIONS.find((o) => o.id === id)?.label ?? id,
-                    )
-                    .join(', ')}`
+                ? ` · for ${wildlife.map((id) => WILDLIFE_VISUALS[id].label.toLowerCase()).join(', ')}`
                 : ''}
             </p>
           </div>
@@ -751,8 +702,8 @@ export function PlantSearchPage() {
 
         {!rdsLoading && coords && !rdsError && rdsPlants.length === 0 && (
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--space-lg)' }}>
-            {wildlife.length || rdsSearch.trim() || rdsLfCode
-              ? 'No plants match your filters. Try clearing the plant type, wildlife filter, or search term.'
+            {wildlife.length || rdsSearch.trim()
+              ? 'No plants match your filters. Try another visitor (birds, insects, mammals) or clear the search.'
               : 'No plants returned for this point. Check bioregion–plant links in the database, or widen your dataset.'}
           </p>
         )}

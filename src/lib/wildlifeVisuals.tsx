@@ -21,10 +21,31 @@ export type WildlifeVisual = {
   label: string
 }
 
-export const WILDLIFE_VISUALS: Record<WildlifeCategory, WildlifeVisual> = {
-  birds: { Icon: IconBird, color: '#1d4ed8', label: 'Birds' },
-  insects: { Icon: IconInsect, color: '#b45309', label: 'Insects' },
-  mammals: { Icon: IconMammal, color: '#92400e', label: 'Mammals' },
+export const WILDLIFE_VISUALS: Record<
+  WildlifeCategory,
+  WildlifeVisual & { tagline: string; examples: string }
+> = {
+  birds: {
+    Icon: IconBird,
+    color: '#1d4ed8',
+    label: 'Birds',
+    tagline: 'Songbirds & honeyeaters',
+    examples: 'Nectar, seeds, safe perches',
+  },
+  insects: {
+    Icon: IconInsect,
+    color: '#b45309',
+    label: 'Insects',
+    tagline: 'Bees & butterflies',
+    examples: 'Pollen-rich native flowers',
+  },
+  mammals: {
+    Icon: IconMammal,
+    color: '#92400e',
+    label: 'Mammals',
+    tagline: 'Possums & gliders',
+    examples: 'Shelter, night foraging',
+  },
 }
 
 const SYNONYMS: ReadonlyArray<{ category: WildlifeCategory; needles: string[] }> = [
