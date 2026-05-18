@@ -1,5 +1,6 @@
 import {
   type ChangeEventHandler,
+  type CSSProperties,
   type ReactNode,
   useCallback,
   useEffect,
@@ -9,6 +10,7 @@ import {
   useState,
 } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { ProhibitedWeedModal } from '../components/ProhibitedWeedModal'
 import { IconBin, IconBook, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
 import { IconSearch } from '../components/Icons'
 import { useLocationArea } from '../context/LocationContext'
@@ -17,8 +19,19 @@ import { enrichPlantByScientificName } from '../lib/plantEnrichment'
 import { identifyWithPlantNet } from '../lib/plantnet'
 import type { PredictResponse } from '../lib/predict'
 import { predictPlantFromBase64 } from '../lib/predict'
-import { labelLfCode } from '../lib/lfCodeLabels'
-import { fetchTopWeeds, fetchWeedLookup, type RegionWeed, type WeedLookupMatch } from '../lib/weedsApi'
+import {
+  inferWeedDisposalCategory,
+  weedDisposalTypeLabel,
+  WEED_DISPOSAL_TYPE_LABELS,
+  type WeedCategory,
+} from '../lib/weedDisposalCategory'
+import {
+  matchStateProhibitedWeed,
+  STATE_PROHIBITED_WEEDS,
+  stateProhibitedWeedElementId,
+  type StateProhibitedWeed,
+} from '../lib/stateProhibitedWeeds'
+import { fetchTopWeeds, type RegionWeed } from '../lib/weedsApi'
 import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
@@ -84,20 +97,124 @@ async function fileToDataUrl(file: File): Promise<string> {
   })
 }
 
+function isWeedModelIdentification(result: PredictResponse): boolean {
+  return result.source !== 'plantnet'
+}
+
+const WEED_BADGE_STYLE: CSSProperties = {
+  display: 'inline-block',
+  padding: '0.35rem 0.85rem',
+  borderRadius: 999,
+  fontSize: '0.78rem',
+  fontWeight: 800,
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  background: 'linear-gradient(135deg, #b71c1c, #e53935)',
+  color: '#fff',
+  boxShadow: '0 2px 8px rgba(183, 28, 28, 0.25)',
+}
+
+function getIdentificationSummary(result: PredictResponse): {
+  heading: string
+  subtitle: string
+  showWeedBadge: boolean
+} {
+  if (isWeedModelIdentification(result)) {
+    return {
+      heading: 'Likely weed match',
+      subtitle:
+        'Our weed identification model classified this plant as a weed — confirm before removal or disposal.',
+      showWeedBadge: true,
+    }
+  }
+
+  return {
+    heading: 'Likely match',
+    subtitle: 'Pl@ntNet identified this plant — confirm before removal or disposal.',
+    showWeedBadge: false,
+  }
+}
+
+const POOR_MATCH_PHOTO_TIPS = [
+  'Try a different angle — include leaves, flowers, fruit or seed heads if the plant has them.',
+  'Fill the frame with the plant and avoid clutter (other species, mulch, tools, hands or busy backgrounds).',
+  'Use even, natural light where you can — harsh shadow or strong backlight makes features harder to read.',
+  'Photograph again when the plant is more developed — mature foliage and reproductive parts (flowers, seed) improve matches.',
+] as const
+
+function PoorMatchAdvice({ tier }: { tier: ConfidenceTier }) {
+  if (tier === 'high') return null
+
+  const isLow = tier === 'low'
+
+  return (
+    <div
+      style={{
+        marginBottom: 'var(--space-md)',
+        padding: 'var(--space-md)',
+        borderRadius: 'var(--radius-md)',
+        background: 'rgba(255,255,255,0.55)',
+        border: '1px solid rgba(0,0,0,0.08)',
+      }}
+    >
+      <h3 style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)', color: 'var(--color-text)' }}>
+        {isLow ? 'Low confidence — try another photo' : 'Moderate confidence — tips for a clearer photo'}
+      </h3>
+      <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>
+        {isLow
+          ? 'This match is uncertain. Before relying on it, upload a new photo with the plant as the clear subject:'
+          : 'For a stronger match next time:'}
+      </p>
+      <ul
+        style={{
+          margin: 0,
+          paddingLeft: '1.15rem',
+          fontSize: '0.88rem',
+          color: 'var(--color-text)',
+          lineHeight: 1.55,
+        }}
+      >
+        {POOR_MATCH_PHOTO_TIPS.map((tip) => (
+          <li key={tip}>{tip}</li>
+        ))}
+      </ul>
+      <p
+        style={{
+          fontSize: '0.82rem',
+          color: 'var(--color-text-muted)',
+          margin: 'var(--space-sm) 0 0',
+          lineHeight: 1.5,
+        }}
+      >
+        <strong>Disclaimer:</strong> Photo ID often works poorly on very young seedlings, bare stems, or plants
+        with few distinguishing features. Treat uncertain results as a hint only — confirm with a field guide, nursery,
+        or local weed officer before removal or disposal.
+      </p>
+    </div>
+  )
+}
+
 function PredictionResultCard({
   result,
-  weedLookupPending,
-  weedLookupMatch,
+  matchedStateProhibitedWeed,
+  suggestedDisposalCategory,
+  onOpenDisposalGuide,
+  onOpenStateProhibitedWeed,
 }: {
   result: PredictResponse
-  weedLookupPending: boolean
-  weedLookupMatch: WeedLookupMatch | null
+  matchedStateProhibitedWeed: StateProhibitedWeed | null
+  suggestedDisposalCategory: WeedCategory | null
+  onOpenDisposalGuide: (type: WeedCategory) => void
+  onOpenStateProhibitedWeed: (weed: StateProhibitedWeed) => void
 }) {
   const tier = getConfidenceTier(result.confidence)
   const theme = CONFIDENCE_TIER[tier]
+  const summary = getIdentificationSummary(result)
+  const identifiedAsWeed =
+    summary.showWeedBadge || isWeedModelIdentification(result) || matchedStateProhibitedWeed != null
   const pct = Math.round(result.confidence * 10000) / 100
   const barPct = Math.min(100, Math.max(0, result.confidence * 100))
-  const sourceLabel = result.source === 'plantnet' ? 'Pl@ntNet identification' : null
+  const sourceLabel = result.source === 'plantnet' ? 'Pl@ntNet identification' : 'Weed identification model'
 
   const [enrichment, setEnrichment] = useState<PlantEnrichment | null>(null)
   const [enrichState, setEnrichState] = useState<'loading' | 'done' | 'error'>('loading')
@@ -137,26 +254,25 @@ function PredictionResultCard({
           marginBottom: 'var(--space-md)',
         }}
       >
-        <h2 style={{ margin: 0, color: theme.accent }}>Likely match</h2>
+        <h2 style={{ margin: 0, color: theme.accent }}>{summary.heading}</h2>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', alignItems: 'center' }}>
-          {sourceLabel && (
-            <span
-              style={{
-                display: 'inline-block',
-                padding: '0.35rem 0.7rem',
-                borderRadius: 999,
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                letterSpacing: '0.02em',
-                textTransform: 'uppercase',
-                background: 'rgba(255,255,255,0.75)',
-                color: theme.accent,
-                border: `1px solid ${theme.accent}40`,
-              }}
-            >
-              {sourceLabel}
-            </span>
-          )}
+          {summary.showWeedBadge && <span style={WEED_BADGE_STYLE}>Weed</span>}
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '0.35rem 0.7rem',
+              borderRadius: 999,
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+              background: 'rgba(255,255,255,0.75)',
+              color: theme.accent,
+              border: `1px solid ${theme.accent}40`,
+            }}
+          >
+            {sourceLabel}
+          </span>
           <span
             style={{
               display: 'inline-block',
@@ -179,7 +295,7 @@ function PredictionResultCard({
         {result.label}
       </p>
       <p style={{ margin: '0 0 var(--space-md)', fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>
-        {theme.subtitle}
+        {summary.subtitle}
       </p>
 
       <div style={{ marginBottom: 'var(--space-md)' }}>
@@ -215,6 +331,8 @@ function PredictionResultCard({
         </div>
       </div>
 
+      <PoorMatchAdvice tier={tier} />
+
       <div
         style={{
           display: 'flex',
@@ -237,87 +355,82 @@ function PredictionResultCard({
         </div>
       </div>
 
-      <div
-        style={{
-          marginTop: 'var(--space-md)',
-          padding: 'var(--space-md)',
-          borderRadius: 'var(--radius-md)',
-          background: 'rgba(255,255,255,0.5)',
-          border: '1px solid rgba(0,0,0,0.08)',
-        }}
-      >
-        <h3 style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)', color: theme.accent }}>
-          Weed database
-        </h3>
-        {weedLookupPending && (
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
-            Checking our environmental weeds list…
+
+      {matchedStateProhibitedWeed ? (
+        <div
+          style={{
+            marginTop: 'var(--space-md)',
+            padding: 'var(--space-md)',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(230, 81, 0, 0.1)',
+            border: '1px solid rgba(230, 81, 0, 0.35)',
+          }}
+        >
+          <span className="badge badge-high" style={{ marginBottom: 'var(--space-sm)' }}>
+            State Prohibited Weed
+          </span>
+          <h3 style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)', color: '#92400e' }}>
+            Do not remove yourself
+          </h3>
+          <p style={{ fontSize: '0.88rem', color: 'var(--color-text)', margin: '0 0 var(--space-sm)', lineHeight: 1.55 }}>
+            This matches <strong>{matchedStateProhibitedWeed.name}</strong>
+            {result.label.trim() ? (
+              <>
+                {' '}
+                (<em style={{ fontStyle: 'italic' }}>{result.label.trim()}</em>)
+              </>
+            ) : null}
+            , a State Prohibited Weed in Victoria. You must not attempt removal — report it to the authorities
+            immediately.
           </p>
-        )}
-        {!weedLookupPending && weedLookupMatch && (
-          <>
-            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>
-              {weedLookupMatch.matchKind === 'scientific_prefix'
-                ? 'Close name match — verify the full scientific name matches your plant.'
-                : 'Listed in our environmental weeds data.'}
-            </p>
-            <p style={{ fontWeight: 700, margin: '0 0 0.25rem', fontSize: '1rem', color: 'var(--color-text)' }}>
-              {weedLookupMatch.commonName || weedLookupMatch.scientificName}
-            </p>
-            {weedLookupMatch.commonName && (
-              <p style={{ fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>
-                {weedLookupMatch.scientificName}
+          <button
+            type="button"
+            className="home-impact__more-link"
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', color: '#92400e' }}
+            onClick={() => onOpenStateProhibitedWeed(matchedStateProhibitedWeed)}
+          >
+            View {matchedStateProhibitedWeed.name} in State prohibited weeds ↓
+          </button>
+        </div>
+      ) : identifiedAsWeed ? (
+        <div
+          style={{
+            marginTop: 'var(--space-md)',
+            padding: 'var(--space-md)',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(255,255,255,0.5)',
+            border: '1px solid rgba(0,0,0,0.08)',
+          }}
+        >
+          <h3 style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)', color: theme.accent }}>
+            Disposal guide type
+          </h3>
+          {suggestedDisposalCategory ? (
+            <>
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-text)', margin: '0 0 var(--space-sm)', lineHeight: 1.55 }}>
+                Based on the identified species, this looks like{' '}
+                <strong>{weedDisposalTypeLabel(suggestedDisposalCategory)}</strong>.
               </p>
-            )}
-            <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.88rem', color: 'var(--color-text)', lineHeight: 1.55 }}>
-              {labelLfCode(weedLookupMatch.lfCode) && (
-                <li>
-                  <strong>Growth form:</strong> {labelLfCode(weedLookupMatch.lfCode)}
-                </li>
-              )}
-              {weedLookupMatch.riskRating && (
-                <li>
-                  <strong>Risk (dataset):</strong> {weedLookupMatch.riskRating}
-                </li>
-              )}
-              {weedLookupMatch.weedStatusVic && (
-                <li>
-                  <strong>Victorian status:</strong> {weedLookupMatch.weedStatusVic}
-                </li>
-              )}
-              {weedLookupMatch.isWons && (
-                <li>
-                  <strong>Weed of National Significance</strong> (WoNS)
-                </li>
-              )}
-              {!labelLfCode(weedLookupMatch.lfCode) &&
-                !weedLookupMatch.riskRating &&
-                !weedLookupMatch.weedStatusVic &&
-                !weedLookupMatch.isWons && (
-                  <li>Listed as an environmental weed; extra fields are not filled in the dataset for this row.</li>
-                )}
-              {weedLookupMatch.inBioregion === true && (
-                <li>Also appears in recommendations for your mapped bioregion.</li>
-              )}
-              {weedLookupMatch.inBioregion === false && (
-                <li>Not linked to your mapped bioregion in this dataset (it may still occur nearby).</li>
-              )}
-            </ul>
-            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
-              Disposal categories on this page (aquatic, woody, etc.) are chosen by you — they are not inferred from the database.
+              <button
+                type="button"
+                className="home-impact__more-link"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}
+                onClick={() => onOpenDisposalGuide(suggestedDisposalCategory)}
+              >
+                View disposal guide for {weedDisposalTypeLabel(suggestedDisposalCategory)} ↓
+              </button>
+            </>
+          ) : (
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.55 }}>
+              We could not infer a disposal category from growth form.{' '}
+              <a href="#disposal" style={{ fontWeight: 600, color: theme.accent }}>
+                Choose the best match in the disposal guide below
+              </a>
+              .
             </p>
-          </>
-        )}
-        {!weedLookupPending && !weedLookupMatch && (
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
-            No entry in our environmental weeds database for this name. It may still be regulated — confirm with your state biosecurity authority.{' '}
-            <a href="#disposal" style={{ fontWeight: 600, color: theme.accent }}>
-              Disposal guide
-            </a>{' '}
-            can still help by how the plant grows.
-          </p>
-        )}
-      </div>
+          )}
+        </div>
+      ) : null}
 
       <div
         style={{
@@ -633,10 +746,6 @@ function TopWeedDetailContent({
 }
 
 // ── Disposal data types ────────────────────────────────────────────────────
-type WeedCategory =
-  | 'aquatic' | 'riparian' | 'woody' | 'climbers'
-  | 'grasses' | 'broadleaf' | 'underground' | 'succulents'
-
 type DisposalSpecies = {
   emoji: string; name: string; latin: string
   statusTag: 'prohibited' | 'restricted'; statusLabel: string
@@ -729,32 +838,14 @@ const DISPOSAL_DATA: Record<WeedCategory, DisposalEntry> = {
 }
 
 const WEED_TYPES: { type: WeedCategory; icon: string; label: string; imgUrl: string }[] = [
-  { type: 'aquatic',      icon: '💧', label: 'Aquatic & Wetland Herbaceous',    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg' },
-  { type: 'riparian',    icon: '🌊', label: 'Riparian Woody Plants',            imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg' },
-  { type: 'woody',       icon: '🌳', label: 'Terrestrial Woody Shrubs & Trees', imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg' },
-  { type: 'climbers',    icon: '🪴', label: 'Climbers & Creeping Groundcovers', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg' },
-  { type: 'grasses',     icon: '🌾', label: 'Grasses & Grass-like',             imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg' },
-  { type: 'broadleaf',   icon: '🍃', label: 'Non-woody Broadleaf Herbs',        imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg' },
-  { type: 'underground', icon: '🥕', label: 'Underground Storage Perennials',   imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG' },
-  { type: 'succulents',  icon: '🌵', label: 'Succulents & Cacti',               imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg' },
-]
-
-const PROHIBITED_WEEDS: { name: string; chinese: string; emoji: string; imgUrl: string; desc: string }[] = [
-  { name: 'Alligator Weed', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alternanthera_philoxeroides_NRCS-1.jpg/330px-Alternanthera_philoxeroides_NRCS-1.jpg', desc: 'Alternanthera philoxeroides. Dense floating mats block waterways and farmland; stem fragments root readily, enabling rapid spread downstream. State Prohibited — do not attempt removal yourself.' },
-  { name: 'Salvinia', chinese: '', emoji: '🌱', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg', desc: 'Salvinia molesta. Can double in area every 2–3 days. Dense mats deplete oxygen, cause fish kills, and can cover an entire dam in one season. Illegal to buy, sell, or move in Victoria.' },
-  { name: 'Water Hyacinth', chinese: '', emoji: '💜', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Eichhornia_crassipes_C.jpg/330px-Eichhornia_crassipes_C.jpg', desc: "Eichhornia crassipes. One of the world's most damaging aquatic weeds. Forms dense floating mats that block light, deplete oxygen, and impede watercraft and irrigation infrastructure." },
-  { name: 'Hawkweed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg', desc: 'Pilosella spp. Releases allelopathic chemicals suppressing surrounding plants. Spreads via wind-dispersed seeds and creeping stolons; threatens alpine and sub-alpine native grasslands.' },
-  { name: 'Lagarosiphon', chinese: '', emoji: '🦆', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg/330px-Lagarosiphon_major._Howardian%2C_1992_%2830491279833%29.jpg', desc: 'Lagarosiphon major. Dense underwater mats choke slow-moving water bodies, causing anoxia and fish death. Fragments spread via boats, propellers, and fishing gear between water bodies.' },
-  { name: 'Knotweed', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Reynoutria_japonica_in_Brastad_1.jpg/330px-Reynoutria_japonica_in_Brastad_1.jpg', desc: 'Reynoutria japonica. Extremely aggressive; rhizomes penetrate concrete and building foundations. Near-impossible to eradicate once established. Spreads from fragments as small as 1 cm of root.' },
-  { name: 'Mesquite', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg/330px-Prosopis_juliflora%2C_known_as_the_Velvet_Mesquite_%2810078437503%29.jpg', desc: 'Prosopis spp. Aggressive woody shrub forming impenetrable thorny thickets. Deep tap roots deplete groundwater; displaces native vegetation across vast arid and semi-arid areas.' },
-  { name: 'Mexican Feather Grass', chinese: '', emoji: '🌾', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Nassella_tenuissima.jpg/330px-Nassella_tenuissima.jpg', desc: 'Nassella tenuissima. Highly ornamental but a serious environmental weed. Wind-dispersed seeds spread kilometres; outcompetes native grassland species and significantly increases fire risk.' },
-  { name: 'Parthenium Weed', chinese: '', emoji: '🌼', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Parthenium_hysterophorus_plant_with_flowers.jpg/330px-Parthenium_hysterophorus_plant_with_flowers.jpg', desc: 'Parthenium hysterophorus. Causes severe allergic reactions in humans and livestock. Produces allelopathic chemicals that suppress surrounding vegetation; rapidly colonises disturbed land.' },
-  { name: 'Branched Broomrape', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Orobanche_ramosaTorrevieja.jpg/330px-Orobanche_ramosaTorrevieja.jpg', desc: 'Phelipanche ramosa. A parasitic plant with no chlorophyll; attaches to and destroys roots of crops and native plants. Produces thousands of tiny, long-lived seeds that persist in soil for decades.' },
-  { name: 'Horsetails', chinese: '', emoji: '🌿', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg/330px-Equisetum_telmateia%2C_Ireland_1_-_Ragnhild_%26_Neil_Crawford.jpg', desc: 'Equisetum spp. Ancient lineage and a serious environmental weed; rhizomes extend several metres deep, making removal extremely difficult. Establishes readily in wet areas and spreads aggressively along watercourses.' },
-  { name: 'Camel Thorn', chinese: '', emoji: '🌵', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Camel-thorn-tree-with-sparrow-weaver-nests.jpg/330px-Camel-thorn-tree-with-sparrow-weaver-nests.jpg', desc: 'Vachellia erioloba. Dense thorny thickets reduce pasture productivity and injure livestock. Spreads rapidly via animal-dispersed seed pods; extremely difficult to control once established.' },
-  { name: 'Karoo & Giraffe Thorn', chinese: '', emoji: '🌳', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg/330px-Acacia_karroo%2C_habitus%2C_Jimmy_Aves_Park%2C_e.jpg', desc: 'Vachellia karroo / V. giraffe. Aggressive thorny acacias forming dense stands that exclude native vegetation and restrict stock movement. Seeds dispersed widely by livestock and wildlife.' },
-  { name: 'Poverty Weed', chinese: '', emoji: '🍃', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Iva_axillaris_%284010960273%29_%282%29.jpg/330px-Iva_axillaris_%284010960273%29_%282%29.jpg', desc: 'Iva axillaris. Dense colonies crowd out pasture species and crops. Causes contact dermatitis and allergic reactions; pollen triggers hay fever. Spreads aggressively via rhizomes.' },
-  { name: 'Tangled Hypericum', chinese: '', emoji: '🌡', imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg/330px-%28MHNT%29_Hypericum_androsaemum_-_Habit.jpg', desc: 'Hypericum androsaemum. Shade-tolerant woody shrub forming impenetrable thickets in moist forest and riparian zones. Berries are toxic to livestock and spread by birds into new sites.' },
+  { type: 'aquatic',      icon: '💧', label: WEED_DISPOSAL_TYPE_LABELS.aquatic,    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Salvinia_molesta.jpg/330px-Salvinia_molesta.jpg' },
+  { type: 'riparian',    icon: '🌊', label: WEED_DISPOSAL_TYPE_LABELS.riparian,    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Salix_alba_Morton.jpg/330px-Salix_alba_Morton.jpg' },
+  { type: 'woody',       icon: '🌳', label: WEED_DISPOSAL_TYPE_LABELS.woody,       imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Pittosporum_undulatum_fruit.jpg/330px-Pittosporum_undulatum_fruit.jpg' },
+  { type: 'climbers',    icon: '🪴', label: WEED_DISPOSAL_TYPE_LABELS.climbers,    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hedera_helix_Dover.jpg/330px-Hedera_helix_Dover.jpg' },
+  { type: 'grasses',     icon: '🌾', label: WEED_DISPOSAL_TYPE_LABELS.grasses,     imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Serrated_tussock.jpg/330px-Serrated_tussock.jpg' },
+  { type: 'broadleaf',   icon: '🍃', label: WEED_DISPOSAL_TYPE_LABELS.broadleaf,   imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hieracium_pilosella_plant.jpg/330px-Hieracium_pilosella_plant.jpg' },
+  { type: 'underground', icon: '🥕', label: WEED_DISPOSAL_TYPE_LABELS.underground, imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Moraea_viscaria_%285%29.JPG/330px-Moraea_viscaria_%285%29.JPG' },
+  { type: 'succulents',  icon: '🌵', label: WEED_DISPOSAL_TYPE_LABELS.succulents,  imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Opuntia_robusta_%28Cactaceae%29.jpg/330px-Opuntia_robusta_%28Cactaceae%29.jpg' },
 ]
 
 const GENERAL_RULES = [
@@ -775,9 +866,6 @@ export function WeedPage() {
   const [error, setError] = useState<string | null>(null)
   const [imageInfo, setImageInfo] = useState<{ bytes: number; base64Chars: number } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
-  const [weedLookupMatch, setWeedLookupMatch] = useState<WeedLookupMatch | null>(null)
-  const [weedLookupPending, setWeedLookupPending] = useState(false)
-
   const [topWeeds, setTopWeeds] = useState<RegionWeed[]>([])
   const [topWeedsLoading, setTopWeedsLoading] = useState(false)
   const [topWeedsError, setTopWeedsError] = useState<string | null>(null)
@@ -786,7 +874,7 @@ export function WeedPage() {
   const [topWeedsHasMore, setTopWeedsHasMore] = useState(false)
 
   // Prohibited weeds modal
-  const [modalWeed, setModalWeed] = useState<{ name: string; desc: string } | null>(null)
+  const [modalWeed, setModalWeed] = useState<StateProhibitedWeed | null>(null)
   // General rules accordion
   const [openRules, setOpenRules] = useState<Set<number>>(new Set())
   // Disposal type selector
@@ -888,6 +976,39 @@ export function WeedPage() {
     setTimeout(() => disposalContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }
 
+  const handleOpenDisposalGuide = useCallback((type: WeedCategory) => {
+    setSelectedType(type)
+    requestAnimationFrame(() => {
+      document.getElementById('disposal')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      window.setTimeout(() => {
+        disposalContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 150)
+    })
+  }, [])
+
+  const matchedStateProhibitedWeed = useMemo(() => {
+    if (!result?.label) return null
+    return matchStateProhibitedWeed(result.label)
+  }, [result?.label])
+
+  const handleOpenStateProhibitedWeed = useCallback((weed: StateProhibitedWeed) => {
+    setModalWeed(weed)
+    requestAnimationFrame(() => {
+      document.getElementById('prohibited')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      window.setTimeout(() => {
+        document
+          .getElementById(stateProhibitedWeedElementId(weed.id))
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 200)
+    })
+  }, [])
+
+  const suggestedDisposalCategory = useMemo(() => {
+    if (!result || matchedStateProhibitedWeed) return null
+    if (!isWeedModelIdentification(result)) return null
+    return inferWeedDisposalCategory(null, result.label)
+  }, [result, matchedStateProhibitedWeed])
+
   const handleFile: ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -900,9 +1021,6 @@ export function WeedPage() {
     setError(null)
     setResult(null)
     setImageInfo(null)
-    setWeedLookupMatch(null)
-    setWeedLookupPending(false)
-
     try {
       const dataUrl = await fileToDataUrl(file)
       setPreviewUrl(dataUrl)
@@ -935,33 +1053,6 @@ export function WeedPage() {
       setError(err instanceof Error ? err.message : 'Prediction failed')
     }
   }
-
-  useEffect(() => {
-    if (state !== 'done' || !result?.label?.trim()) {
-      setWeedLookupMatch(null)
-      setWeedLookupPending(false)
-      return
-    }
-    const ac = new AbortController()
-    setWeedLookupPending(true)
-    fetchWeedLookup(result.label, {
-      lat: coords?.lat,
-      lng: coords?.lng,
-      signal: ac.signal,
-    })
-      .then((res) => {
-        if (ac.signal.aborted) return
-        setWeedLookupMatch(res.match)
-      })
-      .catch(() => {
-        if (ac.signal.aborted) return
-        setWeedLookupMatch(null)
-      })
-      .finally(() => {
-        if (!ac.signal.aborted) setWeedLookupPending(false)
-      })
-    return () => ac.abort()
-  }, [state, result?.label, coords?.lat, coords?.lng])
 
   const showTopWeedsGrid = !topWeedsError && (topWeedsLoading || topWeeds.length > 0)
   const topWeedSlots: (RegionWeed | null)[] = showTopWeedsGrid
@@ -1103,8 +1194,10 @@ export function WeedPage() {
           <PredictionResultCard
             key={result.label}
             result={result}
-            weedLookupPending={weedLookupPending}
-            weedLookupMatch={weedLookupMatch}
+            matchedStateProhibitedWeed={matchedStateProhibitedWeed}
+            suggestedDisposalCategory={suggestedDisposalCategory}
+            onOpenDisposalGuide={handleOpenDisposalGuide}
+            onOpenStateProhibitedWeed={handleOpenStateProhibitedWeed}
           />
         )}
       </WeedSection>
@@ -1408,12 +1501,13 @@ export function WeedPage() {
           </div>
         </div>
         <div className="weed-prohibited-grid">
-          {PROHIBITED_WEEDS.map((w) => (
+          {STATE_PROHIBITED_WEEDS.map((w) => (
             <button
-              key={w.name}
+              key={w.id}
+              id={stateProhibitedWeedElementId(w.id)}
               type="button"
               className="weed-prohibited-card"
-              onClick={() => setModalWeed({ name: w.name, desc: w.desc })}
+              onClick={() => setModalWeed(w)}
             >
               <div className="weed-prohibited-card__media">
                 <img
@@ -1487,22 +1581,7 @@ export function WeedPage() {
         </div>
       </dialog>
 
-      {/* ── Prohibited weed modal ── */}
-      {modalWeed && (
-        <div role="dialog" aria-modal="true"
-          onClick={(e) => { if (e.target === e.currentTarget) setModalWeed(null) }}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-lg)' }}
-        >
-          <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-hover)', maxWidth: 520, width: '100%', padding: 'var(--space-xl)', position: 'relative', animation: 'fade-up 0.2s ease forwards' }}>
-            <button onClick={() => setModalWeed(null)} aria-label="Close"
-              style={{ position: 'absolute', top: 'var(--space-md)', right: 'var(--space-md)', background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: 'var(--color-text-muted)', lineHeight: 1, padding: '0.25rem' }}
-            >×</button>
-            <span className="badge badge-high" style={{ marginBottom: 'var(--space-sm)' }}>State Prohibited Weed</span>
-            <h3 style={{ color: 'var(--color-primary-dark)', marginBottom: 'var(--space-sm)' }}>{modalWeed.name}</h3>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.7 }}>{modalWeed.desc}</p>
-          </div>
-        </div>
-      )}
+      {modalWeed ? <ProhibitedWeedModal weed={modalWeed} onClose={() => setModalWeed(null)} /> : null}
       </div>
     </div>
   )
