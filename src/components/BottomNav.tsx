@@ -38,6 +38,9 @@ const BEGINNER_MENU: MenuItem[] = [
   { to: '/beginners/establish-potted', label: 'Establish potted plant' },
   { to: '/beginners/mulching', label: 'Mulching guide' },
   { to: '/beginners/watering-guide', label: 'Watering guide' },
+  { to: '/beginners/attract-birds', label: 'Attracting birds' },
+  { to: '/beginners/attract-insects', label: 'Attracting insects' },
+  { to: '/beginners/attract-small-mammals', label: 'Attracting small mammals' },
   { to: BEGINNER_RESOURCES_PATH, label: 'More help & resources' },
 ]
 

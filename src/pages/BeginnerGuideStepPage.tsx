@@ -89,15 +89,17 @@ export function BeginnerGuideStepPage() {
             </h2>
             <ol className="beginner-tutorial__steps">
               {tutorial.steps.map((step) => {
-                const splitAt = step.indexOf(':')
-                if (splitAt > 0) {
-                  const lead = step.slice(0, splitAt)
-                  const rest = step.slice(splitAt + 1).trimStart()
-                  return (
-                    <li key={step}>
-                      <strong>{lead}:</strong> {rest}
-                    </li>
-                  )
+                if (!tutorial.plainSteps) {
+                  const splitAt = step.indexOf(':')
+                  if (splitAt > 0) {
+                    const lead = step.slice(0, splitAt)
+                    const rest = step.slice(splitAt + 1).trimStart()
+                    return (
+                      <li key={step}>
+                        <strong>{lead}:</strong> {rest}
+                      </li>
+                    )
+                  }
                 }
                 return <li key={step}>{step}</li>
               })}

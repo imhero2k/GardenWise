@@ -19,6 +19,8 @@ export type Tutorial = {
   intro: string
   sections?: { title: string; body: string[] }[]
   steps: string[]
+  /** When true, steps render as plain list items (no "Lead:" bold split). */
+  plainSteps?: boolean
   tip?: string[]
   related?: { label: string; to: string }[]
   /** Illustrated steps shown under the intro. */
@@ -199,6 +201,134 @@ export const TUTORIALS: Tutorial[] = [
         caption:
           'Aim water at the soil and root zone, not over the leaves — wet foliage wastes water and can encourage fungal problems; keep the base moist, not the canopy.',
       },
+    ],
+  },
+  {
+    id: 'attract-birds',
+    title: 'Attracting birds',
+    plainSteps: true,
+    intro:
+      'Birds visit gardens that offer food, water, shelter and safe places to nest. A mix of local native plants and simple habitat features can bring regular visitors without turning your yard into a full-time feeding station.',
+    sections: [
+      {
+        title: 'Food through the year',
+        body: [
+          'Plant layers: combine trees, tall shrubs and smaller plants so different species can feed at different heights — nectar feeders (e.g. banksias, grevilleas, correas), seed eaters (native grasses, hardenbergia) and insect-eaters that hunt among foliage.',
+          'Seasonal spread: choose species that flower or fruit across seasons so something is available in autumn and winter, not only in spring.',
+          'Let some plants go to seed: resist deadheading every spent flower on seed-producing natives — finches and other seed-eaters will use them.',
+          'Insects are bird food: a garden with diverse native plants and minimal pesticide use supports the insects many birds rely on, especially for raising chicks.',
+        ],
+      },
+      {
+        title: 'Water and shelter',
+        body: [
+          'Shallow water: a bird bath or shallow dish with a sloping edge and fresh water (refill and rinse every few days) helps birds drink and bathe safely — add a stick or stone as a perch and escape route.',
+          'Dense shrubs: bushy natives (e.g. hop bush, bottlebrush, hakea) give cover from predators and wind; place them near but not tight against windows so birds are not startled into glass.',
+          'Nest sites: retain mature trees where safe; install a nest box only if you match the species and entrance size to your area — many small birds prefer natural hollows in old trees.',
+        ],
+      },
+    ],
+    steps: [
+      'Start with one or two reliable local nectar or seed plants suited to your sun and soil (check PlantMe for your area).',
+      'Add a shrub layer for shelter before investing in larger trees — structure matters as much as flower colour.',
+      'Provide clean, shallow water and keep cats indoors (especially at dawn and dusk) or contained away from feeding and bathing areas.',
+      'Avoid pesticides on plants birds feed from — if you must treat a pest, target the affected plant and choose the least harmful option.',
+      'Record what visits across a month and adjust — if honeyeaters dominate, add different flower shapes or lower shrubs for ground-foraging birds.',
+    ],
+    tip: [
+      'Plant local: species native to your bioregion are more likely to support the birds already adapted to your area.',
+      'Messy edges help: a strip of leaf litter or prunings under shrubs mimics bushland litter where insects and ground birds forage.',
+    ],
+    related: [
+      { label: 'Attracting insects', to: '/beginners/attract-insects' },
+      { label: 'Read your garden', to: '/beginners/your-space' },
+      { label: 'More help & resources', to: '/beginners#beginner-resources' },
+    ],
+  },
+  {
+    id: 'attract-insects',
+    title: 'Attracting insects',
+    plainSteps: true,
+    intro:
+      'Insects pollinate flowers, recycle nutrients and feed birds, reptiles and frogs. A native-friendly garden can host a huge variety of bees, butterflies, beetles and other invertebrates when you plant for diversity and reduce chemical use.',
+    sections: [
+      {
+        title: 'Flowers and host plants',
+        body: [
+          'Flower variety: include different colours and shapes (tubular, open daisy-like, flat clusters) — not every pollinator can use the same flower.',
+          'Extended seasons: mix early and late flowering species so nectar and pollen are available across the year, not only in spring.',
+          'Butterfly host plants: caterpillars need specific leaves (e.g. native grasses for skippers, sedges or pea flowers for others) — without host plants, butterflies may only pass through.',
+          'Grasses and sedges: often overlooked; they shelter beetles, provide seeds and support larvae of several butterfly and moth species.',
+        ],
+      },
+      {
+        title: 'Habitat on the ground',
+        body: [
+          'Leaf litter and mulch: a thin layer of organic mulch and some allowed leaf litter gives beetles and ground-nesting bees places to hide and overwinter.',
+          'Bare patches: a few small areas of exposed soil (not the whole lawn) can suit ground-nesting native bees — avoid compacting or paving every edge.',
+          'Logs and rocks: a partly buried log or rock pile in a quiet corner offers cool, damp refuges for beetles and other decomposers.',
+          'Night lighting: bright outdoor lights attract and exhaust flying insects — use motion sensors, warmer bulbs or switch off non-essential lights overnight.',
+        ],
+      },
+    ],
+    steps: [
+      'Replace a small area of exotic flowering plants with two or three local natives that flower at different times.',
+      'Add at least one host plant for butterflies common in your region (nursery staff or council guides can suggest pairs).',
+      'Mulch garden beds and leave some fallen leaves under shrubs instead of bare, sprayed soil.',
+      'Skip routine broad-spectrum sprays — hand-pick or spot-treat only when a pest is clearly out of balance.',
+      'On a warm, calm day, note bees, hoverflies and beetles on flowers and adjust plant choices next season.',
+    ],
+    tip: [
+      '“Bee hotels” can help some species but are not essential — diverse plants and pesticide-free patches matter more for most gardens.',
+      'Wasps and flies are pollinators too: many are harmless; learn the few that sting before reaching for spray.',
+    ],
+    related: [
+      { label: 'Attracting birds', to: '/beginners/attract-birds' },
+      { label: 'Mulching guide', to: '/beginners/mulching' },
+      { label: 'Native plants 101', to: '/learn#native' },
+    ],
+  },
+  {
+    id: 'attract-small-mammals',
+    title: 'Attracting small mammals',
+    plainSteps: true,
+    intro:
+      'Small mammals such as bandicoots, antechinus and various native rodents (where they still occur locally) need cover, safe movement and natural food — not bread or seed left for birds. Even urban gardens can support biodiversity when structure and pets are managed thoughtfully.',
+    sections: [
+      {
+        title: 'Cover and corridors',
+        body: [
+          'Ground layer: low dense shrubs, tussock grasses and groundcovers let small animals move hidden from predators and heat.',
+          'Gaps and links: if fences are unavoidable, a small wildlife-friendly gap at the base (where safe for pets and neighbours) can connect your garden to adjacent habitat — check local rules before modifying boundaries.',
+          'Vertical structure: climbers and mid-height shrubs between taller trees create a three-dimensional maze that many mammals use at night.',
+          'Quiet zones: keep one area relatively undisturbed — less foot traffic, mowing and lighting helps shy species use the space.',
+        ],
+      },
+      {
+        title: 'Food, water and safety',
+        body: [
+          'Natural foraging: leaf litter, fallen bark and diverse native plants support insects, fungi and fruits that mammals eat — feeding wildlife directly often causes harm or dependency.',
+          'Water at ground level: a shallow dish on the ground (with escape routes) can help in dry weather; keep it away from cat ambush points.',
+          'Pet cats: contain cats indoors or in a cat run, especially at night — they are a major pressure on small mammals even in suburbs with bushland nearby.',
+          'Dogs: supervise dogs in the garden, especially at dusk; repeated disturbance prevents mammals from settling.',
+        ],
+      },
+    ],
+    steps: [
+      'Plant a clump of dense, local understorey (shrubs or tussock grasses) in a corner you can leave partly wild.',
+      'Add a log or rock pile in shade and allow leaf litter to accumulate underneath — do not collect wood from bushland reserves.',
+      'Audit fences and pets — reduce cat access to garden beds and provide ground-level water only in open, escape-friendly spots.',
+      'Avoid rodent baits where possible — poisoned rats and mice are eaten by owls, reptiles and mammals, causing secondary poisoning.',
+      'Watch with a torch after dark once a fortnight (quietly, from a distance) to see what already visits before adding more structure.',
+    ],
+    tip: [
+      'Expect regional differences: some mammals are protected or rare — never trap or relocate wildlife without expert advice.',
+      'Bandicoots and similar diggers are a sign of healthy soil life; a few small holes in mulch are usually worth tolerating.',
+    ],
+    related: [
+      { label: 'Attracting birds', to: '/beginners/attract-birds' },
+      { label: 'Attracting insects', to: '/beginners/attract-insects' },
+      { label: 'More help & resources', to: '/beginners#beginner-resources' },
     ],
   },
 ]
