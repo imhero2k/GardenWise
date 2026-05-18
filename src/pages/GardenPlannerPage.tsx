@@ -1554,6 +1554,7 @@ export function GardenPlannerPage() {
                               <span className="garden-planner-catalog__meta">
                                 {FORM_LABEL[spec.form]} · {spec.matureWidth}×{spec.matureHeight}m
                                 {it.lfCode ? ` · LF ${it.lfCode}` : ''}
+                                {it.quantity > 1 ? ` · Qty ${it.quantity}` : ''}
                               </span>
                             </span>
                           </button>

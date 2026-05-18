@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { IconBin, IconPrinter, IconSeedling } from '../components/Icons'
 import {
   PrintableShoppingList,
@@ -22,12 +22,91 @@ function formatAddedAt(iso: string): string {
   })
 }
 
+const MAX_CART_QUANTITY = 99
+
+function SeedCartQuantity({
+  quantity,
+  title,
+  onChange,
+}: {
+  quantity: number
+  title: string
+  onChange: (delta: number) => void
+}) {
+  const atMin = quantity <= 1
+  const atMax = quantity >= MAX_CART_QUANTITY
+
+  return (
+    <div
+      role="group"
+      aria-label={`Quantity for ${title}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--color-border)',
+        background: 'var(--color-surface)',
+        overflow: 'hidden',
+      }}
+    >
+      <button
+        type="button"
+        className="btn btn-ghost"
+        onClick={() => onChange(-1)}
+        disabled={atMin}
+        aria-label={atMin ? `Remove ${title} from cart` : `Decrease quantity of ${title}`}
+        style={{
+          minWidth: 36,
+          height: 36,
+          padding: 0,
+          borderRadius: 0,
+          fontSize: '1.1rem',
+          lineHeight: 1,
+        }}
+      >
+        −
+      </button>
+      <span
+        aria-live="polite"
+        style={{
+          minWidth: 32,
+          textAlign: 'center',
+          fontWeight: 700,
+          fontSize: '0.95rem',
+          padding: '0 0.25rem',
+        }}
+      >
+        {quantity}
+      </span>
+      <button
+        type="button"
+        className="btn btn-ghost"
+        onClick={() => onChange(1)}
+        disabled={atMax}
+        aria-label={`Increase quantity of ${title}`}
+        style={{
+          minWidth: 36,
+          height: 36,
+          padding: 0,
+          borderRadius: 0,
+          fontSize: '1.1rem',
+          lineHeight: 1,
+        }}
+      >
+        +
+      </button>
+    </div>
+  )
+}
+
 function SeedCartCard({
   item,
   onRemove,
+  onChangeQuantity,
 }: {
   item: SeedCartItemV1
   onRemove: (id: string) => void
+  onChangeQuantity: (id: string, delta: number) => void
 }) {
   const title = item.commonName?.trim() || item.scientificName || 'Plant'
   const showSci =
@@ -41,7 +120,7 @@ function SeedCartCard({
       className="card"
       style={{
         display: 'grid',
-        gridTemplateColumns: '88px 1fr auto',
+        gridTemplateColumns: '88px 1fr auto auto',
         gap: 'var(--space-md)',
         alignItems: 'center',
         padding: 'var(--space-md)',
@@ -82,18 +161,16 @@ function SeedCartCard({
       </div>
 
       <div style={{ minWidth: 0 }}>
-        <Link
-          to={`/plants/${encodeURIComponent(item.id)}`}
+        <p
           style={{
             fontWeight: 600,
             color: 'var(--color-text)',
-            textDecoration: 'none',
+            margin: 0,
             fontSize: '1rem',
-            display: 'block',
           }}
         >
           {title}
-        </Link>
+        </p>
         {showSci && (
           <p
             style={{
@@ -119,6 +196,12 @@ function SeedCartCard({
         </p>
       </div>
 
+      <SeedCartQuantity
+        quantity={item.quantity}
+        title={title}
+        onChange={(delta) => onChangeQuantity(item.id, delta)}
+      />
+
       <button
         type="button"
         onClick={() => onRemove(item.id)}
@@ -140,7 +223,8 @@ function SeedCartCard({
 }
 
 export function SeedCartPage() {
-  const { items, remove, clear, count } = useSeedCart()
+  const navigate = useNavigate()
+  const { items, remove, clear, count, totalQuantity, changeQuantity } = useSeedCart()
   const { areaLabel, placeLabel } = useLocationArea()
   const [confirmClear, setConfirmClear] = useState(false)
   const printable = usePrintable()
@@ -149,12 +233,21 @@ export function SeedCartPage() {
     commonName: it.commonName ?? null,
     scientificName: it.scientificName ?? null,
     kind: it.lfCode ? LF_CODE_LABELS[it.lfCode] ?? it.lfCode : null,
-    qty: 1,
+    qty: it.quantity,
     note: it.lfCode ? `LF ${it.lfCode}` : null,
   }))
 
   return (
     <>
+      <button
+        type="button"
+        className="btn btn-ghost btn-sm"
+        onClick={() => navigate(-1)}
+        style={{ marginBottom: 'var(--space-md)' }}
+      >
+        ← Back
+      </button>
+
       <header className="page-header">
         <p className="eyebrow">PlantMe</p>
         <h1
@@ -172,7 +265,14 @@ export function SeedCartPage() {
           Plants you’re tracking to grow or sow.{' '}
           {count > 0 ? (
             <>
-              <strong>{count}</strong> saved on this device.
+              <strong>{count}</strong> {count === 1 ? 'plant' : 'plants'} saved
+              {totalQuantity > count ? (
+                <>
+                  {' '}
+                  (<strong>{totalQuantity}</strong> total)
+                </>
+              ) : null}{' '}
+              on this device.
             </>
           ) : (
             'Bookmark plants from PlantMe to build your list.'
@@ -267,7 +367,12 @@ export function SeedCartPage() {
 
           <div style={{ display: 'grid', gap: 'var(--space-sm)' }}>
             {items.map((it) => (
-              <SeedCartCard key={it.id} item={it} onRemove={remove} />
+              <SeedCartCard
+                key={it.id}
+                item={it}
+                onRemove={remove}
+                onChangeQuantity={changeQuantity}
+              />
             ))}
           </div>
 
@@ -290,7 +395,8 @@ export function SeedCartPage() {
         subtitle="Plants saved from PlantMe to take to your nursery"
         meta={[
           { label: 'Location', value: placeLabel ?? areaLabel },
-          { label: 'Items', value: String(count) },
+          { label: 'Plants', value: String(count) },
+          { label: 'Total qty', value: String(totalQuantity) },
         ]}
         items={printItems}
         columns={{ qty: true, kind: true, note: true }}
