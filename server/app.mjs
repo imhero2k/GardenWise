@@ -280,7 +280,7 @@ app.get(
   }),
 )
 
-/** Match `plant` + `weed_info` by scientific name (from weed checker / ID tools). */
+/** Match `plant` + `weed_info` by scientific name (from plant identifier / ID tools). */
 app.get(
   '/api/weeds/lookup',
   wrap('weeds/lookup', async (req, res) => {

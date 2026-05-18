@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VITE_API_BASE_URL: https://tcal5txtn8.execute-api.ap-southeast-2.amazonaws.com
+      # Pl@ntNet Identify from the browser (key baked into bundle — expose + authorized domains in Pl@ntNet).
       VITE_PLANTNET_API_KEY: ${{ secrets.VITE_PLANTNET_API_KEY }}
       VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
       VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}

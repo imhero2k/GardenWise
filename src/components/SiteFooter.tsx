@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { BEGINNER_RESOURCES_PATH } from '../lib/beginnerResourcesNav'
+import { FooterPageLink } from './FooterPageLink'
 
 function FooterCol({
   title,
@@ -16,32 +18,28 @@ function FooterCol({
   )
 }
 
-function FooterMuted({ children }: { children: ReactNode }) {
-  return <span className="site-footer__muted">{children}</span>
-}
-
 export function SiteFooter() {
   return (
     <footer className="site-footer" aria-label="Site">
       <nav className="site-footer__grid" aria-label="Footer links">
         <div className="site-footer__brand-col">
-          <Link to="/" className="site-footer__brand">
+          <FooterPageLink to="/" className="site-footer__brand">
             RootVio
-          </Link>
+          </FooterPageLink>
           <p className="site-footer__tagline">Grow smart. Garden responsibly.</p>
         </div>
         <FooterCol title="Explore">
           <li>
-            <Link to="/plants">PlantMe</Link>
+            <FooterPageLink to="/plants">PlantMe</FooterPageLink>
           </li>
           <li>
-            <Link to="/planner">Garden planner</Link>
+            <FooterPageLink to="/planner">Garden planner</FooterPageLink>
           </li>
           <li>
-            <Link to="/weed#weed-checker">Plant safety check</Link>
+            <Link to="/weed#weed-checker">Plant identifier</Link>
           </li>
           <li>
-            <Link to="/map">Nursery map</Link>
+            <FooterPageLink to="/map">Nursery map</FooterPageLink>
           </li>
         </FooterCol>
         <FooterCol title="Education">
@@ -52,15 +50,15 @@ export function SiteFooter() {
             <Link to="/learn#environmental-weeds">Environmental weeds</Link>
           </li>
           <li>
-            <Link to="/beginners">Beginner tutorials</Link>
+            <FooterPageLink to="/beginners">Beginner tutorials</FooterPageLink>
           </li>
         </FooterCol>
         <FooterCol title="Connect">
           <li>
-            <FooterMuted>Council support</FooterMuted>
+            <Link to={BEGINNER_RESOURCES_PATH}>Council support</Link>
           </li>
           <li>
-            <Link to="/about">About us</Link>
+            <FooterPageLink to="/about">About us</FooterPageLink>
           </li>
         </FooterCol>
       </nav>

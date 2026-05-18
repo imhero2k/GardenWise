@@ -1,5 +1,7 @@
 import { useLayoutEffect } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { GardensForWildlifeBlurb } from '../components/GardensForWildlifeBlurb'
+import { BEGINNER_RESOURCES_HASH, scrollToBeginnerResources } from '../lib/beginnerResourcesNav'
 import { TUTORIALS } from './beginners/tutorials'
 
 export function BeginnerGuidesPage() {
@@ -9,7 +11,13 @@ export function BeginnerGuidesPage() {
   useLayoutEffect(() => {
     const raw = location.hash.replace(/^#/, '')
     if (!raw) return
-    navigate(`/beginners/${raw}`, { replace: true })
+    if (raw === BEGINNER_RESOURCES_HASH) {
+      requestAnimationFrame(() => scrollToBeginnerResources())
+      return
+    }
+    if (TUTORIALS.some((t) => t.id === raw)) {
+      navigate(`/beginners/${raw}`, { replace: true })
+    }
   }, [location.hash, location.pathname, navigate])
 
   const stepLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -36,7 +44,7 @@ export function BeginnerGuidesPage() {
           <p style={{ color: 'var(--color-text-muted)', margin: 0, maxWidth: '42rem' }}>
             Short tutorials you can follow in order — from understanding your yard to planting, watering and easy
             upkeep. Pair these steps with{' '}
-            <Link to="/plants">PlantMe</Link>, the <Link to="/weed#weed-checker">weed checker</Link>
+            <Link to="/plants">PlantMe</Link>, the <Link to="/weed#weed-checker">plant identifier</Link>
             {', and '}
             <Link to="/learn#native">native plants 101</Link> when you want more context.
           </p>
@@ -54,7 +62,11 @@ export function BeginnerGuidesPage() {
           </section>
         ))}
 
-        <section className="card beginner-tutorial" aria-labelledby="beginner-resources-heading">
+        <section
+          id="beginner-resources"
+          className="card beginner-tutorial"
+          aria-labelledby="beginner-resources-heading"
+        >
           <h2 id="beginner-resources-heading">More help & resources</h2>
           <p className="beginner-tutorial__intro" style={{ maxWidth: '46rem' }}>
             If you’re stuck, these pages make the next decision easier: pick the right plants for your conditions, check
@@ -65,13 +77,16 @@ export function BeginnerGuidesPage() {
               <Link to="/plants">PlantMe</Link> — filter by sun, soil and your area.
             </li>
             <li>
-              <Link to="/weed#weed-checker">Weed checker</Link> — confirm if a plant can spread into bushland.
+              <Link to="/weed#weed-checker">Plant identifier</Link> — confirm if a plant can spread into bushland.
             </li>
             <li>
               <Link to="/map">Nursery map</Link> — find nurseries and public gardens near you.
             </li>
             <li>
               <Link to="/learn#native">Native plants 101</Link> — simple explanations and examples.
+            </li>
+            <li>
+              <GardensForWildlifeBlurb />
             </li>
           </ul>
         </section>

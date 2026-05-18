@@ -1,4 +1,4 @@
-/** Single serrated / jagged leaf (Weeds nav, Plant Safety Check). */
+/** Single serrated / jagged leaf (Weeds nav, plant identifier). */
 export function IconLeaf({ className }: { className?: string }) {
   return (
     <svg
