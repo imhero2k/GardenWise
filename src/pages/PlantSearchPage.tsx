@@ -357,7 +357,8 @@ function DbPlantDetailContent({
 }
 
 function SeedCartHeaderLink() {
-  const { count } = useSeedCart()
+  const { count, totalQuantity } = useSeedCart()
+  const badge = totalQuantity > 0 ? totalQuantity : count
   return (
     <Link
       to="/seed-cart"
@@ -368,11 +369,11 @@ function SeedCartHeaderLink() {
         gap: '0.45rem',
         padding: '0.4rem 0.75rem',
       }}
-      aria-label={`Open seed cart (${count} item${count === 1 ? '' : 's'})`}
+      aria-label={`Open seed cart (${badge} item${badge === 1 ? '' : 's'})`}
     >
       <SeedSproutIcon saved={count > 0} size={22} />
       <span>Seed cart</span>
-      {count > 0 && (
+      {badge > 0 && (
         <span
           aria-hidden
           style={{
@@ -389,7 +390,7 @@ function SeedCartHeaderLink() {
             justifyContent: 'center',
           }}
         >
-          {count}
+          {badge}
         </span>
       )}
     </Link>
@@ -455,7 +456,7 @@ export function PlantSearchPage() {
 
   const openDbPlantDetail = useCallback((plant: RecommendedPlant) => {
     setDbPlantDetail(plant)
-    plantDetailDialogRef.current?.showModal()
+    requestAnimationFrame(() => plantDetailDialogRef.current?.showModal())
   }, [])
 
   const handleWildlifeChange = useCallback(

@@ -4,6 +4,17 @@ import { SeedCartContext } from './SeedCartContextInternal'
 
 const STORAGE_KEY = 'rootvio-seed-cart-v1'
 const MAX_ITEMS = 200
+const MAX_QUANTITY = 99
+
+function parseQuantity(value: unknown): number {
+  const n = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(n)) return 1
+  return Math.max(1, Math.min(MAX_QUANTITY, Math.floor(n)))
+}
+
+function normalizeItem(raw: SeedCartItemV1): SeedCartItemV1 {
+  return { ...raw, quantity: parseQuantity(raw.quantity) }
+}
 
 function isItem(x: unknown): x is SeedCartItemV1 {
   if (!x || typeof x !== 'object') return false
@@ -14,7 +25,8 @@ function isItem(x: unknown): x is SeedCartItemV1 {
     (o.commonName === null || typeof o.commonName === 'string') &&
     (o.imageUrl === null || typeof o.imageUrl === 'string') &&
     (o.lfCode === null || typeof o.lfCode === 'string') &&
-    typeof o.addedAt === 'string'
+    typeof o.addedAt === 'string' &&
+    (o.quantity === undefined || typeof o.quantity === 'number')
   )
 }
 
@@ -30,7 +42,7 @@ function loadStored(): SeedCartItemV1[] {
     for (const it of parsed.items) {
       if (!isItem(it) || seen.has(it.id)) continue
       seen.add(it.id)
-      out.push(it)
+      out.push(normalizeItem(it))
     }
     return out
   } catch {
@@ -74,7 +86,11 @@ export function SeedCartProvider({ children }: { children: ReactNode }) {
   const add = useCallback((input: SeedCartAddInput) => {
     setItems((prev) => {
       if (prev.some((it) => it.id === input.id)) return prev
-      const next: SeedCartItemV1 = { ...input, addedAt: new Date().toISOString() }
+      const next: SeedCartItemV1 = {
+        ...input,
+        quantity: parseQuantity(input.quantity),
+        addedAt: new Date().toISOString(),
+      }
       const merged = [next, ...prev]
       return merged.length > MAX_ITEMS ? merged.slice(0, MAX_ITEMS) : merged
     })
@@ -89,25 +105,51 @@ export function SeedCartProvider({ children }: { children: ReactNode }) {
       if (prev.some((it) => it.id === input.id)) {
         return prev.filter((it) => it.id !== input.id)
       }
-      const next: SeedCartItemV1 = { ...input, addedAt: new Date().toISOString() }
+      const next: SeedCartItemV1 = {
+        ...input,
+        quantity: parseQuantity(input.quantity),
+        addedAt: new Date().toISOString(),
+      }
       const merged = [next, ...prev]
       return merged.length > MAX_ITEMS ? merged.slice(0, MAX_ITEMS) : merged
     })
   }, [])
 
+  const changeQuantity = useCallback((id: string, delta: number) => {
+    if (delta === 0) return
+    setItems((prev) => {
+      const idx = prev.findIndex((it) => it.id === id)
+      if (idx < 0) return prev
+      const current = prev[idx]
+      const nextQty = current.quantity + delta
+      if (nextQty < 1) return prev.filter((it) => it.id !== id)
+      if (nextQty > MAX_QUANTITY) return prev
+      const copy = [...prev]
+      copy[idx] = { ...current, quantity: nextQty }
+      return copy
+    })
+  }, [])
+
   const clear = useCallback(() => setItems([]), [])
+
+  const totalQuantity = useMemo(
+    () => items.reduce((sum, it) => sum + it.quantity, 0),
+    [items],
+  )
 
   const value = useMemo(
     () => ({
       items,
       count: items.length,
+      totalQuantity,
       isInCart,
       add,
       remove,
       toggle,
+      changeQuantity,
       clear,
     }),
-    [items, isInCart, add, remove, toggle, clear],
+    [items, totalQuantity, isInCart, add, remove, toggle, changeQuantity, clear],
   )
 
   return <SeedCartContext.Provider value={value}>{children}</SeedCartContext.Provider>

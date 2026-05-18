@@ -17,6 +17,8 @@ export interface SeedCartItemV1 {
   lfCode: string | null
   /** ISO timestamp of when the item was added. */
   addedAt: string
+  /** How many plants to buy or grow (nursery list quantity). */
+  quantity: number
 }
 
 export interface SeedCartStateV1 {
@@ -25,14 +27,20 @@ export interface SeedCartStateV1 {
 }
 
 /** Minimal input accepted by `add()` — only fields we want to persist. */
-export type SeedCartAddInput = Omit<SeedCartItemV1, 'addedAt'>
+export type SeedCartAddInput = Omit<SeedCartItemV1, 'addedAt' | 'quantity'> & {
+  quantity?: number
+}
 
 export interface SeedCartContextValue {
   items: SeedCartItemV1[]
+  /** Number of distinct saved plants (lines). */
   count: number
+  /** Sum of all line quantities. */
+  totalQuantity: number
   isInCart: (id: string) => boolean
   add: (input: SeedCartAddInput) => void
   remove: (id: string) => void
   toggle: (input: SeedCartAddInput) => void
+  changeQuantity: (id: string, delta: number) => void
   clear: () => void
 }
