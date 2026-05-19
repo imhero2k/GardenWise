@@ -13,20 +13,12 @@ import benefitWellbeingBg from '../assets/home/benefit-wellbeing-bg.png'
 import weedRotatorKhaki from '../assets/home/weed-rotator-khaki.png'
 import weedRotatorThistle from '../assets/home/weed-rotator-thistle.png'
 import weedRotatorGorse from '../assets/home/weed-rotator-gorse.png'
+import { HOME_IMPACT_STATS } from '../data/educationStats'
 
-const WEED_EXAMPLE_SLIDES: { src: string; alt: string }[] = [
-  {
-    src: weedRotatorKhaki,
-    alt: 'Low-growing environmental weed with spiky white flower clusters among grass.',
-  },
-  {
-    src: weedRotatorThistle,
-    alt: 'Spiny thistle with a purple flower and a bumblebee, against the sky.',
-  },
-  {
-    src: weedRotatorGorse,
-    alt: 'Flowering gorse with bright yellow pea blossoms and sharp green spines.',
-  },
+const WEED_EXAMPLE_SLIDES: { src: string; name: string }[] = [
+  { src: weedRotatorKhaki, name: 'Khaki weed' },
+  { src: weedRotatorThistle, name: 'Scotch thistle' },
+  { src: weedRotatorGorse, name: 'Gorse' },
 ]
 
 const HERO_SLIDES: { src: string; alt: string }[] = [
@@ -35,43 +27,13 @@ const HERO_SLIDES: { src: string; alt: string }[] = [
   { src: bottlebrushImg, alt: 'Red bottlebrush flowers and foliage' },
 ]
 
-const HOME_QUICK_PATHS: { to: string; title: string; blurb: string; icon: ReactNode }[] = [
-  {
-    to: '/plants',
-    title: 'Find native plants',
-    blurb: 'Filter by your area, sun and soil to shortlist locals.',
-    icon: <IconSearch />,
-  },
-  {
-    to: '/weed#weed-checker',
-    title: 'Plant identifier',
-    blurb: 'Upload a photo to identify a plant and see if it may be an environmental weed.',
-    icon: <IconLeaf />,
-  },
-  {
-    to: '/beginners',
-    title: 'Beginner guides',
-    blurb: 'Step-by-step help for your first native-friendly patch.',
-    icon: <IconSprout />,
-  },
-  {
-    to: '/learn#native',
-    title: 'Why natives matter',
-    blurb: 'Context on biodiversity, weeds and Victorian landscapes.',
-    icon: <IconBook />,
-  },
-  {
-    to: '/planner',
-    title: 'Garden planner',
-    blurb: 'Lay out a bed and try native species in a simple 3D planner.',
-    icon: <IconPlanner />,
-  },
-  {
-    to: '/map',
-    title: 'Nursery map',
-    blurb: 'Find native plant nurseries and public gardens across Victoria.',
-    icon: <IconMap />,
-  },
+const HOME_QUICK_PATHS: { to: string; title: string; icon: ReactNode }[] = [
+  { to: '/plants', title: 'Find native plants', icon: <IconSearch /> },
+  { to: '/weed#weed-checker', title: 'Identify a plant', icon: <IconLeaf /> },
+  { to: '/beginners', title: 'Beginner guides', icon: <IconSprout /> },
+  { to: '/learn#native', title: 'Why natives matter', icon: <IconBook /> },
+  { to: '/planner', title: 'Garden planner', icon: <IconPlanner /> },
+  { to: '/map', title: 'Nursery map', icon: <IconMap /> },
 ]
 
 function HomeQuickPathsIntro() {
@@ -87,13 +49,6 @@ function HomeQuickPathsIntro() {
 }
 
 type QuickPathItem = (typeof HOME_QUICK_PATHS)[number]
-
-/** Pixels per second when auto-advancing the quick-paths carousel (off-strip only). */
-const QUICK_PATHS_AUTO_SCROLL_PX_PER_SEC = 24
-
-function pointInClientRect(x: number, y: number, r: DOMRect): boolean {
-  return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom
-}
 
 function HomeQuickPathCard({
   item,
@@ -115,7 +70,6 @@ function HomeQuickPathCard({
           {item.icon}
         </span>
         <span className="home-quick-paths__card-title">{item.title}</span>
-        <span className="home-quick-paths__card-blurb">{item.blurb}</span>
       </Link>
     </li>
   )
@@ -124,16 +78,9 @@ function HomeQuickPathCard({
 function HomeQuickPathLoop() {
   const scrollerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLUListElement>(null)
-  const scrollWrapRef = useRef<HTMLDivElement>(null)
-  const copiesRef = useRef(0)
   const segmentW = useRef(0)
+  const lastResizeSegmentW = useRef(0)
   const isSyncing = useRef(false)
-  /** Tracks desktop hover over the strip (pointer coords can be stale before first move). */
-  const mouseOverStripRef = useRef(false)
-  const lastPointerRef = useRef<{ x: number; y: number } | null>(null)
-  const remeasureRef = useRef<() => void>(() => {})
-  /** Fractional scroll budget — slow speeds need this or WebKit rounds tiny scrollBy to zero. */
-  const autoScrollAccumRef = useRef(0)
   const [copies, setCopies] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
       ? 1
@@ -142,22 +89,8 @@ function HomeQuickPathLoop() {
   const { elementRef: revealRef, revealClass } = useScrollReveal<HTMLDivElement>('fade-up')
 
   useEffect(() => {
-    copiesRef.current = copies
-  }, [copies])
-
-  useEffect(() => {
-    const onPointerMove = (e: PointerEvent) => {
-      lastPointerRef.current = { x: e.clientX, y: e.clientY }
-    }
-    window.addEventListener('pointermove', onPointerMove, { passive: true })
-    return () => window.removeEventListener('pointermove', onPointerMove)
-  }, [])
-
-  useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const apply = () => {
-      setCopies(mq.matches ? 1 : 3)
-    }
+    const apply = () => setCopies(mq.matches ? 1 : 3)
     apply()
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
@@ -165,7 +98,17 @@ function HomeQuickPathLoop() {
 
   const remeasure = useCallback(() => {
     const el = trackRef.current
+    const scroller = scrollerRef.current
     if (!el || copies < 2) return
+
+    if (copies >= 3 && scroller && scroller.scrollWidth > 0) {
+      const wFromScroll = Math.round(scroller.scrollWidth / copies)
+      if (wFromScroll > 0) {
+        segmentW.current = wFromScroll
+        return
+      }
+    }
+
     const per = HOME_QUICK_PATHS.length
     const cells = el.querySelectorAll(':scope > li.home-quick-paths__cell')
     if (cells.length < per) return
@@ -178,17 +121,33 @@ function HomeQuickPathLoop() {
     if (w > 0) segmentW.current = w
   }, [copies])
 
-  useEffect(() => {
-    remeasureRef.current = remeasure
-  }, [remeasure])
+  const syncInfiniteScroll = useCallback(
+    (el: HTMLDivElement) => {
+      const w = segmentW.current
+      if (!w || copies < 3) return
+      const sl = el.scrollLeft
+      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth)
+      const edge = 16
+
+      if (sl >= 2 * w - edge || sl >= maxScroll - edge) {
+        el.scrollLeft = sl - w
+      } else if (sl <= edge) {
+        el.scrollLeft = sl + w
+      }
+    },
+    [copies],
+  )
 
   const runAfterScrollQuiet = useCallback((fn: () => void) => {
     isSyncing.current = true
     requestAnimationFrame(() => {
-      fn()
-      requestAnimationFrame(() => {
-        isSyncing.current = false
-      })
+      try {
+        fn()
+      } finally {
+        requestAnimationFrame(() => {
+          isSyncing.current = false
+        })
+      }
     })
   }, [])
 
@@ -208,114 +167,32 @@ function HomeQuickPathLoop() {
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
+    lastResizeSegmentW.current = 0
     const ro = new ResizeObserver(() => {
       remeasure()
       const w = segmentW.current
       if (copies < 3 || !w) return
+      const prev = lastResizeSegmentW.current
+      if (prev !== 0 && Math.abs(w - prev) < 1) return
+      lastResizeSegmentW.current = w
       const scroller = scrollerRef.current
       if (!scroller) return
       runAfterScrollQuiet(() => {
-        const sl = scroller.scrollLeft
-        if (sl >= 2 * w - 12) scroller.scrollLeft = sl - w
-        else if (sl <= 12) scroller.scrollLeft = sl + w
-        else if (scroller.scrollLeft === 0) scroller.scrollLeft = w
+        if (scroller) syncInfiniteScroll(scroller)
       })
     })
     ro.observe(track)
     const scroller = scrollerRef.current
     if (scroller) ro.observe(scroller)
     return () => ro.disconnect()
-  }, [copies, remeasure, runAfterScrollQuiet])
-
-  useEffect(() => {
-    let rafId = 0
-    let last = performance.now()
-
-    const tick = (now: number) => {
-      const scroller = scrollerRef.current
-      const wrap = scrollWrapRef.current
-      const dt = Math.min(48, now - last) / 1000
-      last = now
-
-      if (
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-        document.hidden ||
-        copiesRef.current < 3
-      ) {
-        autoScrollAccumRef.current = 0
-        rafId = requestAnimationFrame(tick)
-        return
-      }
-
-      let pauseForInteraction = false
-      if (wrap) {
-        if (mouseOverStripRef.current) {
-          pauseForInteraction = true
-        }
-        const rect = wrap.getBoundingClientRect()
-        const ptr = lastPointerRef.current
-        if (!pauseForInteraction && ptr && pointInClientRect(ptr.x, ptr.y, rect)) {
-          pauseForInteraction = true
-        }
-        if (!pauseForInteraction) {
-          const ae = document.activeElement
-          if (ae instanceof Node && wrap.contains(ae)) {
-            pauseForInteraction = true
-          }
-        }
-      }
-
-      if (pauseForInteraction) {
-        autoScrollAccumRef.current = 0
-      }
-
-      if (!pauseForInteraction && scroller) {
-        let maxScroll = scroller.scrollWidth - scroller.clientWidth
-        if (maxScroll <= 1) {
-          remeasureRef.current()
-          maxScroll = scroller.scrollWidth - scroller.clientWidth
-        }
-        if (maxScroll > 1) {
-          autoScrollAccumRef.current += QUICK_PATHS_AUTO_SCROLL_PX_PER_SEC * dt
-          const room = maxScroll - scroller.scrollLeft
-          const step = Math.min(room, Math.floor(autoScrollAccumRef.current))
-          if (step >= 1) {
-            scroller.scrollBy({ left: step, top: 0, behavior: 'auto' })
-            autoScrollAccumRef.current -= step
-          }
-        } else {
-          autoScrollAccumRef.current = 0
-        }
-      }
-
-      rafId = requestAnimationFrame(tick)
-    }
-
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  }, [copies, remeasure, runAfterScrollQuiet, syncInfiniteScroll])
 
   const onScroll = useCallback(() => {
     if (copies < 3 || isSyncing.current) return
     const el = scrollerRef.current
-    const w = segmentW.current
-    if (!el || !w) return
-    const sl = el.scrollLeft
-    const edge = 16
-    if (sl >= 2 * w - edge) {
-      runAfterScrollQuiet(() => {
-        const wRun = segmentW.current
-        const cur = el.scrollLeft
-        if (wRun > 0 && cur >= 2 * wRun - edge) el.scrollLeft = cur - wRun
-      })
-    } else if (sl <= edge) {
-      runAfterScrollQuiet(() => {
-        const wRun = segmentW.current
-        const cur = el.scrollLeft
-        if (wRun > 0 && cur <= edge) el.scrollLeft = cur + wRun
-      })
-    }
-  }, [copies, runAfterScrollQuiet])
+    if (!el) return
+    runAfterScrollQuiet(() => syncInfiniteScroll(el))
+  }, [copies, runAfterScrollQuiet, syncInfiniteScroll])
 
   const loops = Array.from({ length: copies }, (_, copyIndex) =>
     HOME_QUICK_PATHS.map((item) => (
@@ -329,21 +206,15 @@ function HomeQuickPathLoop() {
   )
 
   return (
-    <div
-      ref={revealRef}
-      className={`home-quick-paths__fullbleed ${revealClass}`.trim()}
-    >
-      <div
-        ref={scrollWrapRef}
-        className="home-quick-paths__scroll-wrap"
-        onMouseEnter={() => {
-          mouseOverStripRef.current = true
-        }}
-        onMouseLeave={() => {
-          mouseOverStripRef.current = false
-        }}
-      >
-        <div ref={scrollerRef} className="home-quick-paths__viewport" onScroll={onScroll}>
+    <div ref={revealRef} className={`home-quick-paths__fullbleed ${revealClass}`.trim()}>
+      <div className="home-quick-paths__scroll-wrap">
+        <div
+          ref={scrollerRef}
+          className="home-quick-paths__viewport"
+          tabIndex={0}
+          aria-label="Explore RootVio — scroll horizontally to browse"
+          onScroll={onScroll}
+        >
           <ul ref={trackRef} className="home-quick-paths__grid" role="list">
             {loops.flat()}
           </ul>
@@ -352,32 +223,6 @@ function HomeQuickPathLoop() {
     </div>
   )
 }
-
-const INVASIVE_IMPACT_STATS: {
-  value: string
-  label: string
-  source: string
-  href: string
-}[] = [
-  {
-    value: '~54%',
-    label: 'Of Victoria’s original native vegetation estimated cleared since European settlement.',
-    source: 'VAGO (citing DELWP)',
-    href: 'https://www.audit.vic.gov.au/report/offsetting-native-vegetation-loss-private-land/',
-  },
-  {
-    value: '$24.5B',
-    label: 'Estimated yearly cost of environmental weeds to Australia — plants are the largest share.',
-    source: 'CSIRO (NeoBiota, 2021)',
-    href: 'https://www.csiro.au/',
-  },
-  {
-    value: '100+',
-    label: 'Australian endemic species recognised as extinct or extinct in the wild since 1788.',
-    source: 'Woinarski et al. (2019)',
-    href: 'https://doi.org/10.1016/j.biocon.2019.07.026',
-  },
-]
 
 type NativePlantBenefit = {
   title: string
@@ -422,7 +267,7 @@ function HomeImpactStatCard({
   stat,
   index,
 }: {
-  stat: (typeof INVASIVE_IMPACT_STATS)[number]
+  stat: (typeof HOME_IMPACT_STATS)[number]
   index: number
 }) {
   const { elementRef, revealClass } = useScrollReveal<HTMLElement>('rise-scale')
@@ -435,11 +280,6 @@ function HomeImpactStatCard({
     >
       <p className="learn-stat__value">{stat.value}</p>
       <p className="learn-stat__label">{stat.label}</p>
-      <p className="learn-stat__source">
-        <a href={stat.href} target="_blank" rel="noopener noreferrer">
-          {stat.source}
-        </a>
-      </p>
     </article>
   )
 }
@@ -479,7 +319,7 @@ function HomeImpactWeedRotator() {
     return () => window.clearInterval(id)
   }, [])
 
-  const liveLabel = WEED_EXAMPLE_SLIDES[idx]?.alt ?? ''
+  const liveLabel = WEED_EXAMPLE_SLIDES[idx]?.name ?? ''
 
   return (
     <div className="home-impact__weeds-card card">
@@ -494,7 +334,11 @@ function HomeImpactWeedRotator() {
             key={slide.src}
             className={`home-impact-weeds-slide${i === idx ? ' home-impact-weeds-slide--active' : ''}`}
             style={{ backgroundImage: `url(${slide.src})` }}
-          />
+            role="img"
+            aria-label={slide.name}
+          >
+            <span className="home-impact-weeds-slide__name">{slide.name}</span>
+          </div>
         ))}
       </div>
       <p className="home-native-benefits__photo-credit">
@@ -551,24 +395,43 @@ export function HomePage() {
         </div>
         <div className="hero-inner">
           <h1 className="hero-title home-hero__title home-hero__rise home-hero__rise--d0">
-            Grow smart. Garden responsibly.
+            <span className="hero-title__line">Grow smart.</span>
+            <span className="hero-title__line">Garden responsibly.</span>
           </h1>
           <p className="home-hero__rise home-hero__rise--d1">
             Every garden counts. RootVio empowers Victorian gardeners to grow local, remove
             environmental weeds, and protect the biodiversity that makes this state extraordinary.
           </p>
-          <div className="hero-cta-row home-hero__rise home-hero__rise--d2">
-            <Link to="/plants" className="btn btn-primary home-hero__cta-btn">
-              Start Gardening
-            </Link>
-            <Link to="/weed#weed-checker" className="btn btn-secondary home-hero__cta-btn">
-              Plant identifier
-            </Link>
+          <div className="home-hero__ctas home-hero__rise home-hero__rise--d2">
+            <div className="hero-cta-row">
+              <Link to="/weed#weed-checker" className="btn btn-secondary home-hero__cta-btn">
+                Identify a plant
+              </Link>
+              <Link to="/plants" className="btn btn-primary home-hero__cta-btn">
+                Start Gardening
+              </Link>
+            </div>
+            <div className="hero-cta-row home-hero__cta-row--below">
+              <Link
+                to="/planner"
+                className="btn home-hero__cta-btn home-hero__cta-btn--planner"
+              >
+                Plan your garden
+              </Link>
+            </div>
           </div>
         </div>
+        <a href="#home-quick-paths" className="home-hero__scroll-hint">
+          <span className="home-hero__scroll-hint-label">Scroll</span>
+          <span className="home-hero__scroll-hint-chevron" aria-hidden />
+        </a>
       </section>
 
-      <section className="home-quick-paths section-block" aria-labelledby="home-quick-paths-heading">
+      <section
+        id="home-quick-paths"
+        className="home-quick-paths section-block"
+        aria-labelledby="home-quick-paths-heading"
+      >
         <HomeQuickPathsIntro />
         <HomeQuickPathLoop />
       </section>
@@ -605,7 +468,7 @@ export function HomePage() {
           </aside>
           <div className="home-impact__stats">
             <div className="learn-stats">
-              {INVASIVE_IMPACT_STATS.map((s, i) => (
+              {HOME_IMPACT_STATS.map((s, i) => (
                 <HomeImpactStatCard key={s.value} stat={s} index={i} />
               ))}
             </div>
@@ -635,10 +498,6 @@ export function HomePage() {
         >
           Benefits of native plants
         </h2>
-        <p className="home-section-lead">
-          Native plants are species that evolved in your region and belong naturally in local
-          ecosystems, supporting wildlife without being introduced from elsewhere.
-        </p>
         <div className="home-native-benefits">
           <div className="home-native-benefits__grid" role="list">
             {NATIVE_PLANT_BENEFITS.map((item, i) => (

@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ProhibitedWeedModal } from '../components/ProhibitedWeedModal'
-import { IconBin, IconBook, IconCamera, IconDroplet, IconPrevent } from '../components/Icons'
+import { IconBook, IconCamera } from '../components/Icons'
 import { IconSearch } from '../components/Icons'
 import { useLocationArea } from '../context/LocationContext'
 import type { PlantEnrichment } from '../lib/plantEnrichment'
@@ -29,9 +29,10 @@ import {
   matchStateProhibitedWeed,
   STATE_PROHIBITED_WEEDS,
   stateProhibitedWeedElementId,
+  VIC_STATE_PROHIBITED_WEED_REPORT_URL,
   type StateProhibitedWeed,
 } from '../lib/stateProhibitedWeeds'
-import { fetchTopWeeds, type RegionWeed } from '../lib/weedsApi'
+import { fetchTopWeeds, fetchWeedLookup, type RegionWeed } from '../lib/weedsApi'
 import {
   useRecommendedPlantEnrichment,
   type EnrichmentState,
@@ -99,6 +100,24 @@ async function fileToDataUrl(file: File): Promise<string> {
 
 function isWeedModelIdentification(result: PredictResponse): boolean {
   return result.source !== 'plantnet'
+}
+
+function plantNamesMatch(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase()
+}
+
+function resolveIdentificationCommonName(
+  scientificName: string,
+  sources: Array<string | null | undefined>,
+): string | null {
+  const sci = scientificName.trim()
+  for (const source of sources) {
+    const name = source?.trim()
+    if (!name) continue
+    if (sci && plantNamesMatch(name, sci)) continue
+    return name
+  }
+  return null
 }
 
 const WEED_BADGE_STYLE: CSSProperties = {
@@ -218,6 +237,7 @@ function PredictionResultCard({
 
   const [enrichment, setEnrichment] = useState<PlantEnrichment | null>(null)
   const [enrichState, setEnrichState] = useState<'loading' | 'done' | 'error'>('loading')
+  const [weedLookupCommonName, setWeedLookupCommonName] = useState<string | null>(null)
 
   useEffect(() => {
     const ac = new AbortController()
@@ -233,6 +253,37 @@ function PredictionResultCard({
       })
     return () => ac.abort()
   }, [result.label])
+
+  useEffect(() => {
+    const ac = new AbortController()
+    setWeedLookupCommonName(null)
+    fetchWeedLookup(result.label, { signal: ac.signal })
+      .then((data) => {
+        if (ac.signal.aborted) return
+        setWeedLookupCommonName(data.match?.commonName ?? null)
+      })
+      .catch(() => {
+        if (ac.signal.aborted) return
+      })
+    return () => ac.abort()
+  }, [result.label])
+
+  const commonName = useMemo(
+    () =>
+      resolveIdentificationCommonName(result.label, [
+        result.commonName,
+        matchedStateProhibitedWeed?.name,
+        weedLookupCommonName,
+        enrichment?.inaturalist?.commonName,
+      ]),
+    [
+      result.label,
+      result.commonName,
+      matchedStateProhibitedWeed?.name,
+      weedLookupCommonName,
+      enrichment?.inaturalist?.commonName,
+    ],
+  )
 
   return (
     <div
@@ -291,9 +342,24 @@ function PredictionResultCard({
           </span>
         </div>
       </div>
-      <p style={{ fontWeight: 700, marginBottom: 'var(--space-sm)', fontSize: '1.15rem', color: 'var(--color-text)' }}>
-        {result.label}
-      </p>
+      <div style={{ marginBottom: 'var(--space-sm)' }}>
+        {commonName ? (
+          <p style={{ fontWeight: 700, margin: '0 0 0.2rem', fontSize: '1.15rem', color: 'var(--color-text)' }}>
+            {commonName}
+          </p>
+        ) : null}
+        <p
+          style={{
+            fontWeight: commonName ? 500 : 700,
+            margin: 0,
+            fontSize: commonName ? '1rem' : '1.15rem',
+            fontStyle: commonName ? 'italic' : 'normal',
+            color: commonName ? 'var(--color-text-muted)' : 'var(--color-text)',
+          }}
+        >
+          {result.label}
+        </p>
+      </div>
       <p style={{ margin: '0 0 var(--space-md)', fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>
         {summary.subtitle}
       </p>
@@ -372,7 +438,7 @@ function PredictionResultCard({
           <h3 style={{ fontSize: '0.95rem', margin: '0 0 var(--space-sm)', color: '#92400e' }}>
             Do not remove yourself
           </h3>
-          <p style={{ fontSize: '0.88rem', color: 'var(--color-text)', margin: '0 0 var(--space-sm)', lineHeight: 1.55 }}>
+          <p style={{ fontSize: '0.88rem', color: 'var(--color-text)', margin: '0 0 var(--space-md)', lineHeight: 1.55 }}>
             This matches <strong>{matchedStateProhibitedWeed.name}</strong>
             {result.label.trim() ? (
               <>
@@ -383,14 +449,23 @@ function PredictionResultCard({
             , a State Prohibited Weed in Victoria. You must not attempt removal — report it to the authorities
             immediately.
           </p>
-          <button
-            type="button"
-            className="home-impact__more-link"
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', color: '#92400e' }}
-            onClick={() => onOpenStateProhibitedWeed(matchedStateProhibitedWeed)}
-          >
-            View {matchedStateProhibitedWeed.name} in State prohibited weeds ↓
-          </button>
+          <div className="weed-prohibited-id-actions">
+            <button
+              type="button"
+              className="weed-prohibited-id-btn weed-prohibited-id-btn--view"
+              onClick={() => onOpenStateProhibitedWeed(matchedStateProhibitedWeed)}
+            >
+              View {matchedStateProhibitedWeed.name}
+            </button>
+            <a
+              href={VIC_STATE_PROHIBITED_WEED_REPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="weed-prohibited-id-btn weed-prohibited-id-btn--report"
+            >
+              Report State Prohibited Weed
+            </a>
+          </div>
         </div>
       ) : identifiedAsWeed ? (
         <div
@@ -407,17 +482,16 @@ function PredictionResultCard({
           </h3>
           {suggestedDisposalCategory ? (
             <>
-              <p style={{ fontSize: '0.88rem', color: 'var(--color-text)', margin: '0 0 var(--space-sm)', lineHeight: 1.55 }}>
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-text)', margin: '0 0 var(--space-md)', lineHeight: 1.55 }}>
                 Based on the identified species, this looks like{' '}
                 <strong>{weedDisposalTypeLabel(suggestedDisposalCategory)}</strong>.
               </p>
               <button
                 type="button"
-                className="home-impact__more-link"
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}
+                className="weed-disposal-id-btn"
                 onClick={() => onOpenDisposalGuide(suggestedDisposalCategory)}
               >
-                View disposal guide for {weedDisposalTypeLabel(suggestedDisposalCategory)} ↓
+                View disposal guide for {weedDisposalTypeLabel(suggestedDisposalCategory)}
               </button>
             </>
           ) : (
@@ -432,14 +506,12 @@ function PredictionResultCard({
         </div>
       ) : null}
 
-      <div
-        style={{
-          marginTop: 'var(--space-lg)',
-          paddingTop: 'var(--space-md)',
-          borderTop: '1px solid rgba(0,0,0,0.08)',
-        }}
+      <details
+        className="weed-learn-more"
+        style={{ '--weed-learn-more-color': theme.accent } as CSSProperties}
       >
-        <h3 style={{ fontSize: '1rem', marginBottom: 'var(--space-sm)', color: theme.accent }}>Learn more</h3>
+        <summary className="weed-learn-more__summary">Learn more</summary>
+        <div className="weed-learn-more__body">
         <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-md)' }}>
           Reference photos and text from Wikipedia, GBIF taxonomy, and iNaturalist (public APIs — POC).
         </p>
@@ -578,27 +650,8 @@ function PredictionResultCard({
             </div>
           </>
         )}
-      </div>
-
-      {Array.isArray(result.probabilities) && result.probabilities.length > 0 && (
-        <details style={{ marginTop: 'var(--space-md)' }}>
-          <summary style={{ cursor: 'pointer', color: 'var(--color-text-muted)' }}>
-            Show model probabilities
-          </summary>
-          <pre
-            style={{
-              marginTop: 'var(--space-sm)',
-              background: 'rgba(255,255,255,0.5)',
-              padding: 'var(--space-sm)',
-              borderRadius: 'var(--radius-md)',
-              overflowX: 'auto',
-              border: '1px solid rgba(0,0,0,0.06)',
-            }}
-          >
-            {JSON.stringify(result.probabilities.slice(0, 50), null, 2)}
-          </pre>
-        </details>
-      )}
+        </div>
+      </details>
 
       <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: 'var(--space-md)' }}>
         Always confirm ID with your state biosecurity resource. This feature uses an ML model and can be wrong.
@@ -675,12 +728,6 @@ function TopWeedPlaceholderSlot({ variant }: { variant: 'loading' | 'empty' }) {
       <div className="card-body top-weed-card__body">
         <div className="top-weed-card__ph-line top-weed-card__ph-line--title" />
         <div className="top-weed-card__ph-line top-weed-card__ph-line--sub" />
-        <div className="top-weed-card__ph-tags">
-          <span className="top-weed-card__ph-chip" />
-          <span className="top-weed-card__ph-chip top-weed-card__ph-chip--sm" />
-        </div>
-        <div className="top-weed-card__ph-status" />
-        <p className="top-weed-card__blurb top-weed-card__blurb--reserve" />
         <div className="top-weed-card__ph-line top-weed-card__ph-line--link" />
       </div>
     </div>
@@ -706,42 +753,55 @@ function TopWeedDetailContent({
   const showSci = Boolean(common && sci && common.toLowerCase() !== sci.toLowerCase())
 
   return (
-    <>
+    <div className="plant-detail-dialog__content">
       {hero && (
         <div className="plant-detail-dialog__hero">
           <img src={hero} alt="" loading="lazy" referrerPolicy="no-referrer" />
         </div>
       )}
-      <div className="plant-detail-dialog__intro">
-        <p className="plant-detail-dialog__primary">{primaryTitle}</p>
-        {showSci && <p className="plant-detail-dialog__sci">{sci}</p>}
-        <ul className="plant-detail-dialog__meta">
-          <li>
-            <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
-          </li>
-        </ul>
+      <div className="plant-detail-dialog__details">
+        <div className="plant-detail-dialog__intro">
+          <p className="plant-detail-dialog__primary">{primaryTitle}</p>
+          {showSci && <p className="plant-detail-dialog__sci">{sci}</p>}
+          <ul className="plant-detail-dialog__meta">
+            <li>
+              <strong>Risk:</strong> {weed.riskRating ?? 'Unknown'}
+            </li>
+            {weed.weedStatusVic && (
+              <li>
+                <strong>Victorian status:</strong> {weed.weedStatusVic}
+              </li>
+            )}
+            {weed.isWons && <li>Weed of National Significance (WoNS)</li>}
+            {weed.riskScore != null && (
+              <li>
+                <strong>Risk score:</strong> {weed.riskScore}
+              </li>
+            )}
+          </ul>
+        </div>
+        {summary ? (
+          <p className="plant-detail-dialog__summary">{summary}</p>
+        ) : enrichment === 'loading' ? (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading description…</p>
+        ) : (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            No public description found for this species yet.
+          </p>
+        )}
+        {link && (
+          <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
+            <a href={link} target="_blank" rel="noreferrer">
+              Learn more (Wikipedia / species database) →
+            </a>
+          </p>
+        )}
+        <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
+          Risk metadata is from your weeds database. Photos and short descriptions may come from
+          Wikipedia and iNaturalist.
+        </p>
       </div>
-      {summary ? (
-        <p className="plant-detail-dialog__summary">{summary}</p>
-      ) : enrichment === 'loading' ? (
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading description…</p>
-      ) : (
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
-          No public description found for this species yet.
-        </p>
-      )}
-      {link && (
-        <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
-          <a href={link} target="_blank" rel="noreferrer">
-            Learn more (Wikipedia / species database) →
-          </a>
-        </p>
-      )}
-      <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
-        Risk metadata is from your weeds database. Photos and short descriptions may come from
-        Wikipedia and iNaturalist.
-      </p>
-    </>
+    </div>
   )
 }
 
@@ -905,9 +965,26 @@ export function WeedPage() {
     [topWeeds, topWeedsEnriched],
   )
 
+  /** Scroll only after sidebar / in-page hash navigation — not when top-weed fetch state changes. */
+  const lastHashForScrollRef = useRef('')
+  const pendingHashScrollRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (location.pathname !== '/weed') {
+      lastHashForScrollRef.current = ''
+      pendingHashScrollRef.current = null
+      return
+    }
+    const hash = location.hash
+    const raw = hash.replace(/^#/, '').trim()
+    if (!raw || hash === lastHashForScrollRef.current) return
+    lastHashForScrollRef.current = hash
+    pendingHashScrollRef.current = raw
+  }, [location.hash, location.pathname])
+
   useEffect(() => {
     if (location.pathname !== '/weed') return
-    const raw = location.hash.replace(/^#/, '')
+    const raw = pendingHashScrollRef.current
     if (!raw) return
     if (raw === 'top-weeds' && (topWeedsLoading || topWeedsEnrichBusy)) return
 
@@ -916,7 +993,9 @@ export function WeedPage() {
     const run = () => {
       if (cancelled) return
       const el = document.getElementById(raw)
-      if (el) scrollElementWithFixedHeader(el, 'smooth')
+      if (!el) return
+      scrollElementWithFixedHeader(el, 'smooth')
+      pendingHashScrollRef.current = null
     }
     const t = window.setTimeout(run, 0)
     const id0 = requestAnimationFrame(() => {
@@ -928,7 +1007,7 @@ export function WeedPage() {
       cancelAnimationFrame(id0)
       cancelAnimationFrame(innerFrame)
     }
-  }, [location.hash, location.pathname, topWeedsLoading, topWeedsEnrichBusy])
+  }, [location.pathname, topWeedsLoading, topWeedsEnrichBusy])
 
   useEffect(() => {
     queueMicrotask(() => setTopWeedsOffset(0))
@@ -1098,54 +1177,12 @@ export function WeedPage() {
         <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
       </Link>
 
-      <div className="section-block" style={{ marginBottom: 0 }}>
-        <h2 className="sr-only">Quick links</h2>
-        <div className="feature-grid">
-          <a href="#weed-checker" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconCamera />
-            </div>
-            <div>
-              <h3>Plant identifier</h3>
-              <p>Scan or upload a photo to identify the plant — same tool as on the home page.</p>
-            </div>
-          </a>
-          <a href="#rules" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconDroplet />
-            </div>
-            <div>
-              <h3>General rules</h3>
-              <p>Key rules to follow whenever removing any weed from your garden or land.</p>
-            </div>
-          </a>
-          <a href="#disposal" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconBin />
-            </div>
-            <div>
-              <h3>Disposal guide</h3>
-              <p>Select your weed type for tailored safe removal and disposal instructions.</p>
-            </div>
-          </a>
-          <a href="#prohibited" className="feature-tile">
-            <div className="feature-tile__icon">
-              <IconPrevent />
-            </div>
-            <div>
-              <h3>Prohibited weeds</h3>
-              <p>State prohibited weeds in Victoria you must not remove — report them immediately.</p>
-            </div>
-          </a>
-        </div>
-      </div>
-
       <WeedSection id="weed-checker" title="Plant identifier" eyebrow="Identify">
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)' }}>
           Upload a photo or use your camera — we will identify the plant and return a confidence score.
         </p>
 
-      <label htmlFor={inputId} className="upload-zone" style={{ display: 'block' }}>
+      <label htmlFor={inputId} className="upload-zone">
         <input
           id={inputId}
           type="file"
@@ -1154,11 +1191,11 @@ export function WeedPage() {
           className="sr-only"
           onChange={handleFile}
         />
-        <IconCamera />
-        <p style={{ margin: 'var(--space-sm) 0 0', fontWeight: 600 }}>Tap to upload or scan</p>
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-            JPG or PNG — sent to the prediction API
-        </p>
+        <span className="upload-zone__icon" aria-hidden="true">
+          <IconCamera />
+        </span>
+        <p className="upload-zone__title">Tap to upload or scan a photo</p>
+        <p className="upload-zone__hint">JPG or PNG — we will identify the plant and show a confidence score</p>
       </label>
 
         {previewUrl && (
@@ -1244,7 +1281,7 @@ export function WeedPage() {
               const extra = topWeedsEnriched[`top-${w.id}`]
               const meta = typeof extra === 'object' && extra ? extra : undefined
               const img = meta?.imageUrl
-              const blurb = meta?.description
+              const cardTitle = w.commonName?.trim() || w.scientificName || 'Weed'
               return (
                 <button
                   type="button"
@@ -1269,21 +1306,13 @@ export function WeedPage() {
                       <div className="vicflora-card__image-placeholder" aria-hidden />
                     )}
                   </div>
-      <div className="card-body top-weed-card__body">
-                    <h3 className="top-weed-card__title">{w.commonName || w.scientificName}</h3>
-                    {w.commonName ? (
-                      <p className="top-weed-card__sci">{w.scientificName}</p>
-                    ) : (
-                      <p className="top-weed-card__sci top-weed-card__sci--empty" aria-hidden="true" />
-                    )}
+                  <div className="card-body top-weed-card__body">
+                    <h3 className="top-weed-card__title">{cardTitle}</h3>
                     <div className="top-weed-card__meta">
                       <span>
                         <strong>Risk:</strong> {w.riskRating ?? 'Unknown'}
                       </span>
                     </div>
-                    {blurb ? <p className="top-weed-card__blurb top-weed-card__blurb--filled">{blurb}</p> : (
-                      <p className="top-weed-card__blurb top-weed-card__blurb--reserve" aria-hidden="true" />
-                    )}
                     <p className="top-weed-card__cta">View details</p>
                   </div>
                 </button>
@@ -1324,9 +1353,6 @@ export function WeedPage() {
 
       {/* ── General rules ── */}
       <WeedSection id="rules" title="General rules" eyebrow="Always apply">
-        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)', fontSize: '0.88rem' }}>
-          Follow these rules whenever removing any weed. Tap each rule to expand details.
-        </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
           {GENERAL_RULES.map((rule, i) => {
             const open = openRules.has(i)
@@ -1368,9 +1394,6 @@ export function WeedPage() {
 
       {/* ── Disposal guide ── */}
       <WeedSection id="disposal" title="Disposal guide by weed type" eyebrow="Dispose responsibly">
-        <p style={{ color: 'var(--color-text-muted)', marginTop: 0, marginBottom: 'var(--space-md)', fontSize: '0.88rem' }}>
-          Select the category that best matches your weed to see tailored disposal instructions.
-        </p>
         <div className="weed-disposal-type-grid">
           {WEED_TYPES.map(({ type, icon, label, imgUrl }) => {
             const active = selectedType === type
@@ -1417,8 +1440,36 @@ export function WeedPage() {
           return (
             <div ref={disposalContentRef} style={{ marginTop: 'var(--space-xl)', scrollMarginTop: 'var(--space-xl)' }}>
               <h3 style={{ color: 'var(--color-primary-dark)', marginBottom: 'var(--space-lg)', fontSize: '1.1rem' }}>{d.title}</h3>
+              <div className="weed-disposal-columns" style={{ marginBottom: 'var(--space-xl)' }}>
+                <div style={{ background: 'rgba(230,81,0,0.06)', border: '1px solid rgba(230,81,0,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-warning)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>⚡ What makes it risky</h4>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {d.risk.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-warning)', fontWeight: 700, marginTop: 1 }}>•</span>{item}</li>)}
+                  </ul>
+                </div>
+                <div style={{ background: 'rgba(46,125,50,0.06)', border: '1px solid rgba(46,125,50,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>✓ What to do</h4>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {d.dos.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-success)', marginTop: 1 }}>✓</span>{item}</li>)}
+                  </ul>
+                </div>
+                <div style={{ background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-danger)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>✗ What NOT to do</h4>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {d.donts.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-danger)', fontWeight: 700, marginTop: 1 }}>✗</span>{item}</li>)}
+                  </ul>
+                </div>
+              </div>
+              {d.prohibitedNote && (
+                <div style={{ marginBottom: 'var(--space-xl)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)', background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
+                  <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>🚫</span>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-danger)', lineHeight: 1.6 }}>
+                    <strong>{d.prohibitedNote}</strong>
+                  </p>
+                </div>
+              )}
               <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', margin: '0 0 var(--space-sm)' }}>Representative Species</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-md)', marginBottom: 'var(--space-xl)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-md)' }}>
                 {d.species.map((s) => (
                   <div key={s.name} className="card" style={{ overflow: 'hidden' }}>
                     {/* Species photo */}
@@ -1448,34 +1499,6 @@ export function WeedPage() {
                   </div>
                 ))}
               </div>
-              <div className="weed-disposal-columns">
-                <div style={{ background: 'rgba(230,81,0,0.06)', border: '1px solid rgba(230,81,0,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
-                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-warning)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>⚡ What makes it risky</h4>
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    {d.risk.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-warning)', fontWeight: 700, marginTop: 1 }}>•</span>{item}</li>)}
-                  </ul>
-                </div>
-                <div style={{ background: 'rgba(46,125,50,0.06)', border: '1px solid rgba(46,125,50,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
-                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>✓ What to do</h4>
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    {d.dos.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-success)', marginTop: 1 }}>✓</span>{item}</li>)}
-                  </ul>
-                </div>
-                <div style={{ background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
-                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-danger)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>✗ What NOT to do</h4>
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    {d.donts.map((item, i) => <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}><span style={{ flexShrink: 0, color: 'var(--color-danger)', fontWeight: 700, marginTop: 1 }}>✗</span>{item}</li>)}
-                  </ul>
-                </div>
-              </div>
-              {d.prohibitedNote && (
-                <div style={{ marginTop: 'var(--space-md)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)', background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
-                  <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>🚫</span>
-                  <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-danger)', lineHeight: 1.6 }}>
-                    <strong>{d.prohibitedNote}</strong>
-                  </p>
-                </div>
-              )}
             </div>
           )
         })()}
@@ -1491,7 +1514,7 @@ export function WeedPage() {
               The following weeds are <strong>State Prohibited Weeds</strong> in Victoria. You must <strong>not</strong> attempt to remove them yourself — report them to the Department of Energy, Environment and Climate Action immediately.
             </p>
             <a
-              href="https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed"
+              href={VIC_STATE_PROHIBITED_WEED_REPORT_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="weed-report-cta"

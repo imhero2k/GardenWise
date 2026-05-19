@@ -278,7 +278,7 @@ const LF_CODE_PROFILES: Record<string, LfCodeProfile> = {
 }
 
 const GOAL_OPTIONS: GoalOption[] = [
-  { id: 'free', label: 'Free planning', shortLabel: 'Free', tone: 'neutral' },
+  { id: 'free', label: 'No goal', shortLabel: 'No goal', tone: 'neutral' },
   { id: 'bird', label: 'Bird-friendly garden', shortLabel: 'Bird-friendly', tone: 'bird' },
   { id: 'pollinator', label: 'Pollinator garden', shortLabel: 'Pollinator', tone: 'pollinator' },
 ]
@@ -621,7 +621,7 @@ function goalProgressItems(goal: GardenGoal, counts: FormCounts): ProgressItem[]
   return [
     {
       title: 'Manual layout',
-      detail: `${counts.total} plant${counts.total === 1 ? '' : 's'} placed in free planning mode.`,
+      detail: `${counts.total} plant${counts.total === 1 ? '' : 's'} placed with no goal selected.`,
       state: counts.total > 0 ? 'complete' : 'active',
     },
   ]
@@ -645,7 +645,7 @@ function goalReasons(goal: GardenGoal): string[] {
   }
 
   return [
-    'Free planning keeps the existing manual catalog available for quick layout and spacing checks.',
+    'With no goal selected, the full manual catalog stays available for quick layout and spacing checks.',
   ]
 }
 
