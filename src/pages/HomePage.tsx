@@ -341,24 +341,6 @@ function HomeImpactWeedRotator() {
           </div>
         ))}
       </div>
-      <p className="home-native-benefits__photo-credit">
-        <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">
-          Unsplash
-        </a>
-        :{' '}
-        <a href="https://unsplash.com/photos/TotuOjWlLgU" target="_blank" rel="noopener noreferrer">
-          Yashika g
-        </a>
-        {' · '}
-        <a href="https://unsplash.com/photos/7FN-K3-5xGg" target="_blank" rel="noopener noreferrer">
-          Piaras Jackson
-        </a>
-        {' · '}
-        <a href="https://unsplash.com/photos/r5_PqJLV3jw" target="_blank" rel="noopener noreferrer">
-          Annie Spratt
-        </a>
-        .
-      </p>
     </div>
   )
 }
@@ -506,16 +488,9 @@ export function HomePage() {
           </div>
           <p className="home-native-benefits__photo-credit">Kangaroo paw photograph: John Jennings.</p>
           <p className="home-native-benefits__photo-credit">
+            Photographs on this page from{' '}
             <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">
               Unsplash
-            </a>
-            :{' '}
-            <a href="https://unsplash.com/photos/EiKgz_46i70" target="_blank" rel="noopener noreferrer">
-              Photo by Pen Ash
-            </a>
-            {' · '}
-            <a href="https://unsplash.com/photos/19SC2oaVZW0" target="_blank" rel="noopener noreferrer">
-              Photo by Kazuend
             </a>
             .
           </p>

@@ -1,8 +1,10 @@
-import { useLayoutEffect } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Fragment, useLayoutEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { BeginnerTierCrossLink } from '../components/BeginnerTierCrossLink'
 import { GardensForWildlifeBlurb } from '../components/GardensForWildlifeBlurb'
+import { BeginnersSidenav } from '../components/BeginnersSidenav'
 import { BEGINNER_RESOURCES_HASH, scrollToBeginnerResources } from '../lib/beginnerResourcesNav'
-import { TUTORIALS } from './beginners/tutorials'
+import { BASIC_TUTORIALS, TUTORIALS } from './beginners/tutorials'
 
 export function BeginnerGuidesPage() {
   const location = useLocation()
@@ -20,22 +22,15 @@ export function BeginnerGuidesPage() {
     }
   }, [location.hash, location.pathname, navigate])
 
-  const stepLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `beginners-sidenav__link${isActive ? ' beginners-sidenav__link--active' : ''}`
-
   return (
     <div className="beginners-layout">
-      <aside className="beginners-sidenav" aria-label="Basics navigation">
-        <p className="beginners-sidenav__title">Basics</p>
-        <NavLink to="/beginners" className={stepLinkClass} end>
-          All guides
-        </NavLink>
-        {TUTORIALS.map((t) => (
-          <NavLink key={t.id} to={`/beginners/${t.id}`} className={stepLinkClass}>
-            {t.title}
-          </NavLink>
-        ))}
-      </aside>
+      <BeginnersSidenav
+        sectionTitle="Basics"
+        indexTo="/beginners"
+        indexLabel="Basic guides"
+        tutorials={BASIC_TUTORIALS}
+        crossLink={{ to: '/beginners/advanced', label: 'Advanced guides' }}
+      />
 
       <div className="beginners-layout__main">
         <header className="page-header fade-up">
@@ -43,16 +38,26 @@ export function BeginnerGuidesPage() {
           <h1>Step-by-step: your first native-friendly garden</h1>
         </header>
 
-        {TUTORIALS.map((t) => (
-          <section key={t.id} className="card beginner-tutorial" aria-labelledby={`${t.id}-heading`}>
-            <h2 id={`${t.id}-heading`}>{t.title}</h2>
-            <p className="beginner-tutorial__intro">{t.intro}</p>
-            <p style={{ margin: 0 }}>
-              <Link to={`/beginners/${t.id}`} className="home-impact__more-link">
-                Open this guide
-              </Link>
-            </p>
-          </section>
+        {BASIC_TUTORIALS.map((t) => (
+          <Fragment key={t.id}>
+            <section className="card beginner-tutorial" aria-labelledby={`${t.id}-heading`}>
+              <h2 id={`${t.id}-heading`}>{t.title}</h2>
+              <p className="beginner-tutorial__intro">{t.intro}</p>
+              <p style={{ margin: 0 }}>
+                <Link to={`/beginners/${t.id}`} className="home-impact__more-link">
+                  Open this guide
+                </Link>
+              </p>
+            </section>
+            {t.id === 'watering-guide' ? (
+              <BeginnerTierCrossLink
+                title="Advanced guides"
+                description="Extreme heat and cold, attracting birds, insects and small mammals — for when you are ready to go further."
+                to="/beginners/advanced"
+                linkLabel="View advanced guides"
+              />
+            ) : null}
+          </Fragment>
         ))}
 
         <section

@@ -21,6 +21,16 @@ export interface FrostWindow {
   provider: WeatherProvider
 }
 
+export interface HeatWindow {
+  /** ISO-8601 hour heat is expected to start (earliest hour above threshold) */
+  startsAt: string
+  /** Highest forecast temperature in the next 24 h */
+  maxTempC: number
+  /** Hours from now until the hot period begins */
+  hoursUntil: number
+  provider: WeatherProvider
+}
+
 function getGoogleApiKey(): string | undefined {
   const k = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   return typeof k === 'string' && k.trim() ? k.trim() : undefined
@@ -138,13 +148,28 @@ export async function fetchCurrentWeather(
 }
 
 const FROST_THRESHOLD_C = 2
+export const HEAT_THRESHOLD_C = 32
+const HOURLY_CACHE_TTL_MS = 60 * 60 * 1000
 
-async function fetchGoogleFrostForecast(
+type HourlyPoint = { time: string; degrees: number }
+
+let hourlyCache: {
+  key: string
+  fetchedAt: number
+  points: HourlyPoint[]
+  provider: WeatherProvider
+} | null = null
+
+function cacheKey(lat: number, lng: number) {
+  return `${lat.toFixed(4)},${lng.toFixed(4)}`
+}
+
+async function fetchGoogleHourlyTemps(
   lat: number,
   lng: number,
   apiKey: string,
   signal?: AbortSignal,
-): Promise<FrostWindow | null> {
+): Promise<HourlyPoint[]> {
   const u = new URL('https://weather.googleapis.com/v1/forecast/hours:lookup')
   u.searchParams.set('key', apiKey)
   u.searchParams.set('location.latitude', String(lat))
@@ -162,31 +187,23 @@ async function fetchGoogleFrostForecast(
   }
 
   const hours = data.forecastHours
-  if (!hours?.length) return null
+  if (!hours?.length) return []
 
-  let minTemp = Infinity
-  let frostStart: string | undefined
-  const now = Date.now()
-
+  const points: HourlyPoint[] = []
   for (const h of hours) {
-    const deg = h.temperature?.degrees
-    const ts = h.interval?.startTime
-    if (deg == null || !ts) continue
-    if (deg < minTemp) minTemp = deg
-    if (deg <= FROST_THRESHOLD_C && !frostStart) frostStart = ts
+    const degrees = h.temperature?.degrees
+    const time = h.interval?.startTime
+    if (degrees == null || !time) continue
+    points.push({ time, degrees })
   }
-
-  if (!frostStart || minTemp > FROST_THRESHOLD_C) return null
-
-  const hoursUntil = Math.max(0, Math.round((new Date(frostStart).getTime() - now) / 3_600_000))
-  return { startsAt: frostStart, minTempC: Math.round(minTemp), hoursUntil, provider: 'google' }
+  return points
 }
 
-async function fetchOpenMeteoFrostForecast(
+async function fetchOpenMeteoHourlyTemps(
   lat: number,
   lng: number,
   signal?: AbortSignal,
-): Promise<FrostWindow | null> {
+): Promise<HourlyPoint[]> {
   const u = new URL('https://api.open-meteo.com/v1/forecast')
   u.searchParams.set('latitude', String(lat))
   u.searchParams.set('longitude', String(lng))
@@ -195,7 +212,7 @@ async function fetchOpenMeteoFrostForecast(
   u.searchParams.set('timezone', 'auto')
 
   const res = await fetch(u.toString(), { signal })
-  if (!res.ok) throw new Error('Frost forecast unavailable')
+  if (!res.ok) throw new Error('Hourly forecast unavailable')
 
   const data = (await res.json()) as {
     hourly?: { time?: string[]; temperature_2m?: number[] }
@@ -203,41 +220,118 @@ async function fetchOpenMeteoFrostForecast(
 
   const times = data.hourly?.time
   const temps = data.hourly?.temperature_2m
-  if (!times?.length || !temps?.length) return null
+  if (!times?.length || !temps?.length) return []
 
+  const points: HourlyPoint[] = []
+  for (let i = 0; i < times.length; i++) {
+    const degrees = temps[i]
+    if (degrees == null) continue
+    points.push({ time: times[i], degrees })
+  }
+  return points
+}
+
+async function fetchHourlyTemperatures(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<{ points: HourlyPoint[]; provider: WeatherProvider }> {
+  const key = cacheKey(lat, lng)
+  if (
+    hourlyCache?.key === key &&
+    Date.now() - hourlyCache.fetchedAt < HOURLY_CACHE_TTL_MS
+  ) {
+    return { points: hourlyCache.points, provider: hourlyCache.provider }
+  }
+
+  const googleKey = getGoogleApiKey()
+  if (googleKey) {
+    try {
+      const points = await fetchGoogleHourlyTemps(lat, lng, googleKey, signal)
+      if (points.length) {
+        hourlyCache = { key, fetchedAt: Date.now(), points, provider: 'google' }
+        return { points, provider: 'google' }
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+
+  const points = await fetchOpenMeteoHourlyTemps(lat, lng, signal)
+  hourlyCache = { key, fetchedAt: Date.now(), points, provider: 'openmeteo' }
+  return { points, provider: 'openmeteo' }
+}
+
+function hoursUntilStart(startsAt: string) {
+  return Math.max(0, Math.round((new Date(startsAt).getTime() - Date.now()) / 3_600_000))
+}
+
+function detectFrost(points: HourlyPoint[], provider: WeatherProvider): FrostWindow | null {
   let minTemp = Infinity
   let frostStart: string | undefined
-  const now = Date.now()
 
-  for (let i = 0; i < times.length; i++) {
-    const deg = temps[i]
-    if (deg == null) continue
-    if (deg < minTemp) minTemp = deg
-    if (deg <= FROST_THRESHOLD_C && !frostStart) frostStart = times[i]
+  for (const { time, degrees } of points) {
+    if (degrees < minTemp) minTemp = degrees
+    if (degrees <= FROST_THRESHOLD_C && !frostStart) frostStart = time
   }
 
   if (!frostStart || minTemp > FROST_THRESHOLD_C) return null
-
-  const hoursUntil = Math.max(0, Math.round((new Date(frostStart).getTime() - now) / 3_600_000))
-  return { startsAt: frostStart, minTempC: Math.round(minTemp), hoursUntil, provider: 'openmeteo' }
+  return {
+    startsAt: frostStart,
+    minTempC: Math.round(minTemp),
+    hoursUntil: hoursUntilStart(frostStart),
+    provider,
+  }
 }
 
-/**
- * Check whether frost (≤ 2 °C) is forecast in the next 24 hours.
- * Returns a FrostWindow if yes, null if no frost expected.
- */
+function detectHeat(points: HourlyPoint[], provider: WeatherProvider): HeatWindow | null {
+  let maxTemp = -Infinity
+  let heatStart: string | undefined
+
+  for (const { time, degrees } of points) {
+    if (degrees > maxTemp) maxTemp = degrees
+    if (degrees > HEAT_THRESHOLD_C && !heatStart) heatStart = time
+  }
+
+  if (!heatStart || maxTemp <= HEAT_THRESHOLD_C) return null
+  return {
+    startsAt: heatStart,
+    maxTempC: Math.round(maxTemp),
+    hoursUntil: hoursUntilStart(heatStart),
+    provider,
+  }
+}
+
+/** Frost (≤ 2 °C) or heat (> HEAT_THRESHOLD_C) from one 24 h hourly fetch (cached 1 h). */
+export async function fetchExtremeTemperatureAlerts(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<{ frost: FrostWindow | null; heat: HeatWindow | null }> {
+  const { points, provider } = await fetchHourlyTemperatures(lat, lng, signal)
+  if (!points.length) return { frost: null, heat: null }
+  return {
+    frost: detectFrost(points, provider),
+    heat: detectHeat(points, provider),
+  }
+}
+
+/** Check whether frost (≤ 2 °C) is forecast in the next 24 hours. */
 export async function fetchFrostForecast(
   lat: number,
   lng: number,
   signal?: AbortSignal,
 ): Promise<FrostWindow | null> {
-  const key = getGoogleApiKey()
-  if (key) {
-    try {
-      return await fetchGoogleFrostForecast(lat, lng, key, signal)
-    } catch {
-      /* fall through */
-    }
-  }
-  return fetchOpenMeteoFrostForecast(lat, lng, signal)
+  const { points, provider } = await fetchHourlyTemperatures(lat, lng, signal)
+  return detectFrost(points, provider)
+}
+
+/** Check whether heat (> HEAT_THRESHOLD_C) is forecast in the next 24 hours. */
+export async function fetchHeatForecast(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<HeatWindow | null> {
+  const { points, provider } = await fetchHourlyTemperatures(lat, lng, signal)
+  return detectHeat(points, provider)
 }
