@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { enrichPlantByScientificName, type PlantEnrichment } from '../lib/plantEnrichment'
-import type { StateProhibitedWeed } from '../lib/stateProhibitedWeeds'
-
-const VIC_REPORT_URL =
-  'https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed'
+import {
+  VIC_STATE_PROHIBITED_WEED_REPORT_URL,
+  type StateProhibitedWeed,
+} from '../lib/stateProhibitedWeeds'
 
 export function ProhibitedWeedModal({ weed, onClose }: { weed: StateProhibitedWeed; onClose: () => void }) {
   const [enrichment, setEnrichment] = useState<PlantEnrichment | null>(null)
@@ -208,7 +208,7 @@ export function ProhibitedWeedModal({ weed, onClose }: { weed: StateProhibitedWe
         )}
 
         <a
-          href={VIC_REPORT_URL}
+          href={VIC_STATE_PROHIBITED_WEED_REPORT_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="weed-report-cta"

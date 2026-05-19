@@ -62,11 +62,14 @@ function mapPlantNetResponse(json: PlantNetIdentifyResponse): PredictResponse | 
 
   const score = typeof best?.score === 'number' && Number.isFinite(best.score) ? best.score : null
   const confidence = score != null ? Math.max(0, Math.min(1, score)) : 0.5
+  const commonName =
+    best?.species?.commonNames?.map((n) => n.trim()).find((n) => n.length > 0) ?? null
 
   return {
     class_index: -1,
     confidence,
     label,
+    commonName,
     source: 'plantnet',
   }
 }

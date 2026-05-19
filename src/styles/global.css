@@ -29,6 +29,11 @@
   --space-xl: 2rem;
   --space-2xl: 2.75rem;
   --bottom-nav-h: 72px;
+  --location-bar-inner-h: calc(2.5rem + 1.4rem);
+  --location-bar-pad-block: 1.4rem;
+  --location-bar-total-h: calc(var(--location-bar-inner-h) + var(--location-bar-pad-block));
+  --page-sidenav-w: 220px;
+  --page-sidenav-gutter: var(--space-md);
   --anchor-scroll-padding: 0px;
   --transition: 0.22s ease;
 }
@@ -50,7 +55,7 @@ html {
   }
 
   :root {
-    --location-bar-est-h: calc(var(--location-bar-inner-h, 4.25rem) + var(--space-lg) + 2px);
+    --location-bar-est-h: calc(var(--location-bar-total-h) + var(--space-lg) + 2px);
     --anchor-scroll-padding: calc(
       var(--bottom-nav-h) + env(safe-area-inset-top, 0px) + var(--space-md) + var(--location-bar-est-h)
     );
@@ -498,6 +503,120 @@ img {
 
 @media (prefers-reduced-motion: reduce) {
   .weed-report-cta:active {
+    transform: none;
+  }
+}
+
+/* Plant ID — state prohibited weed actions */
+.weed-prohibited-id-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.weed-prohibited-id-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.25;
+  box-shadow: var(--shadow-soft);
+  transition:
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition),
+    filter var(--transition);
+}
+
+.weed-prohibited-id-btn--view {
+  color: #fff;
+  background: #e65100;
+}
+
+.weed-prohibited-id-btn--view:hover {
+  background: #c2410c;
+  color: #fff;
+  filter: brightness(1.05);
+}
+
+.weed-prohibited-id-btn--view:focus-visible {
+  outline: 3px solid rgba(230, 81, 0, 0.45);
+  outline-offset: 2px;
+}
+
+.weed-prohibited-id-btn--report {
+  color: #fff;
+  background: #b3261e;
+}
+
+.weed-prohibited-id-btn--report:hover {
+  background: #9a1f18;
+  color: #fff;
+  text-decoration: none;
+  filter: brightness(1.05);
+}
+
+.weed-prohibited-id-btn--report:focus-visible {
+  outline: 3px solid rgba(179, 38, 30, 0.45);
+  outline-offset: 2px;
+}
+
+.weed-prohibited-id-btn:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weed-prohibited-id-btn:active {
+    transform: none;
+  }
+}
+
+.weed-disposal-id-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1.25;
+  color: #fff;
+  background: var(--color-primary);
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition:
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition),
+    filter var(--transition);
+}
+
+.weed-disposal-id-btn:hover {
+  background: var(--color-primary-dark);
+  filter: brightness(1.05);
+}
+
+.weed-disposal-id-btn:focus-visible {
+  outline: 3px solid rgba(46, 125, 50, 0.4);
+  outline-offset: 2px;
+}
+
+.weed-disposal-id-btn:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weed-disposal-id-btn:active {
     transform: none;
   }
 }
@@ -1090,6 +1209,22 @@ img {
   line-height: 1.6;
 }
 
+.beginner-resources__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.7;
+}
+
+.beginner-resources__list a {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.beginner-resources__list a:hover,
+.beginner-resources__list a:focus-visible {
+  color: var(--color-link-hover);
+}
+
 .beginner-tutorial__steps {
   margin: 0;
   padding-left: 1.35rem;
@@ -1637,14 +1772,31 @@ img {
   align-items: stretch;
 }
 
+/* Uniform preview image frame — aspect-ratio sets height from column width; media fills the box. */
 .plant-grid--top-weeds .card-media-top__imgwrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
   aspect-ratio: 4 / 3;
-  min-height: clamp(168px, 42vw, 240px);
+  overflow: hidden;
+  background: var(--color-bg);
 }
 
 .plant-grid--top-weeds .card-media-top__imgwrap img,
-.plant-grid--top-weeds .vicflora-card__image-placeholder {
-  min-height: clamp(168px, 42vw, 240px);
+.plant-grid--top-weeds .card-media-top__imgwrap .vicflora-card__image-placeholder,
+.plant-grid--top-weeds .card-media-top__imgwrap .top-weed-card__ph-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  object-fit: cover;
+}
+
+.plant-grid--top-weeds .card-media-top__imgwrap .vicflora-card__image-placeholder,
+.plant-grid--top-weeds .card-media-top__imgwrap .top-weed-card__ph-image {
+  object-fit: unset;
 }
 
 .plant-grid--top-weeds .top-weed-card,
@@ -1657,10 +1809,25 @@ img {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 15.5rem;
+  min-height: 0;
 }
 
-.plant-grid--top-weeds .top-weed-card__title {
+.catalog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.catalog-card__cta,
+.plant-grid--top-weeds .top-weed-card__cta {
+  font-size: 0.78rem;
+  color: var(--color-primary);
+  margin: auto 0 0;
+  flex-shrink: 0;
+}
+
+.plant-grid--top-weeds .top-weed-card__title,
+.catalog-card__body .plant-card-title {
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.25;
@@ -1669,7 +1836,6 @@ img {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  min-height: calc(1.05rem * 1.25 * 2);
 }
 
 .plant-grid--top-weeds .top-weed-card__sci {
@@ -1692,10 +1858,9 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 0.6rem;
-  margin-top: 0.55rem;
+  margin-top: 0.35rem;
   align-items: center;
   font-size: 0.82rem;
-  min-height: 2.45rem;
   align-content: flex-start;
 }
 
@@ -1736,13 +1901,6 @@ img {
   margin-top: auto;
 }
 
-.plant-grid--top-weeds .top-weed-card__cta {
-  font-size: 0.78rem;
-  color: var(--color-primary);
-  margin: var(--space-sm) 0 0;
-  flex-shrink: 0;
-}
-
 .top-weed-card--placeholder {
   border: 1px dashed var(--color-border);
   box-shadow: none;
@@ -1764,9 +1922,6 @@ img {
 }
 
 .top-weed-card__ph-image {
-  width: 100%;
-  height: 100%;
-  min-height: 4rem;
   background: var(--color-bg);
 }
 
@@ -1834,6 +1989,57 @@ img {
   100% {
     background-position: -100% 0;
   }
+}
+
+/* Plant ID result — collapsible Learn more */
+.weed-learn-more {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.weed-learn-more__summary {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  user-select: none;
+  color: var(--weed-learn-more-color, var(--color-primary-dark));
+  transition: color var(--transition);
+}
+
+.weed-learn-more__summary:hover {
+  color: var(--color-link-hover);
+}
+
+.weed-learn-more__summary::-webkit-details-marker {
+  display: none;
+}
+
+.weed-learn-more__summary::after {
+  content: '▼';
+  font-size: 0.7rem;
+  color: var(--weed-learn-more-color, var(--color-text-muted));
+  transition:
+    transform var(--transition),
+    color var(--transition);
+  flex-shrink: 0;
+}
+
+.weed-learn-more__summary:hover::after {
+  color: var(--color-link-hover);
+}
+
+.weed-learn-more[open] .weed-learn-more__summary::after {
+  transform: rotate(180deg);
+}
+
+.weed-learn-more__body {
+  margin-top: var(--space-md);
 }
 
 /* Weed page — general rules accordion & disposal type tiles (hover like prohibited weed cards) */
@@ -2389,14 +2595,91 @@ img {
   justify-content: center;
 }
 
+@media (min-width: 640px) {
+  :root {
+    --location-bar-inner-h: calc(2.5rem + 1.7rem);
+    --location-bar-pad-block: 1.7rem;
+  }
+}
+
 /* Home hero — editorial stagger + ambient motion (Figma-style landing) */
 .hero.home-hero {
-  min-height: calc(100svh - var(--bottom-nav-h));
+  min-height: calc(100svh - var(--bottom-nav-h) - (var(--location-bar-total-h) / 2));
+  padding-block: var(--space-lg);
+}
+
+.home-hero__scroll-hint {
+  position: absolute;
+  bottom: max(var(--space-md), env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--space-sm);
+  transform: translateX(-50%);
+  color: #fff;
+  opacity: 0.42;
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+
+.home-hero__scroll-hint:hover,
+.home-hero__scroll-hint:focus-visible {
+  opacity: 0.72;
+  text-decoration: none;
+  outline: none;
+}
+
+.home-hero__scroll-hint:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.home-hero__scroll-hint-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.home-hero__scroll-hint-chevron {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: -0.15rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero__scroll-hint-chevron {
+    animation: home-hero-scroll-hint-bob 2.2s ease-in-out infinite;
+  }
+}
+
+@keyframes home-hero-scroll-hint-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(5px) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__scroll-hint-chevron {
+    animation: none;
+  }
 }
 
 .home-hero .hero-inner {
-  gap: clamp(2.1rem, 6vh, 3.75rem);
-  padding-block: clamp(0.5rem, 2vh, 1.5rem);
+  gap: clamp(1.5rem, 4vh, 2.75rem);
+  padding-block: clamp(0.35rem, 1vh, 1rem);
 }
 
 .home-hero .hero-inner > p {
@@ -2406,9 +2689,20 @@ img {
   line-height: 1.65;
 }
 
-.home-hero .hero-cta-row {
+.home-hero__ctas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
   margin-top: var(--space-sm);
-  gap: var(--space-md);
+}
+
+.home-hero .hero-cta-row {
+  gap: var(--space-lg);
+}
+
+.home-hero__cta-row--below {
+  margin-top: 0;
 }
 
 .home-hero__ambient {
@@ -2520,20 +2814,31 @@ img {
 }
 
 .home-hero .hero-title.home-hero__title {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 0.06em;
   max-width: none;
   margin-bottom: 0;
-  font-size: clamp(2.15rem, 7.25vw, 4.15rem);
+  font-size: clamp(1.85rem, 8vw, 4.15rem);
   font-weight: 700;
   line-height: 1.08;
   letter-spacing: -0.02em;
-  white-space: nowrap;
+  white-space: normal;
 }
 
-@media (max-width: 380px) {
+@media (min-width: 640px) {
   .home-hero .hero-title.home-hero__title {
-    font-size: clamp(1.65rem, 6.5vw, 2.05rem);
-    white-space: normal;
+    display: block;
+    font-size: clamp(2.15rem, 7.25vw, 4.15rem);
+    white-space: nowrap;
+  }
+
+  .home-hero .hero-title.home-hero__title .hero-title__line {
+    display: inline;
+  }
+
+  .home-hero .hero-title.home-hero__title .hero-title__line + .hero-title__line::before {
+    content: ' ';
   }
 }
 
@@ -2569,6 +2874,30 @@ img {
   .home-hero__cta-btn.btn-secondary:hover {
     transform: translateY(-2px);
   }
+
+  .home-hero__cta-btn--planner:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.home-hero__cta-btn--planner {
+  background: linear-gradient(135deg, var(--color-accent-soft) 0%, var(--color-accent) 100%);
+  color: var(--color-primary-dark);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: var(--shadow-soft);
+}
+
+.home-hero__cta-btn--planner:hover {
+  background: linear-gradient(135deg, #e8f5e9 0%, var(--color-accent-soft) 100%);
+  color: var(--color-primary-dark);
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: var(--shadow-hover);
+}
+
+.home-hero__cta-btn--planner:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+  color: var(--color-primary-dark);
 }
 
 /* Feature cards on home */
@@ -2779,7 +3108,7 @@ img {
   min-width: 0;
 }
 
-/* Programmatic auto-scroll: use a div viewport; WebKit is flaky with scrollLeft on <ul>. */
+/* Horizontal scroll viewport (manual swipe / trackpad / keyboard). */
 .home-quick-paths__viewport {
   width: 100%;
   max-width: 100%;
@@ -2793,6 +3122,11 @@ img {
   -ms-overflow-style: none;
   padding: 0 max(var(--space-md), env(safe-area-inset-left)) 0
     max(var(--space-md), env(safe-area-inset-right));
+}
+
+.home-quick-paths__viewport:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .home-quick-paths__viewport::-webkit-scrollbar {
@@ -2841,22 +3175,23 @@ img {
 }
 
 .home-quick-paths__cell {
-  flex: 0 0 min(292px, 80vw);
-  max-width: 300px;
+  flex: 0 0 min(200px, 72vw);
+  max-width: 220px;
 }
 
 @media (min-width: 900px) {
   .home-quick-paths__cell {
-    flex: 0 0 260px;
+    flex: 0 0 200px;
   }
 }
 
 .home-quick-paths__card {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   height: 100%;
-  min-height: 100%;
-  padding: var(--space-lg);
+  min-height: 0;
+  padding: var(--space-md) var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -2888,7 +3223,7 @@ img {
   justify-content: center;
   width: 48px;
   height: 48px;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
   border-radius: var(--radius-sm);
   background: rgba(46, 125, 50, 0.1);
   color: var(--color-primary-dark);
@@ -2908,33 +3243,9 @@ img {
   font-weight: 700;
   font-size: 1.05rem;
   letter-spacing: -0.01em;
-  margin-bottom: 0.35rem;
+  margin: 0;
+  line-height: 1.3;
   color: var(--color-text);
-}
-
-.home-quick-paths__card-blurb {
-  display: block;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--color-text-muted);
-  flex: 1;
-  margin-bottom: var(--space-md);
-}
-
-.home-quick-paths__card::after {
-  content: 'Open →';
-  margin-top: auto;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-primary-dark);
-  transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1), letter-spacing 0.35s ease;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .home-quick-paths__card:hover::after {
-    transform: translateX(4px);
-    letter-spacing: 0.02em;
-  }
 }
 
 /* Mission statement (home was moved to /about; shared card styles) */
@@ -3071,6 +3382,21 @@ img {
 .home-impact-weeds-slide--active {
   opacity: 1;
   transform: scale(1);
+}
+
+.home-impact-weeds-slide__name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-lg) var(--space-md) var(--space-sm);
+  background: linear-gradient(180deg, transparent 0%, rgba(11, 28, 13, 0.82) 72%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3636,22 +3962,70 @@ img {
   text-decoration-color: color-mix(in srgb, var(--color-link-hover) 85%, transparent);
 }
 
-/* Weed upload */
+/* Plant identifier upload drop zone */
 .upload-zone {
-  border: 2px dashed var(--color-accent);
-  border-radius: var(--radius-md);
-  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: clamp(220px, 38vw, 320px);
+  padding: var(--space-xl) var(--space-lg);
+  border: 3px dashed color-mix(in srgb, var(--color-primary) 55%, var(--color-accent));
+  border-radius: var(--radius-lg);
   text-align: center;
-  background: rgba(255, 255, 255, 0.7);
+  background: color-mix(in srgb, var(--color-primary) 8%, #fff);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--color-primary) 12%, transparent);
   cursor: pointer;
   transition:
     border-color var(--transition),
-    background var(--transition);
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
 }
 
 .upload-zone:hover {
   border-color: var(--color-primary);
-  background: #fff;
+  background: color-mix(in srgb, var(--color-primary) 12%, #fff);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.upload-zone:focus-within {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  outline-offset: 3px;
+  border-color: var(--color-primary);
+}
+
+.upload-zone__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 14%, #fff);
+  color: var(--color-primary-dark);
+}
+
+.upload-zone__icon svg {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.upload-zone__title {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  line-height: 1.3;
+}
+
+.upload-zone__hint {
+  margin: 0;
+  max-width: 28ch;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
 }
 
 .app-brand {
@@ -3794,7 +4168,6 @@ img {
 
 /* Location bar + dialog */
 .location-bar {
-  --location-bar-inner-h: calc(2.5rem + 1.4rem);
   position: relative;
   z-index: 1;
   margin: calc(-1 * var(--space-md)) calc(-1 * var(--space-md)) var(--space-lg);
@@ -3813,7 +4186,6 @@ img {
 
 @media (min-width: 640px) {
   .location-bar {
-    --location-bar-inner-h: calc(2.5rem + 1.7rem);
     margin: calc(-1 * var(--space-lg)) calc(-1 * var(--space-xl)) var(--space-lg);
     padding: 0.85rem 1.1rem;
   }
@@ -4186,8 +4558,23 @@ button.vicflora-card {
   padding: 0;
   max-width: min(520px, 94vw);
   max-height: min(88vh, 720px);
+  width: 100%;
   background: var(--color-surface);
   box-shadow: var(--shadow-hover);
+}
+
+@media (min-width: 768px) {
+  .plant-detail-dialog {
+    max-width: min(760px, 92vw);
+    max-height: 92vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  .plant-detail-dialog {
+    max-width: min(880px, 90vw);
+    max-height: 94vh;
+  }
 }
 
 .plant-detail-dialog::backdrop {
@@ -4199,6 +4586,18 @@ button.vicflora-card {
   display: flex;
   flex-direction: column;
   max-height: min(88vh, 720px);
+}
+
+@media (min-width: 768px) {
+  .plant-detail-dialog__inner {
+    max-height: 92vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  .plant-detail-dialog__inner {
+    max-height: 94vh;
+  }
 }
 
 .plant-detail-dialog__header {
@@ -4218,6 +4617,20 @@ button.vicflora-card {
   margin: 0;
   line-height: 1.25;
   padding-right: var(--space-sm);
+}
+
+@media (min-width: 768px) {
+  .plant-detail-dialog__title {
+    font-size: 1.25rem;
+  }
+
+  .plant-detail-dialog__header {
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+  }
+
+  .plant-detail-dialog__body {
+    padding: var(--space-lg);
+  }
 }
 
 .plant-detail-dialog__close {
@@ -4248,6 +4661,31 @@ button.vicflora-card {
   min-height: 0;
 }
 
+.plant-detail-dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+@media (min-width: 900px) {
+  .plant-detail-dialog__content:has(.plant-detail-dialog__hero) {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .plant-detail-dialog__content:has(.plant-detail-dialog__hero) .plant-detail-dialog__hero {
+    margin-bottom: 0;
+    position: sticky;
+    top: 0;
+  }
+
+  .plant-detail-dialog__content:has(.plant-detail-dialog__hero) .plant-detail-dialog__details {
+    min-width: 0;
+  }
+}
+
 .plant-detail-dialog__hero {
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -4261,6 +4699,18 @@ button.vicflora-card {
   max-height: 220px;
   object-fit: cover;
   display: block;
+}
+
+@media (min-width: 768px) {
+  .plant-detail-dialog__hero img {
+    max-height: 320px;
+  }
+}
+
+@media (min-width: 900px) {
+  .plant-detail-dialog__content:has(.plant-detail-dialog__hero) .plant-detail-dialog__hero img {
+    max-height: min(480px, 58vh);
+  }
 }
 
 .plant-detail-dialog__intro {
@@ -4596,42 +5046,92 @@ button.vicflora-card {
   margin-bottom: var(--space-xl);
 }
 
-/* Learn page: optional side navigation (desktop/tablet) */
-.learn-layout {
-  display: block;
-}
-
-.learn-sidenav {
-  display: none;
-}
-
-/* Weed page: optional side navigation (wide screens) */
-.weed-layout {
-  display: block;
-}
-
-.weed-sidenav {
-  display: none;
-}
-
-/* Beginner guide step pages: optional side navigation (wide screens) */
+/* Learn / Weed / Beginners — optional side navigation (wide screens) */
+.learn-layout,
+.weed-layout,
 .beginners-layout {
   display: block;
 }
 
+.learn-sidenav,
+.weed-sidenav,
 .beginners-sidenav {
   display: none;
 }
 
+.learn-sidenav__title,
+.weed-sidenav__title,
+.beginners-sidenav__title {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.learn-sidenav__link,
+.weed-sidenav__link,
+.beginners-sidenav__link {
+  display: block;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+}
+
+.beginners-sidenav__link--active {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.learn-sidenav__link:hover,
+.learn-sidenav__link:focus-visible,
+.weed-sidenav__link:hover,
+.weed-sidenav__link:focus-visible,
+.beginners-sidenav__link:hover,
+.beginners-sidenav__link:focus-visible {
+  background: color-mix(in srgb, var(--color-link-hover) 18%, transparent);
+  color: var(--color-link-hover);
+  text-decoration: none;
+  outline: none;
+}
+
+.learn-sidenav__link:focus-visible,
+.weed-sidenav__link:focus-visible,
+.beginners-sidenav__link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-link-hover) 55%, transparent);
+  outline-offset: 2px;
+}
+
+/*
+ * Wide screens: fixed sidenav in the left gutter beside the full-width content column.
+ * Width and left are computed from available gutter space so the nav never overlaps
+ * content or clips off the viewport edge.
+ */
 @media (min-width: 1400px) {
+  .learn-sidenav,
+  .weed-sidenav,
   .beginners-sidenav {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
     position: fixed;
     top: calc(var(--bottom-nav-h) + var(--space-md));
-    left: calc(50% - 600px - 240px);
-    width: 220px;
+    left: max(
+      var(--space-md),
+      calc(
+        (100vw - var(--content-max-w)) / 2 - var(--page-sidenav-w) - var(--page-sidenav-gutter)
+      )
+    );
+    width: min(
+      var(--page-sidenav-w),
+      calc((100vw - var(--content-max-w)) / 2 - var(--page-sidenav-gutter) - var(--space-md))
+    );
+    max-height: calc(100dvh - var(--bottom-nav-h) - var(--space-md) * 2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: var(--space-md);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
@@ -4639,145 +5139,24 @@ button.vicflora-card {
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-soft);
     z-index: 40;
-  }
-
-  .beginners-sidenav__title {
-    margin: 0 0 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-  }
-
-  .beginners-sidenav__link {
-    display: block;
-    padding: 0.45rem 0.55rem;
-    border-radius: var(--radius-sm);
-    color: var(--color-primary-dark);
-    text-decoration: none;
-    font-weight: 600;
-    transition: background var(--transition), color var(--transition);
-  }
-
-  .beginners-sidenav__link--active {
-    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  }
-
-  .beginners-sidenav__link:hover,
-  .beginners-sidenav__link:focus-visible {
-    background: color-mix(in srgb, var(--color-link-hover) 18%, transparent);
-    color: var(--color-link-hover);
-    text-decoration: none;
-    outline: none;
-  }
-
-  .beginners-sidenav__link:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--color-link-hover) 55%, transparent);
-    outline-offset: 2px;
-  }
-
-  .weed-sidenav {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    position: fixed;
-    top: calc(var(--bottom-nav-h) + var(--space-md));
-    left: calc(50% - 600px - 240px);
-    width: 220px;
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-soft);
-    z-index: 40;
-  }
-
-  .weed-sidenav__title {
-    margin: 0 0 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-  }
-
-  .weed-sidenav__link {
-    display: block;
-    padding: 0.45rem 0.55rem;
-    border-radius: var(--radius-sm);
-    color: var(--color-primary-dark);
-    text-decoration: none;
-    font-weight: 600;
-    transition: background var(--transition), color var(--transition);
-  }
-
-  .weed-sidenav__link:hover,
-  .weed-sidenav__link:focus-visible {
-    background: color-mix(in srgb, var(--color-link-hover) 18%, transparent);
-    color: var(--color-link-hover);
-    text-decoration: none;
-    outline: none;
-  }
-
-  .weed-sidenav__link:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--color-link-hover) 55%, transparent);
-    outline-offset: 2px;
   }
 }
 
-/*
- * Wide-screen enhancement: keep Learn content full width (same as other pages),
- * and park the sidenav in the left "gutter" so it doesn't shrink the article.
- */
-@media (min-width: 1400px) {
-  .learn-sidenav {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    position: fixed;
-    top: calc(var(--bottom-nav-h) + var(--space-md));
-    left: calc(50% - 600px - 240px);
-    width: 220px;
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-soft);
+/* Narrow gutter: smaller type so links remain readable without stealing content width */
+@media (min-width: 1400px) and (max-width: 1719.98px) {
+  .learn-sidenav__title,
+  .weed-sidenav__title,
+  .beginners-sidenav__title {
+    font-size: 0.68rem;
   }
 
-  .learn-sidenav__title {
-    margin: 0 0 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-  }
-
-  .learn-sidenav__link {
-    display: block;
-    padding: 0.45rem 0.55rem;
-    border-radius: var(--radius-sm);
-    color: var(--color-primary-dark);
-    text-decoration: none;
-    font-weight: 600;
-    transition: background var(--transition), color var(--transition);
-  }
-
-  .learn-sidenav__link:hover,
-  .learn-sidenav__link:focus-visible {
-    background: color-mix(in srgb, var(--color-link-hover) 18%, transparent);
-    color: var(--color-link-hover);
-    text-decoration: none;
-    outline: none;
-  }
-
-  .learn-sidenav__link:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--color-link-hover) 55%, transparent);
-    outline-offset: 2px;
+  .learn-sidenav__link,
+  .weed-sidenav__link,
+  .beginners-sidenav__link {
+    font-size: 0.82rem;
+    line-height: 1.35;
+    padding: 0.35rem 0.45rem;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -4885,6 +5264,44 @@ button.vicflora-card {
 .learn-disclaimer a:focus-visible {
   color: var(--color-link-hover);
   text-decoration: none;
+}
+
+.learn-sources {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border);
+  background: var(--color-bg);
+}
+
+.learn-sources__list {
+  margin: 0 0 var(--space-md);
+  padding-left: 1.15rem;
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.learn-sources__item {
+  margin-bottom: 0.35rem;
+}
+
+.learn-sources__item a {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.learn-sources__item a:hover,
+.learn-sources__item a:focus-visible {
+  color: var(--color-link-hover);
+  text-decoration: none;
+}
+
+.learn-sources__note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
 }
 
 /* Learn page · chapter dividers (native plants & weeds) */

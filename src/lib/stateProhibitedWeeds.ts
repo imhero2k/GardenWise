@@ -1,3 +1,6 @@
+export const VIC_STATE_PROHIBITED_WEED_REPORT_URL =
+  'https://agriculture.vic.gov.au/biosecurity/weeds/stop-the-sale-stop-the-spread/report-a-state-prohibited-weed'
+
 export type StateProhibitedWeed = {
   id: string
   name: string

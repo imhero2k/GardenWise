@@ -1,11 +1,6 @@
 import { useLayoutEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-
-interface StatCard {
-  value: string
-  label: string
-  source: string
-}
+import { EDUCATION_SOURCES, LEARN_NATIVE_STATS, LEARN_WEED_STATS } from '../data/educationStats'
 
 interface TopicCard {
   title: string
@@ -18,24 +13,6 @@ interface ClassificationTier {
   summary: string
   body: string
 }
-
-const STATS: StatCard[] = [
-  {
-    value: '>50%',
-    label: "of Victoria's native vegetation cleared since European settlement",
-    source: 'Biodiversity 2037, Ch. 1',
-  },
-  {
-    value: '4,000',
-    label: 'habitat hectares lost every year, even with regulations in place',
-    source: 'Biodiversity 2037, Ch. 2',
-  },
-  {
-    value: '$283M',
-    label: "estimated annual health cost of Melbourne's urban heat island effect",
-    source: 'Biodiversity 2037, Ch. 5',
-  },
-]
 
 const TOPICS: TopicCard[] = [
   {
@@ -91,24 +68,6 @@ const TOPICS: TopicCard[] = [
       'Agriculture, forestry and fisheries depend directly on healthy ecosystems.',
       'Together they contribute around $8 billion to the state economy each year.',
     ],
-  },
-]
-
-const INVASIVE_STATS: StatCard[] = [
-  {
-    value: '1,800+',
-    label: "environmental weed species listed in Victoria's advisory list (2022)",
-    source: 'DEECA / ARI Victoria',
-  },
-  {
-    value: '$24.5B',
-    label: 'estimated yearly cost of environmental weeds to Australia — plants are the largest share',
-    source: 'CSIRO / NeoBiota, 2021',
-  },
-  {
-    value: '$300M',
-    label: 'spent each year on public weed control across national parks and Indigenous lands',
-    source: 'Australia State of Environment, 2021',
   },
 ]
 
@@ -208,6 +167,9 @@ export function LearnPage() {
         <a className="learn-sidenav__link" href="#environmental-weeds">
           Weeds 101
         </a>
+        <a className="learn-sidenav__link" href="#sources">
+          Sources
+        </a>
       </aside>
 
       <div className="learn-layout__main">
@@ -232,11 +194,10 @@ export function LearnPage() {
         </section>
 
         <section className="learn-stats" aria-label="Key biodiversity statistics">
-          {STATS.map((stat) => (
+          {LEARN_NATIVE_STATS.map((stat) => (
             <article className="learn-stat" key={stat.value}>
               <div className="learn-stat__value">{stat.value}</div>
               <p className="learn-stat__label">{stat.label}</p>
-              <p className="learn-stat__source">{stat.source}</p>
             </article>
           ))}
         </section>
@@ -306,11 +267,10 @@ export function LearnPage() {
         </section>
 
         <section className="learn-stats" aria-label="Key environmental weed statistics">
-          {INVASIVE_STATS.map((stat) => (
+          {LEARN_WEED_STATS.map((stat) => (
             <article className="learn-stat learn-stat--alt" key={stat.value}>
               <div className="learn-stat__value">{stat.value}</div>
               <p className="learn-stat__label">{stat.label}</p>
-              <p className="learn-stat__source">{stat.source}</p>
             </article>
           ))}
         </section>
@@ -400,19 +360,30 @@ export function LearnPage() {
           </div>
         </section>
 
-        <aside className="learn-disclaimer" role="note">
-          <strong>Sources:</strong> Native-plant material on this page is summarised from{' '}
-          <em>Protecting Victoria&rsquo;s Environment — Biodiversity 2037</em>, published by the Victorian Government
-          (Department of Energy, Environment and Climate Action, formerly DELWP, 2017, CC BY 4.0). Environmental-weed
-          material draws on DEECA / ARI Victoria — <em>Advisory List of Environmental Weeds in Victoria</em> (2022);
-          Agriculture Victoria — <em>Invasive Plants and Animals Policy Framework</em>; DEECA —{' '}
-          <em>Weeds and Pests on Public Land Program</em>; CSIRO / NeoBiota (2021); and the{' '}
-          <em>Australian State of the Environment</em> (2021). For full detail visit{' '}
-          <a href="https://www.environment.vic.gov.au/biodiversity/biodiversity-plan" target="_blank" rel="noopener noreferrer">
-            environment.vic.gov.au
-          </a>
-          . RootVio is not affiliated with the Victorian Government.
-        </aside>
+        <section
+          id="sources"
+          className="learn-sources"
+          aria-labelledby="learn-sources-heading"
+          style={{ scrollMarginTop: 'var(--space-xl)' }}
+        >
+          <h2 id="learn-sources-heading" className="learn-section-heading">
+            Sources
+          </h2>
+          <ul className="learn-sources__list">
+            {EDUCATION_SOURCES.map((source) => (
+              <li key={source.label} className="learn-sources__item">
+                {source.href ? (
+                  <a href={source.href} target="_blank" rel="noopener noreferrer">
+                    {source.label}
+                  </a>
+                ) : (
+                  source.label
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="learn-sources__note">RootVio is not affiliated with the Victorian Government.</p>
+        </section>
       </div>
     </div>
   )
