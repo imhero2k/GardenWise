@@ -1,6 +1,22 @@
 import { useCallback, useState } from 'react'
-import type { TutorialMedia } from '../pages/beginners/tutorials'
+import type { TutorialMedia, TutorialMediaAttribution } from '../pages/beginners/tutorials'
 import { ImageLightbox } from './ImageLightbox'
+
+export function BeginnerMediaAttribution({
+  attribution,
+}: {
+  attribution: TutorialMediaAttribution
+}) {
+  return (
+    <p className="beginner-page__attribution">
+      {attribution.beforeLink}
+      <a href={attribution.link.to} target="_blank" rel="noopener noreferrer">
+        {attribution.link.label}
+      </a>
+      {attribution.afterLink}
+    </p>
+  )
+}
 
 export function BeginnerTutorialMedia({ media }: { media: TutorialMedia[] }) {
   const [enlarged, setEnlarged] = useState<TutorialMedia | null>(null)

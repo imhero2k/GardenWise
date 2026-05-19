@@ -1,7 +1,36 @@
 import { useLayoutEffect } from 'react'
-import { Link, NavLink, Navigate, useLocation, useParams } from 'react-router-dom'
-import { BeginnerTutorialMedia } from '../components/BeginnerTutorialMedia'
-import { getTutorialById, TUTORIALS } from './beginners/tutorials'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { BeginnerMediaAttribution, BeginnerTutorialMedia } from '../components/BeginnerTutorialMedia'
+import { BeginnersSidenav } from '../components/BeginnersSidenav'
+import {
+  getTutorialById,
+  getTutorialsInTier,
+  type TutorialSectionBody,
+} from './beginners/tutorials'
+
+function renderSectionBodyItem(b: TutorialSectionBody) {
+  if (typeof b === 'string') {
+    const splitAt = b.indexOf(':')
+    if (splitAt > 0) {
+      const lead = b.slice(0, splitAt)
+      const rest = b.slice(splitAt + 1).trimStart()
+      return (
+        <li key={b}>
+          <strong>{lead}:</strong> {rest}
+        </li>
+      )
+    }
+    return <li key={b}>{b}</li>
+  }
+
+  return (
+    <li key={`${b.lead}-${b.link.to}`}>
+      <strong>{b.lead}:</strong> {b.beforeLink}
+      <Link to={b.link.to}>{b.link.label}</Link>
+      {b.afterLink}
+    </li>
+  )
+}
 
 export function BeginnerGuideStepPage() {
   const { id } = useParams()
@@ -14,35 +43,42 @@ export function BeginnerGuideStepPage() {
   const tutorial = getTutorialById(id)
   if (!tutorial) return <Navigate to="/beginners" replace />
 
-  const idx = TUTORIALS.findIndex((t) => t.id === tutorial.id)
-  const prev = idx > 0 ? TUTORIALS[idx - 1] : null
-  const next = idx >= 0 && idx < TUTORIALS.length - 1 ? TUTORIALS[idx + 1] : null
+  const tierTutorials = getTutorialsInTier(tutorial.tier)
+  const idx = tierTutorials.findIndex((t) => t.id === tutorial.id)
+  const prev = idx > 0 ? tierTutorials[idx - 1] : null
+  const next = idx >= 0 && idx < tierTutorials.length - 1 ? tierTutorials[idx + 1] : null
 
-  const stepLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `beginners-sidenav__link${isActive ? ' beginners-sidenav__link--active' : ''}`
+  const isAdvanced = tutorial.tier === 'advanced'
+  const indexTo = isAdvanced ? '/beginners/advanced' : '/beginners'
+  const indexLabel = isAdvanced ? 'Advanced guides' : 'Basic guides'
+  const backLabel = isAdvanced ? 'Back to advanced guides' : 'Back to basic guides'
+  const eyebrow = isAdvanced ? 'Advanced guides' : 'Beginner guides'
+  const allGuidesLabel = isAdvanced ? 'Advanced guides' : 'Basic guides'
 
   return (
     <div className="beginners-layout">
-      <aside className="beginners-sidenav" aria-label="Basics navigation">
-        <p className="beginners-sidenav__title">Basics</p>
-        <NavLink to="/beginners" className={stepLinkClass} end>
-          All guides
-        </NavLink>
-        {TUTORIALS.map((t) => (
-          <NavLink key={t.id} to={`/beginners/${t.id}`} className={stepLinkClass}>
-            {t.title}
-          </NavLink>
-        ))}
-      </aside>
+      <BeginnersSidenav
+        sectionTitle={isAdvanced ? 'Advanced' : 'Basics'}
+        indexTo={indexTo}
+        indexLabel={indexLabel}
+        tutorials={tierTutorials}
+        crossLink={
+          isAdvanced
+            ? { to: '/beginners', label: 'Basics guides' }
+            : { to: '/beginners/advanced', label: 'Advanced guides' }
+        }
+      />
 
       <div className="beginners-layout__main">
         <header className="page-header fade-up">
-          <p className="eyebrow">Beginner guides</p>
+          <p className="eyebrow">{eyebrow}</p>
           <h1>{tutorial.title}</h1>
           <p style={{ color: 'var(--color-text-muted)', margin: 0, maxWidth: '46rem' }}>
             {tutorial.intro}
           </p>
-          {tutorial.media?.length ? <BeginnerTutorialMedia media={tutorial.media} /> : null}
+          {tutorial.media?.length ? (
+            <BeginnerTutorialMedia media={tutorial.media} />
+          ) : null}
           {tutorial.mediaPlaceholders?.length ? (
             <div className="beginner-media" aria-label="Image placeholders">
               {tutorial.mediaPlaceholders.map((m) => (
@@ -53,8 +89,8 @@ export function BeginnerGuideStepPage() {
             </div>
           ) : null}
           <p style={{ margin: 'var(--space-md) 0 0' }}>
-            <Link to="/beginners" className="home-impact__more-link">
-              Back to all guides
+            <Link to={indexTo} className="home-impact__more-link">
+              {backLabel}
             </Link>
           </p>
         </header>
@@ -64,19 +100,7 @@ export function BeginnerGuideStepPage() {
               <section key={s.title} className="card beginner-tutorial" aria-label={s.title}>
                 <h2 style={{ marginBottom: 'var(--space-md)' }}>{s.title}</h2>
                 <ul style={{ margin: 0, paddingLeft: '1.15rem', lineHeight: 1.7 }}>
-                  {s.body.map((b) => {
-                    const splitAt = b.indexOf(':')
-                    if (splitAt > 0) {
-                      const lead = b.slice(0, splitAt)
-                      const rest = b.slice(splitAt + 1).trimStart()
-                      return (
-                        <li key={b}>
-                          <strong>{lead}:</strong> {rest}
-                        </li>
-                      )
-                    }
-                    return <li key={b}>{b}</li>
-                  })}
+                  {s.body.map((b) => renderSectionBodyItem(b))}
                 </ul>
               </section>
             ))
@@ -148,11 +172,15 @@ export function BeginnerGuideStepPage() {
                 Next: {next.title} →
               </Link>
             ) : null}
-            <Link to="/beginners" className="btn btn-secondary">
-              All guides
+            <Link to={indexTo} className="btn btn-secondary">
+              {allGuidesLabel}
             </Link>
           </div>
         </nav>
+
+        {tutorial.mediaAttribution ? (
+          <BeginnerMediaAttribution attribution={tutorial.mediaAttribution} />
+        ) : null}
       </div>
     </div>
   )

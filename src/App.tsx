@@ -6,6 +6,7 @@ import { Layout } from './components/Layout'
 import { RequireAuth } from './components/RequireAuth'
 import { HomePage } from './pages/HomePage'
 import { BeginnerGuidesPage } from './pages/BeginnerGuidesPage'
+import { BeginnerAdvancedGuidesPage } from './pages/BeginnerAdvancedGuidesPage'
 import { BeginnerGuideStepPage } from './pages/BeginnerGuideStepPage'
 import { LearnPage } from './pages/LearnPage'
 import { NurseryMapPage } from './pages/NurseryMapPage'
@@ -48,6 +49,7 @@ export default function App() {
                 <Route path="planner" element={<GardenPlannerPage />} />
                 <Route path="map" element={<NurseryMapPage />} />
                 <Route path="beginners" element={<BeginnerGuidesPage />} />
+                <Route path="beginners/advanced" element={<BeginnerAdvancedGuidesPage />} />
                 <Route path="beginners/:id" element={<BeginnerGuideStepPage />} />
                 <Route path="learn" element={<LearnPage />} />
                 <Route path="about" element={<AboutPage />} />

@@ -1279,14 +1279,18 @@ img {
 
 .beginner-media__zoom {
   position: relative;
+  display: block;
   width: 100%;
+  aspect-ratio: 4 / 3;
   margin: 0;
   padding: 0;
   border: none;
-  background: none;
+  background: var(--color-surface);
   cursor: zoom-in;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   text-align: left;
+  overflow: hidden;
 }
 
 .beginner-media__zoom:focus-visible {
@@ -1313,10 +1317,10 @@ img {
 
 .beginner-media__img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  object-fit: cover;
+  object-position: center;
   background: var(--color-surface);
 }
 
@@ -1325,6 +1329,26 @@ img {
   font-size: 0.88rem;
   line-height: 1.5;
   color: var(--color-text-muted);
+}
+
+.beginner-page__attribution {
+  margin: var(--space-xl) 0 0;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  max-width: 46rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.beginner-page__attribution a {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.beginner-page__attribution a:hover,
+.beginner-page__attribution a:focus-visible {
+  color: var(--color-link-hover);
 }
 
 .beginner-media__ph {
@@ -3410,11 +3434,6 @@ img {
   }
 }
 
-.home-impact__weeds-card .home-native-benefits__photo-credit {
-  padding: var(--space-md) var(--space-md) var(--space-md);
-  margin-top: var(--space-xs);
-}
-
 .home-impact__more {
   margin: var(--space-md) 0 0;
   font-size: 0.9rem;
@@ -4054,9 +4073,9 @@ img {
 
 /* ── Frost badge (inline in location bar row) ── */
 .frost-badge {
-  all: unset;
   cursor: pointer;
   display: inline-flex;
+  text-decoration: none;
   align-items: center;
   gap: 0.3rem;
   padding: 0.2rem 0.55rem;
@@ -4129,6 +4148,39 @@ img {
   padding: 0.65rem var(--space-md);
 }
 
+.frost-banner__link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition);
+}
+
+.frost-banner__link:hover,
+.frost-banner__link:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.92;
+}
+
+.frost-banner__link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.frost-banner__guide {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.frost-banner--urgent .frost-banner__guide {
+  text-decoration-thickness: 2px;
+}
+
 .frost-banner__icon {
   flex-shrink: 0;
   width: 22px;
@@ -4164,6 +4216,158 @@ img {
 .frost-banner__dismiss:focus-visible {
   opacity: 1;
   background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Heat badge (inline in location bar row) ── */
+.heat-badge {
+  cursor: pointer;
+  display: inline-flex;
+  text-decoration: none;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #ffebee;
+  color: #b71c1c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background var(--transition), box-shadow var(--transition);
+  animation: heat-pulse 2.5s ease-in-out infinite;
+}
+
+.heat-badge:hover {
+  background: #ffcdd2;
+  box-shadow: 0 0 0 2px #ef9a9a;
+}
+
+.heat-badge--urgent {
+  background: #ff1744;
+  color: #fff;
+}
+
+.heat-badge--urgent:hover {
+  background: #d50000;
+  box-shadow: 0 0 0 2px #ff8a80;
+}
+
+.heat-badge__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.heat-badge__label {
+  letter-spacing: 0.01em;
+}
+
+.heat-badge__temp {
+  opacity: 0.85;
+}
+
+@keyframes heat-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
+/* ── Heat alert banner (above <main>, hero-proof) ── */
+.heat-banner {
+  position: relative;
+  z-index: 49;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-bottom: 2px solid #ef5350;
+  color: #b71c1c;
+}
+
+.heat-banner--urgent {
+  background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
+  border-bottom-color: #b71c1c;
+  color: #fff;
+}
+
+.heat-banner__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: var(--content-max-w, 60rem);
+  margin: 0 auto;
+  padding: 0.65rem var(--space-md);
+}
+
+.heat-banner__link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition);
+}
+
+.heat-banner__link:hover,
+.heat-banner__link:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.92;
+}
+
+.heat-banner__link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.heat-banner__guide {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.heat-banner--urgent .heat-banner__guide {
+  text-decoration-thickness: 2px;
+}
+
+.heat-banner__icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  opacity: 0.9;
+  animation: heat-pulse 2.5s ease-in-out infinite;
+}
+
+.heat-banner__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.heat-banner__dismiss {
+  all: unset;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  opacity: 0.55;
+  transition: opacity var(--transition), background var(--transition);
+}
+
+.heat-banner__dismiss:hover,
+.heat-banner__dismiss:focus-visible {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.heat-banner--urgent .heat-banner__dismiss:hover,
+.heat-banner--urgent .heat-banner__dismiss:focus-visible {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Location bar + dialog */
