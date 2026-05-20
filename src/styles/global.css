@@ -5103,6 +5103,759 @@ button.vicflora-card {
   line-height: 1.55;
 }
 
+/* ─────────────────────────────────────────────────────────────────────
+ * Learn page · editorial restyle (progressive disclosure)
+ * Bands stack vertically. Heroes occupy ~80vh; subsequent bands reveal on
+ * scroll via `useScrollReveal`. Reuses `.about-band__inner` for content
+ * max-width; only `.learn-band*` rules live here.
+ * ───────────────────────────────────────────────────────────────────── */
+
+.learn-band {
+  --learn-accent: var(--color-primary);
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 2.75rem) var(--space-md);
+  scroll-margin-top: var(--space-xl);
+}
+
+/* Hero bands keep extra breathing room — the rest stay tight. */
+.learn-band--hero {
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+}
+
+.learn-band--invasive {
+  --learn-accent: var(--color-primary-dark);
+}
+
+/* Subtle graph-paper background for hero bands */
+.learn-band--hero {
+  min-height: min(80vh, 640px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 55%, #fff) 0%, transparent 100%),
+    repeating-linear-gradient(
+      to right,
+      rgba(46, 125, 50, 0.05) 0,
+      rgba(46, 125, 50, 0.05) 1px,
+      transparent 1px,
+      transparent 56px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(46, 125, 50, 0.05) 0,
+      rgba(46, 125, 50, 0.05) 1px,
+      transparent 1px,
+      transparent 56px
+    );
+}
+
+@media (max-width: 720px) {
+  .learn-band--hero {
+    min-height: min(70vh, 480px);
+  }
+}
+
+.learn-band__head {
+  text-align: center;
+  margin-bottom: clamp(1rem, 2.5vw, 1.6rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+/* ── Hero grid ─────────────────────────────────────────────── */
+
+.learn-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .learn-hero-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 340px);
+    align-items: center;
+  }
+}
+
+.learn-hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.learn-hero__copy .learn-display {
+  margin-bottom: 0.15rem;
+}
+
+.learn-hero__copy .eyebrow {
+  margin: 0;
+}
+
+.learn-hero__chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.learn-hero-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #fff 65%, transparent);
+  border: 1px solid color-mix(in srgb, var(--learn-accent) 12%, transparent);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    transform var(--transition),
+    background var(--transition),
+    border-color var(--transition);
+}
+
+.learn-hero-chip:hover,
+.learn-hero-chip:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, #fff 85%, transparent);
+  border-color: color-mix(in srgb, var(--learn-accent) 32%, transparent);
+  outline: none;
+}
+
+.learn-hero-chip__icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--learn-accent) 12%, transparent);
+  color: var(--learn-accent);
+}
+
+.learn-hero-chip__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.learn-hero-chip__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.learn-hero-chip__text strong {
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  font-size: 0.95rem;
+}
+
+.learn-hero-chip__text small {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+.learn-hero__scroll-cue {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.learn-hero__scroll-dot {
+  width: 1.1rem;
+  height: 1.7rem;
+  border: 1.5px solid color-mix(in srgb, var(--learn-accent) 65%, transparent);
+  border-radius: 999px;
+  position: relative;
+}
+
+.learn-hero__scroll-dot::after {
+  content: '';
+  position: absolute;
+  top: 0.3rem;
+  left: 50%;
+  width: 3px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--learn-accent);
+  transform: translateX(-50%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .learn-hero__scroll-dot::after {
+    animation: learn-scroll-bob 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes learn-scroll-bob {
+  0%, 100% { transform: translate(-50%, 0); opacity: 1; }
+  50% { transform: translate(-50%, 0.45rem); opacity: 0.4; }
+}
+
+/* ── Display headline + lede ──────────────────────────────── */
+
+.learn-display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 7.2vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: var(--color-text);
+}
+
+/* Subsequent bands stay restrained so the hero stays dominant. */
+.learn-band--mechanisms .learn-display,
+.learn-band--facts .learn-display,
+.learn-band--tiers .learn-display {
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+}
+
+/* CTA section headings are even smaller — they're section titles, not display. */
+.learn-band--cta .learn-display,
+.learn-cta-card__copy .learn-display {
+  font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+  line-height: 1.18;
+  letter-spacing: -0.005em;
+}
+
+.learn-display--center {
+  text-align: center;
+  max-width: 22ch;
+}
+
+.learn-display .accent {
+  color: var(--learn-accent);
+}
+
+.learn-lede {
+  margin: 0;
+  font-size: clamp(0.88rem, 1.1vw, 1rem);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  max-width: 56ch;
+}
+
+/* Hero lede stays smaller than mechanism/facts ledes so the headline dominates. */
+.learn-band--hero .learn-lede {
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  color: color-mix(in srgb, var(--color-text-muted) 92%, var(--color-text));
+}
+
+.learn-lede--center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Eyebrow chip variant ─────────────────────────────────── */
+
+.eyebrow--chip {
+  display: inline-block;
+  padding: 0.32rem 0.85rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--learn-accent) 12%, transparent);
+  color: var(--learn-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ── Quick Facts band ─────────────────────────────────────── */
+
+.learn-factrow-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.learn-factrow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: 1.05rem 1.2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--learn-accent) 6%, var(--color-surface));
+  border-left: 4px solid var(--learn-accent);
+}
+
+.learn-factrow--warning {
+  --learn-accent: #b06b1f;
+}
+
+.learn-factrow__badge {
+  flex-shrink: 0;
+  min-width: 4.4rem;
+  height: 4.4rem;
+  padding: 0 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.2rem;
+  background: var(--learn-accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.learn-factrow__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.learn-factrow__title {
+  margin: 0 0 0.3rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.35;
+}
+
+.learn-factrow__source {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.learn-factrow-foot {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* ── Mechanism cards ──────────────────────────────────────── */
+
+.learn-mech-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 720px) {
+  .learn-mech-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .learn-mech-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.learn-mech-card {
+  position: relative;
+  padding: 1.4rem 1.4rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--learn-accent) 10%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--learn-accent) 22%, var(--color-border));
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  scroll-margin-top: var(--space-xl);
+}
+
+/* Per-card accent palette — each card gets its own --learn-accent so the
+ * background tint, badge fill, subline colour and SVG icon all swap as one.
+ * Native bands use 6 nature-inspired tones; weeds use 4 warmer tones. */
+.learn-band--mechanisms:not(.learn-band--invasive) .learn-mech-card:nth-child(1) { --learn-accent: #2f7a3f; } /* forest green */
+.learn-band--mechanisms:not(.learn-band--invasive) .learn-mech-card:nth-child(2) { --learn-accent: #c45757; } /* rose */
+.learn-band--mechanisms:not(.learn-band--invasive) .learn-mech-card:nth-child(3) { --learn-accent: #c98a1e; } /* amber */
+.learn-band--mechanisms:not(.learn-band--invasive) .learn-mech-card:nth-child(4) { --learn-accent: #3672a8; } /* lake blue */
+.learn-band--mechanisms:not(.learn-band--invasive) .learn-mech-card:nth-child(5) { --learn-accent: #6f8e35; } /* sage */
+.learn-band--mechanisms:not(.learn-band--invasive) .learn-mech-card:nth-child(6) { --learn-accent: #a07238; } /* ochre */
+
+.learn-band--mechanisms.learn-band--invasive .learn-mech-card:nth-child(1) { --learn-accent: #a8472f; } /* rust */
+.learn-band--mechanisms.learn-band--invasive .learn-mech-card:nth-child(2) { --learn-accent: #b66a17; } /* burnt orange */
+.learn-band--mechanisms.learn-band--invasive .learn-mech-card:nth-child(3) { --learn-accent: #8d4a64; } /* mulberry */
+.learn-band--mechanisms.learn-band--invasive .learn-mech-card:nth-child(4) { --learn-accent: #6c5a3d; } /* warm taupe */
+
+/* Staggered reveal — fires once the band gets the visible class. */
+.learn-band--mechanisms.reveal-on-scroll--visible .learn-mech-card {
+  transition-delay: 0ms;
+}
+
+.learn-band--mechanisms .learn-mech-card:nth-child(2) { transition-delay: 80ms; }
+.learn-band--mechanisms .learn-mech-card:nth-child(3) { transition-delay: 160ms; }
+.learn-band--mechanisms .learn-mech-card:nth-child(4) { transition-delay: 240ms; }
+.learn-band--mechanisms .learn-mech-card:nth-child(5) { transition-delay: 320ms; }
+.learn-band--mechanisms .learn-mech-card:nth-child(6) { transition-delay: 400ms; }
+
+.learn-mech-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.learn-mech-card__icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--learn-accent);
+}
+
+.learn-mech-card__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.learn-mech-card__num {
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: var(--learn-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.learn-mech-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  color: var(--color-text);
+}
+
+.learn-mech-card__sub {
+  margin: 0;
+  font-weight: 600;
+  color: var(--learn-accent);
+  line-height: 1.4;
+}
+
+.learn-mech-card__body {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.learn-mech-card__inset {
+  margin-top: auto;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.learn-mech-card__inset .eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+}
+
+.learn-mech-card__inset p:last-child {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+/* ── CTA band ─────────────────────────────────────────────── */
+
+.learn-cta-card {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--learn-accent) 8%, var(--color-surface)),
+    var(--color-surface)
+  );
+  border: 1px solid color-mix(in srgb, var(--learn-accent) 22%, var(--color-border));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.learn-cta-card__copy h2 {
+  margin: 0 0 0.6rem;
+}
+
+.learn-cta-card__copy p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+.learn-cta-card__copy ul.learn-topic__list {
+  margin-top: var(--space-md);
+}
+
+.learn-cta-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* ── Editorial card (What is a weed) ──────────────────────── */
+
+.learn-editorial-card {
+  padding: clamp(1.4rem, 3vw, 2.25rem);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.learn-editorial-card .learn-display {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+}
+
+.learn-editorial-card p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.learn-editorial-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.learn-editorial-card__footer a {
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+.learn-editorial-card__footer a:hover {
+  text-decoration: underline;
+}
+
+/* ── Tier strip (demoted) ─────────────────────────────────── */
+
+.learn-tier-strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.learn-tier-strip__row {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+}
+
+.learn-tier-strip__row--t1 { border-left-color: #b00020; }
+.learn-tier-strip__row--t2 { border-left-color: #d97706; }
+.learn-tier-strip__row--t3 { border-left-color: #b08300; }
+.learn-tier-strip__row--t4 { border-left-color: var(--color-primary); }
+
+.learn-tier-strip__level {
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.learn-tier-strip__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.learn-tier-strip__tag {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.learn-tier-strip__summary {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.learn-tier-strip__row--t1 .learn-tier-strip__summary { color: #b00020; }
+.learn-tier-strip__row--t2 .learn-tier-strip__summary { color: #d97706; }
+.learn-tier-strip__row--t3 .learn-tier-strip__summary { color: #b08300; }
+
+.learn-tier-strip__body {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Learn page · entrance animations
+ *
+ * Two layers:
+ *   1. Hero stagger — eyebrow, headline, lede, chips, scroll-cue rise in
+ *      sequence once the hero band gets `.reveal-on-scroll--visible`.
+ *      The hero band's own translate is suppressed so children animate
+ *      against a stationary parent.
+ *   2. Band-head + row stagger — `learn-band__head` children, fact rows,
+ *      and tier rows each rise individually after their band becomes
+ *      visible.
+ *
+ * Everything below is gated behind `prefers-reduced-motion: no-preference`
+ * so motion-sensitive users see the page in its default static state.
+ * ───────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero band — let children carry all the motion. */
+  .learn-band--hero.reveal-on-scroll--fade-up {
+    transform: none;
+  }
+
+  .learn-band--hero .learn-hero__copy > *,
+  .learn-band--hero .learn-hero__chips li,
+  .learn-band--hero .learn-hero__scroll-cue {
+    opacity: 0;
+    transform: translateY(0.95rem);
+    transition:
+      opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__copy > *,
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__chips li,
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__scroll-cue {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero sequence delays */
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__copy > .eyebrow         { transition-delay: 60ms;  }
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__copy > .learn-display   { transition-delay: 200ms; }
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__copy > .learn-lede      { transition-delay: 420ms; }
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__chips li:nth-child(1)   { transition-delay: 540ms; }
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__chips li:nth-child(2)   { transition-delay: 640ms; }
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__chips li:nth-child(3)   { transition-delay: 740ms; }
+  .learn-band--hero.reveal-on-scroll--visible .learn-hero__scroll-cue              { transition-delay: 860ms; }
+
+  /* Band-head children (eyebrow chip → display → lede) stagger in. */
+  .learn-band:not(.learn-band--hero) .learn-band__head > * {
+    opacity: 0;
+    transform: translateY(0.55rem);
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
+  }
+
+  .learn-band:not(.learn-band--hero).reveal-on-scroll--visible .learn-band__head > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  .learn-band:not(.learn-band--hero).reveal-on-scroll--visible .learn-band__head > *:nth-child(2) { transition-delay: 110ms; }
+  .learn-band:not(.learn-band--hero).reveal-on-scroll--visible .learn-band__head > *:nth-child(3) { transition-delay: 220ms; }
+  .learn-band:not(.learn-band--hero).reveal-on-scroll--visible .learn-band__head > *:nth-child(4) { transition-delay: 330ms; }
+
+  /* Fact rows stagger inside the facts band. */
+  .learn-band--facts .learn-factrow {
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transition:
+      opacity 0.55s ease-out,
+      transform 0.55s ease-out;
+  }
+
+  .learn-band--facts.reveal-on-scroll--visible .learn-factrow { opacity: 1; transform: none; }
+
+  .learn-band--facts.reveal-on-scroll--visible .learn-factrow:nth-child(1) { transition-delay: 360ms; }
+  .learn-band--facts.reveal-on-scroll--visible .learn-factrow:nth-child(2) { transition-delay: 460ms; }
+  .learn-band--facts.reveal-on-scroll--visible .learn-factrow:nth-child(3) { transition-delay: 560ms; }
+  .learn-band--facts.reveal-on-scroll--visible .learn-factrow-foot          { transition-delay: 680ms; }
+
+  .learn-band--facts .learn-factrow-foot {
+    opacity: 0;
+    transform: translateY(0.4rem);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+
+  .learn-band--facts.reveal-on-scroll--visible .learn-factrow-foot { opacity: 1; transform: none; }
+
+  /* Tier strip rows stagger. */
+  .learn-band--tiers .learn-tier-strip__row {
+    opacity: 0;
+    transform: translateY(0.45rem);
+    transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  }
+
+  .learn-band--tiers.reveal-on-scroll--visible .learn-tier-strip__row { opacity: 1; transform: none; }
+
+  .learn-band--tiers.reveal-on-scroll--visible .learn-tier-strip__row:nth-child(1) { transition-delay: 300ms; }
+  .learn-band--tiers.reveal-on-scroll--visible .learn-tier-strip__row:nth-child(2) { transition-delay: 400ms; }
+  .learn-band--tiers.reveal-on-scroll--visible .learn-tier-strip__row:nth-child(3) { transition-delay: 500ms; }
+  .learn-band--tiers.reveal-on-scroll--visible .learn-tier-strip__row:nth-child(4) { transition-delay: 600ms; }
+
+  /* Editorial card (What-is-a-weed): paragraphs cascade. */
+  .learn-editorial-card > * {
+    opacity: 0;
+    transform: translateY(0.4rem);
+    transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  }
+
+  .reveal-on-scroll--visible .learn-editorial-card > * { opacity: 1; transform: none; }
+
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(2) { transition-delay: 100ms; }
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(3) { transition-delay: 180ms; }
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(4) { transition-delay: 260ms; }
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(5) { transition-delay: 340ms; }
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(6) { transition-delay: 420ms; }
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(7) { transition-delay: 500ms; }
+  .reveal-on-scroll--visible .learn-editorial-card > *:nth-child(8) { transition-delay: 580ms; }
+}
+
 /* Weed page · cross-link back to Learn */
 .weed-learn-link {
   display: flex;
