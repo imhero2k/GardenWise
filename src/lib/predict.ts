@@ -2,6 +2,8 @@ export interface PredictResponse {
   class_index: number
   confidence: number
   label: string
+  /** Vernacular name when known (e.g. from Pl@ntNet). */
+  commonName?: string | null
   probabilities?: number[]
   /** Client-side annotation (e.g. "plantnet" when using fallback). */
   source?: 'model' | 'plantnet'

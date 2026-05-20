@@ -129,16 +129,10 @@ function RdsPlantCard({
   enrichment?: EnrichmentState
   onOpen: (p: RecommendedPlant) => void
 }) {
-  const common = plant.commonName?.trim()
-  const sci = plant.scientificName
-  const primaryTitle = common || sci || 'Plant'
-  const showScientificLine =
-    Boolean(common && sci && common.toLowerCase() !== sci.toLowerCase())
+  const displayName = plant.commonName?.trim() || plant.scientificName || 'Plant'
   const extra =
     typeof enrichment === 'object' && enrichment !== null ? enrichment : undefined
   const imageSrc = plant.imageUrl?.trim() || extra?.imageUrl
-  const blurb = plant.description?.trim() || extra?.description || null
-  const loadingBlurb = enrichment === 'loading' && !blurb
 
   return (
     <button
@@ -154,45 +148,9 @@ function RdsPlantCard({
           <div className="vicflora-card__image-placeholder" aria-hidden />
         )}
       </div>
-      <div className="card-body" style={{ flex: 1, textAlign: 'left' }}>
-        <h3 className="plant-card-title">{primaryTitle}</h3>
-        {showScientificLine && <p className="plant-card-sci">{sci}</p>}
-        {plant.family && (
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
-            Family: {plant.family}
-          </p>
-        )}
-        {plant.lfCode && (
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-xs) 0 0' }}>
-            Plant type: {lfCodeLabel(plant.lfCode)}
-          </p>
-        )}
-        {loadingBlurb && (
-          <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
-            Loading description…
-          </p>
-        )}
-        {blurb && (
-          <p
-            className="rds-plant-card__blurb"
-            style={{
-              fontSize: '0.78rem',
-              color: 'var(--color-text-muted)',
-              margin: 'var(--space-sm) 0 0',
-              lineHeight: 1.35,
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {blurb}
-          </p>
-        )}
-
-        <p style={{ fontSize: '0.78rem', color: 'var(--color-primary)', margin: 'var(--space-sm) 0 0' }}>
-          View details
-        </p>
+      <div className="card-body catalog-card__body" style={{ flex: 1, textAlign: 'left' }}>
+        <h3 className="plant-card-title">{displayName}</h3>
+        <p className="catalog-card__cta">View details</p>
       </div>
     </button>
   )
@@ -313,52 +271,55 @@ function DbPlantDetailContent({
   const link = plant.externalLinkUrl?.trim() || extra?.linkUrl
 
   return (
-    <>
+    <div className="plant-detail-dialog__content">
       {hero && (
         <div className="plant-detail-dialog__hero">
           <img src={hero} alt="" loading="lazy" />
         </div>
       )}
-      <div className="plant-detail-dialog__intro">
-        <p className="plant-detail-dialog__primary">{primaryTitle}</p>
-        {common && sci && common.toLowerCase() !== sci.toLowerCase() && (
-          <p className="plant-detail-dialog__sci">{sci}</p>
+      <div className="plant-detail-dialog__details">
+        <div className="plant-detail-dialog__intro">
+          <p className="plant-detail-dialog__primary">{primaryTitle}</p>
+          {common && sci && common.toLowerCase() !== sci.toLowerCase() && (
+            <p className="plant-detail-dialog__sci">{sci}</p>
+          )}
+          {(plant.family || plant.lfCode) && (
+            <ul className="plant-detail-dialog__meta">
+              {plant.family && <li>Family: {plant.family}</li>}
+              {plant.lfCode && <li>Plant type: {lfCodeLabel(plant.lfCode)}</li>}
+            </ul>
+          )}
+        </div>
+        {summary ? (
+          <p className="plant-detail-dialog__summary">{summary}</p>
+        ) : enrichment === 'loading' ? (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading description…</p>
+        ) : (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            No description found for this species yet.
+          </p>
         )}
-        {(plant.family || plant.lfCode) && (
-          <ul className="plant-detail-dialog__meta">
-            {plant.family && <li>Family: {plant.family}</li>}
-            {plant.lfCode && <li>Plant type: {lfCodeLabel(plant.lfCode)}</li>}
-          </ul>
+        {link && (
+          <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
+            <a href={link} target="_blank" rel="noreferrer">
+              Learn more (Wikipedia / species database) →
+            </a>
+          </p>
         )}
-      </div>
-      {summary ? (
-        <p className="plant-detail-dialog__summary">{summary}</p>
-      ) : enrichment === 'loading' ? (
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Loading description…</p>
-      ) : (
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
-          No description found for this species yet.
-        </p>
-      )}
-      {link && (
-        <p style={{ margin: 'var(--space-md) 0 0', fontSize: '0.88rem' }}>
-          <a href={link} target="_blank" rel="noreferrer">
-            Learn more (Wikipedia / species database) →
-          </a>
-        </p>
-      )}
 
-      <WildlifeSection state={detail} />
-      <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
-        Short descriptions and photos may come from Wikipedia and iNaturalist when not stored in your database.
-      </p>
-    </>
+        <WildlifeSection state={detail} />
+        <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 'var(--space-md) 0 0' }}>
+          Short descriptions and photos may come from Wikipedia and iNaturalist when not stored in your database.
+        </p>
+      </div>
+    </div>
   )
 }
 
 function SeedCartHeaderLink() {
   const { count, totalQuantity } = useSeedCart()
   const badge = totalQuantity > 0 ? totalQuantity : count
+  const hasItems = badge > 0
   return (
     <Link
       to="/seed-cart"
@@ -366,33 +327,33 @@ function SeedCartHeaderLink() {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.45rem',
-        padding: '0.4rem 0.75rem',
+        gap: '0.55rem',
+        padding: '0.5rem 0.85rem',
+        fontSize: '1rem',
+        fontWeight: 600,
       }}
       aria-label={`Open seed cart (${badge} item${badge === 1 ? '' : 's'})`}
     >
-      <SeedSproutIcon saved={count > 0} size={22} />
+      <SeedSproutIcon saved={hasItems} size={26} />
       <span>Seed cart</span>
-      {badge > 0 && (
-        <span
-          aria-hidden
-          style={{
-            minWidth: 22,
-            padding: '0 0.4rem',
-            height: 22,
-            borderRadius: 999,
-            background: 'var(--color-primary)',
-            color: '#fff',
-            fontSize: '0.78rem',
-            fontWeight: 700,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {badge}
-        </span>
-      )}
+      <span
+        aria-hidden
+        style={{
+          minWidth: 26,
+          padding: '0 0.45rem',
+          height: 26,
+          borderRadius: 999,
+          background: 'var(--color-primary)',
+          color: '#fff',
+          fontSize: '0.88rem',
+          fontWeight: 700,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {badge}
+      </span>
     </Link>
   )
 }

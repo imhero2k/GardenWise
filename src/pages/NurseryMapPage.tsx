@@ -9,7 +9,7 @@ type Filter = 'all' | 'nursery' | 'garden' | 'nearby'
 
 export function NurseryMapPage() {
   const { areaLabel, regionCode, coords } = useLocationArea()
-  const [filter, setFilter] = useState<Filter>('all')
+  const [filter, setFilter] = useState<Filter>('nearby')
   const [selected, setSelected] = useState<Nursery | null>(null)
   const [listOpen, setListOpen] = useState(true)
   const [nearbyRadiusKm, setNearbyRadiusKm] = useState(20)
@@ -39,22 +39,15 @@ export function NurseryMapPage() {
       <header className="page-header">
         <p className="eyebrow">Local</p>
         <h1>Nurseries &amp; public gardens</h1>
-        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-          Victorian native plant nurseries and public gardens from the{' '}
-          <a href="https://apsvic.org.au/nurseries-and-public-gardens/" target="_blank" rel="noreferrer">
-            APS Victoria
-          </a>{' '}
-          map layer (non-comprehensive). Website links come from that layer where provided; some Google Maps
-          details are not in the export.
-          {regionCode ? (
-            <>
-              {' '}
-              Area focus: <strong style={{ color: 'var(--color-text)' }}>{areaLabel}</strong>.
-            </>
-          ) : (
-            ' Set your area and use GPS for “Nearby” sorting.'
-          )}
-        </p>
+        {regionCode ? (
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+            Area focus: <strong style={{ color: 'var(--color-text)' }}>{areaLabel}</strong>.
+          </p>
+        ) : (
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+            Set your area and use GPS for “Nearby” sorting.
+          </p>
+        )}
       </header>
 
       <div className="chip-row" style={{ marginBottom: 'var(--space-md)' }} role="tablist" aria-label="Map filters">
@@ -155,13 +148,26 @@ export function NurseryMapPage() {
         </aside>
       </div>
 
-      <p className="map-legend">
-        Map data &copy;{' '}
-        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-          OpenStreetMap
-        </a>{' '}
-        contributors.
-      </p>
+      <div className="map-legend">
+        <p style={{ margin: 0 }}>
+          Map data &copy;{' '}
+          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+            OpenStreetMap
+          </a>{' '}
+          contributors.
+        </p>
+        <p style={{ margin: '0.35rem 0 0' }}>
+          Nursery and garden locations from{' '}
+          <a
+            href="https://apsvic.org.au/nurseries-and-public-gardens/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Australian Plants Society Victoria
+          </a>
+          .
+        </p>
+      </div>
 
       {selected && (
         <div className="card card-body fade-up" style={{ marginTop: 'var(--space-md)' }}>

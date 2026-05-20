@@ -6,6 +6,15 @@ import mulchDepthImg from '../../assets/beginners/mulch-depth.png'
 import mulchTypesImg from '../../assets/beginners/mulch-types.png'
 import wateringAtBaseImg from '../../assets/beginners/watering-at-base.png'
 import wateringEarlyMorningImg from '../../assets/beginners/watering-early-morning.png'
+import attractBirdsHoneyeaterImg from '../../assets/beginners/attract-birds-honeyeater.png'
+import attractBirdsSpinebillImg from '../../assets/beginners/attract-birds-spinebill.png'
+import attractBirdsWattlebirdImg from '../../assets/beginners/attract-birds-wattlebird.png'
+import attractInsectsBeeImg from '../../assets/beginners/attract-insects-bee.png'
+import attractInsectsButterflyImg from '../../assets/beginners/attract-insects-butterfly.png'
+import attractInsectsLadybirdImg from '../../assets/beginners/attract-insects-ladybird.png'
+import attractMammalsFlyingFoxImg from '../../assets/beginners/attract-mammals-flying-fox.png'
+import attractMammalsPossumImg from '../../assets/beginners/attract-mammals-possum.png'
+import attractMammalsSugarGliderImg from '../../assets/beginners/attract-mammals-sugar-glider.png'
 
 export type TutorialMedia = {
   src: string
@@ -13,11 +22,29 @@ export type TutorialMedia = {
   caption: string
 }
 
+export type TutorialSectionBody =
+  | string
+  | {
+      lead: string
+      beforeLink: string
+      link: { label: string; to: string }
+      afterLink?: string
+    }
+
+export type TutorialTier = 'basic' | 'advanced'
+
+export type TutorialMediaAttribution = {
+  beforeLink: string
+  link: { label: string; to: string }
+  afterLink?: string
+}
+
 export type Tutorial = {
   id: string
+  tier: TutorialTier
   title: string
   intro: string
-  sections?: { title: string; body: string[] }[]
+  sections?: { title: string; body: TutorialSectionBody[] }[]
   steps: string[]
   /** When true, steps render as plain list items (no "Lead:" bold split). */
   plainSteps?: boolean
@@ -25,12 +52,14 @@ export type Tutorial = {
   related?: { label: string; to: string }[]
   /** Illustrated steps shown under the intro. */
   media?: TutorialMedia[]
+  mediaAttribution?: TutorialMediaAttribution
   mediaPlaceholders?: { label: string }[]
 }
 
 export const TUTORIALS: Tutorial[] = [
   {
     id: 'your-space',
+    tier: 'basic',
     title: 'Read your garden',
     intro:
       'Before you choose plants, get a feel for where things are easy to tend, how light and drainage vary, and how you will water—so your natives sit where they can thrive without a fuss.',
@@ -68,6 +97,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'establish-potted',
+    tier: 'basic',
     title: 'Establish potted plant in garden',
     intro:
       'A simple method to get a nursery pot settled into the ground with minimal stress and better early growth.',
@@ -108,6 +138,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'mulching',
+    tier: 'basic',
     title: 'Mulching guide',
     intro:
       'Mulch is a protective layer over the soil surface. Done well, it saves water, buffers heat, and reduces weeds while your garden establishes.',
@@ -160,6 +191,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'watering-guide',
+    tier: 'basic',
     title: 'Watering guide',
     intro:
       'There is no single perfect schedule — watering depends on weather, soil type, sun exposure, wind, pot size, and how established the plant is. Use the tips below to decide when to water.',
@@ -202,13 +234,109 @@ export const TUTORIALS: Tutorial[] = [
           'Aim water at the soil and root zone, not over the leaves — wet foliage wastes water and can encourage fungal problems; keep the base moist, not the canopy.',
       },
     ],
+    related: [
+      { label: 'Extreme heat', to: '/beginners/extreme-heat' },
+      { label: 'Mulching guide', to: '/beginners/mulching' },
+    ],
+  },
+  {
+    id: 'extreme-heat',
+    tier: 'advanced',
+    title: 'Extreme heat',
+    intro:
+      'When temperatures spike, even tough natives can struggle if the soil dries out. These steps help you keep moisture in the ground, cut heat stress, and give tender plants temporary relief.',
+    sections: [
+      {
+        title: 'What to do in a heatwave',
+        body: [
+          {
+            lead: 'Watering',
+            beforeLink: 'Follow the ',
+            link: { label: 'general watering tips', to: '/beginners/watering-guide' },
+            afterLink: ' for when and how to water, especially before hot days.',
+          },
+          {
+            lead: 'Mulch well',
+            beforeLink: 'See the ',
+            link: { label: 'mulching guide', to: '/beginners/mulching' },
+            afterLink: ' — a thick mulch layer shields soil from sun and slows evaporation from the surface.',
+          },
+          'Provide extra shade: younger or newly placed plants usually need more protection than established Australian natives.',
+          'Protect raised bed sides: sun on metal sides heats the soil — grow heat-tolerant plants along the outside and keep them pruned tall and narrow, not spreading into the bed.',
+          'Relocate pots and seedlings: move trays and pots to shade under trees or shrubs, or indoors for the day if needed.',
+          'Keep plants healthy: well-watered, adequately fed plants cope better with extreme weather — the resilience you want year-round.',
+        ],
+      },
+    ],
+    steps: [],
+    related: [
+      { label: 'Extreme cold', to: '/beginners/extreme-cold' },
+      { label: 'Watering guide', to: '/beginners/watering-guide' },
+      { label: 'Mulching guide', to: '/beginners/mulching' },
+    ],
+  },
+  {
+    id: 'extreme-cold',
+    tier: 'advanced',
+    title: 'Extreme cold',
+    intro:
+      'Frost can injure or kill plants even when daytime weather feels mild. Understanding how frost works — and where it hits hardest on your block — helps you choose the right plants and reduce damage through winter and early spring.',
+    sections: [
+      {
+        title: 'How to minimise frost damage',
+        body: [
+          'Use microclimates: established tree canopy and frost-free pockets on your property are the best places for tender plants.',
+          'No nitrogen after midsummer: avoid nitrogenous fertiliser from midsummer onward in frost-prone areas — it encourages soft, frost-vulnerable growth.',
+          'Keep air moving: do not block cold air at ground level with dense plantings, weeds, hedges, fences or buildings that trap frost pockets.',
+          'Keep soils moist: dryness makes frost damage more likely — check moisture before cold snaps.',
+          {
+            lead: 'Mulch for frost',
+            beforeLink: 'In frost-prone spots, gravel or screenings are often better than thick organic mulch, which can trap cold air — see the ',
+            link: { label: 'mulching guide', to: '/beginners/mulching' },
+            afterLink: ' for mulch types and depth.',
+          },
+          'Seaweed sprays: sprays on leaves may strengthen cell walls and help plants cope with frost and heat stress.',
+        ],
+      },
+      {
+        title: 'Frost facts',
+        body: [
+          'How frost hurts plants: freezing shrinks cells and ice forms between them; if thawing is slow, tissue loses water and you see “frost burn”.',
+          'Sun after frost: rapid thawing plus strong morning sun on still-frozen foliage can make damage worse.',
+          'Temperature risk: below about -2°C, many garden plants are at risk of frost damage.',
+        ],
+      },
+    ],
+    steps: [],
+    related: [
+      { label: 'Extreme heat', to: '/beginners/extreme-heat' },
+      { label: 'Mulching guide', to: '/beginners/mulching' },
+    ],
   },
   {
     id: 'attract-birds',
+    tier: 'advanced',
     title: 'Attracting birds',
     plainSteps: true,
     intro:
       'Birds visit gardens that offer food, water, shelter and safe places to nest. A mix of local native plants and simple habitat features can bring regular visitors without turning your yard into a full-time feeding station.',
+    media: [
+      {
+        src: attractBirdsSpinebillImg,
+        alt: 'Eastern spinebill with long curved beak feeding among purple tubular flowers',
+        caption: 'Eastern spinebill',
+      },
+      {
+        src: attractBirdsWattlebirdImg,
+        alt: 'Red wattlebird perched on a bare branch against green foliage',
+        caption: 'Red wattlebird',
+      },
+      {
+        src: attractBirdsHoneyeaterImg,
+        alt: 'New Holland honeyeater with yellow wing patches on a flowering grevillea',
+        caption: 'New Holland honeyeater',
+      },
+    ],
     sections: [
       {
         title: 'Food through the year',
@@ -247,10 +375,36 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'attract-insects',
+    tier: 'advanced',
     title: 'Attracting insects',
     plainSteps: true,
     intro:
       'Insects pollinate flowers, recycle nutrients and feed birds, reptiles and frogs. A native-friendly garden can host a huge variety of bees, butterflies, beetles and other invertebrates when you plant for diversity and reduce chemical use.',
+    media: [
+      {
+        src: attractInsectsLadybirdImg,
+        alt: 'Transverse ladybird with orange and black patterned wing covers on a green leaf',
+        caption: 'Transverse ladybird',
+      },
+      {
+        src: attractInsectsButterflyImg,
+        alt: 'Painted lady butterfly with orange and black wings resting near purple sage flowers',
+        caption: 'Painted lady butterfly',
+      },
+      {
+        src: attractInsectsBeeImg,
+        alt: 'Blue-banded bee with vivid blue stripes pollinating a pink flowering gum blossom',
+        caption: 'Blue-banded bee',
+      },
+    ],
+    mediaAttribution: {
+      beforeLink: 'Ladybird photo: ',
+      link: {
+        label: 'Wikimedia Commons',
+        to: 'https://commons.wikimedia.org/wiki/File:Coccinella_transversalis_2.jpg',
+      },
+      afterLink: ' (Coccinella transversalis).',
+    },
     sections: [
       {
         title: 'Flowers and host plants',
@@ -290,10 +444,36 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'attract-small-mammals',
+    tier: 'advanced',
     title: 'Attracting small mammals',
     plainSteps: true,
     intro:
       'Small mammals such as bandicoots, antechinus and various native rodents (where they still occur locally) need cover, safe movement and natural food — not bread or seed left for birds. Even urban gardens can support biodiversity when structure and pets are managed thoughtfully.',
+    media: [
+      {
+        src: attractMammalsPossumImg,
+        alt: 'Common ringtail possum with orange-brown fur clinging to branches among green foliage',
+        caption: 'Common ringtail possum',
+      },
+      {
+        src: attractMammalsSugarGliderImg,
+        alt: 'Sugar glider with grey and white fur gripping a green stem head-down',
+        caption: 'Sugar glider',
+      },
+      {
+        src: attractMammalsFlyingFoxImg,
+        alt: 'Three grey-headed flying foxes with orange collars hanging from a tree branch',
+        caption: 'Grey-headed flying fox',
+      },
+    ],
+    mediaAttribution: {
+      beforeLink: 'Ringtail possum photo: ',
+      link: {
+        label: 'Wikimedia Commons',
+        to: 'https://commons.wikimedia.org/wiki/File:Ringtail_Possum._Brisbane.jpg',
+      },
+      afterLink: ' (Andrew Mercer, CC BY-SA 4.0).',
+    },
     sections: [
       {
         title: 'Cover and corridors',
@@ -333,8 +513,15 @@ export const TUTORIALS: Tutorial[] = [
   },
 ]
 
+export const BASIC_TUTORIALS = TUTORIALS.filter((t) => t.tier === 'basic')
+export const ADVANCED_TUTORIALS = TUTORIALS.filter((t) => t.tier === 'advanced')
+
 export function getTutorialById(id: string | undefined): Tutorial | undefined {
   if (!id) return undefined
   return TUTORIALS.find((t) => t.id === id)
+}
+
+export function getTutorialsInTier(tier: TutorialTier): Tutorial[] {
+  return TUTORIALS.filter((t) => t.tier === tier)
 }
 

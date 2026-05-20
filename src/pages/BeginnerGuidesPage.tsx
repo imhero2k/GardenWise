@@ -1,8 +1,10 @@
-import { useLayoutEffect } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Fragment, useLayoutEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { BeginnerTierCrossLink } from '../components/BeginnerTierCrossLink'
 import { GardensForWildlifeBlurb } from '../components/GardensForWildlifeBlurb'
+import { BeginnersSidenav } from '../components/BeginnersSidenav'
 import { BEGINNER_RESOURCES_HASH, scrollToBeginnerResources } from '../lib/beginnerResourcesNav'
-import { TUTORIALS } from './beginners/tutorials'
+import { BASIC_TUTORIALS, TUTORIALS } from './beginners/tutorials'
 
 export function BeginnerGuidesPage() {
   const location = useLocation()
@@ -20,46 +22,42 @@ export function BeginnerGuidesPage() {
     }
   }, [location.hash, location.pathname, navigate])
 
-  const stepLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `beginners-sidenav__link${isActive ? ' beginners-sidenav__link--active' : ''}`
-
   return (
     <div className="beginners-layout">
-      <aside className="beginners-sidenav" aria-label="Basics navigation">
-        <p className="beginners-sidenav__title">Basics</p>
-        <NavLink to="/beginners" className={stepLinkClass} end>
-          All guides
-        </NavLink>
-        {TUTORIALS.map((t) => (
-          <NavLink key={t.id} to={`/beginners/${t.id}`} className={stepLinkClass}>
-            {t.title}
-          </NavLink>
-        ))}
-      </aside>
+      <BeginnersSidenav
+        sectionTitle="Basics"
+        indexTo="/beginners"
+        indexLabel="Basic guides"
+        tutorials={BASIC_TUTORIALS}
+        crossLink={{ to: '/beginners/advanced', label: 'Advanced guides' }}
+      />
 
       <div className="beginners-layout__main">
         <header className="page-header fade-up">
           <p className="eyebrow">Beginner guides</p>
           <h1>Step-by-step: your first native-friendly garden</h1>
-          <p style={{ color: 'var(--color-text-muted)', margin: 0, maxWidth: '42rem' }}>
-            Short tutorials you can follow in order — from understanding your yard to planting, watering and easy
-            upkeep. Pair these steps with{' '}
-            <Link to="/plants">PlantMe</Link>, the <Link to="/weed#weed-checker">plant identifier</Link>
-            {', and '}
-            <Link to="/learn#native">native plants 101</Link> when you want more context.
-          </p>
         </header>
 
-        {TUTORIALS.map((t) => (
-          <section key={t.id} className="card beginner-tutorial" aria-labelledby={`${t.id}-heading`}>
-            <h2 id={`${t.id}-heading`}>{t.title}</h2>
-            <p className="beginner-tutorial__intro">{t.intro}</p>
-            <p style={{ margin: 0 }}>
-              <Link to={`/beginners/${t.id}`} className="home-impact__more-link">
-                Open this guide
-              </Link>
-            </p>
-          </section>
+        {BASIC_TUTORIALS.map((t) => (
+          <Fragment key={t.id}>
+            <section className="card beginner-tutorial" aria-labelledby={`${t.id}-heading`}>
+              <h2 id={`${t.id}-heading`}>{t.title}</h2>
+              <p className="beginner-tutorial__intro">{t.intro}</p>
+              <p style={{ margin: 0 }}>
+                <Link to={`/beginners/${t.id}`} className="home-impact__more-link">
+                  Open this guide
+                </Link>
+              </p>
+            </section>
+            {t.id === 'watering-guide' ? (
+              <BeginnerTierCrossLink
+                title="Advanced guides"
+                description="Extreme heat and cold, attracting birds, insects and small mammals — for when you are ready to go further."
+                to="/beginners/advanced"
+                linkLabel="View advanced guides"
+              />
+            ) : null}
+          </Fragment>
         ))}
 
         <section
@@ -68,25 +66,16 @@ export function BeginnerGuidesPage() {
           aria-labelledby="beginner-resources-heading"
         >
           <h2 id="beginner-resources-heading">More help & resources</h2>
-          <p className="beginner-tutorial__intro" style={{ maxWidth: '46rem' }}>
-            If you’re stuck, these pages make the next decision easier: pick the right plants for your conditions, check
-            whether a garden plant is risky, and find a local nursery for labels and advice.
-          </p>
-          <ul style={{ margin: 0, paddingLeft: '1.25rem', lineHeight: 1.7 }}>
-            <li>
-              <Link to="/plants">PlantMe</Link> — filter by sun, soil and your area.
-            </li>
-            <li>
-              <Link to="/weed#weed-checker">Plant identifier</Link> — confirm if a plant can spread into bushland.
-            </li>
-            <li>
-              <Link to="/map">Nursery map</Link> — find nurseries and public gardens near you.
-            </li>
-            <li>
-              <Link to="/learn#native">Native plants 101</Link> — simple explanations and examples.
-            </li>
+          <ul className="beginner-resources__list">
             <li>
               <GardensForWildlifeBlurb />
+            </li>
+            <li>
+              <a href="https://weeds.org.au/" target="_blank" rel="noopener noreferrer">
+                Weeds Australia
+              </a>
+              {' '}
+              — national guide to identifying and managing invasive plants.
             </li>
           </ul>
         </section>
