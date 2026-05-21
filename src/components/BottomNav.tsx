@@ -43,8 +43,8 @@ const BEGINNER_MENU: MenuItem[] = [
 ]
 
 const LEARN_MENU: MenuItem[] = [
-  { to: '/learn#native', label: 'Native plants 101' },
-  { to: '/learn#environmental-weeds', label: 'Weeds 101 (environmental weeds)' },
+  { to: '/learn#native', label: 'Native plants' },
+  { to: '/learn#environmental-weeds', label: 'Environmental weeds' },
 ]
 
 function NavMenu({ items }: { items: MenuItem[] }) {

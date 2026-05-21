@@ -1172,7 +1172,7 @@ export function WeedPage() {
         <span className="weed-learn-link__icon"><IconBook /></span>
         <span className="weed-learn-link__text">
           <strong>Why does this matter?</strong> Read{' '}
-          <em>Environmental weeds in your garden</em> in Native plants 101.
+          <em>Environmental weeds in your garden</em> on the Learn page.
         </span>
         <span className="weed-learn-link__chev" aria-hidden>&rarr;</span>
       </Link>

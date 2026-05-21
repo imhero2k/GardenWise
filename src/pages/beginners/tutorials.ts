@@ -439,7 +439,7 @@ export const TUTORIALS: Tutorial[] = [
     related: [
       { label: 'Attracting birds', to: '/beginners/attract-birds' },
       { label: 'Mulching guide', to: '/beginners/mulching' },
-      { label: 'Native plants 101', to: '/learn#native' },
+      { label: 'Native plants', to: '/learn#native' },
     ],
   },
   {
