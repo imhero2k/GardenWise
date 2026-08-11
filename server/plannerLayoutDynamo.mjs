@@ -8,6 +8,7 @@
  * Env:
  *   DYNAMODB_PLANNER_LAYOUT_TABLE — table name (required for save/load)
  *   AWS_REGION — optional, default ap-southeast-2
+ *   DYNAMODB_ENDPOINT — optional, e.g. http://localhost:8000 for DynamoDB Local
  *
  * Lambda IAM: dynamodb:GetItem, dynamodb:PutItem on the table.
  */
@@ -17,15 +18,30 @@ import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dyn
 
 const region = String(process.env.AWS_REGION ?? 'ap-southeast-2').trim() || 'ap-southeast-2'
 const tableName = String(process.env.DYNAMODB_PLANNER_LAYOUT_TABLE ?? '').trim()
+const endpoint = String(process.env.DYNAMODB_ENDPOINT ?? '').trim() || undefined
 
 /** @type {DynamoDBDocumentClient | null} */
 let docClient = null
 
 function getDocClient() {
   if (!docClient) {
-    docClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region }), {
-      marshallOptions: { removeUndefinedValues: true },
-    })
+    docClient = DynamoDBDocumentClient.from(
+      new DynamoDBClient({
+        region,
+        ...(endpoint
+          ? {
+              endpoint,
+              credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
+              },
+            }
+          : {}),
+      }),
+      {
+        marshallOptions: { removeUndefinedValues: true },
+      },
+    )
   }
   return docClient
 }

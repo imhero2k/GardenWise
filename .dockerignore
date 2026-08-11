@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.github
+.env
+.env.*
+!.env.example
+*.md
+.DS_Store
+coverage
+.vscode
+.cursor
+database
+lambda_weedscan
+agent-transcripts
