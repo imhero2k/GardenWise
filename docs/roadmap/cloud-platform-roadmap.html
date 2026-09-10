@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>GardenWise / RootVio — Cloud Platform Engineering Roadmap</title>
+<style>
+/* ============================== TOKENS ============================== */
+:root{
+  --ink:#0c1f17; --ink2:#22332b;
+  --green:#0f3d26; --green2:#166534; --green3:#22c55e;
+  --amber:#b45309; --red:#9f1239;
+  --muted:#5f7169; --line:#dde7e1; --line2:#eef4f0;
+  --soft:#f5f9f6; --soft2:#eef5f0;
+}
+@page { size: A4; margin: 0; }
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; background:#fff; }
+body{
+  font-family:"Segoe UI","Helvetica Neue","Liberation Sans",Arial,sans-serif;
+  color:var(--ink); font-size:9.6pt; line-height:1.5;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+.page{
+  position:relative; width:210mm; height:296.6mm;
+  padding:14mm 15mm 16mm; overflow:hidden; background:#fff;
+  page-break-after:always; break-after:page;
+}
+.page:last-of-type{ page-break-after:auto; break-after:auto; }
+
+.pfoot{
+  position:absolute; left:15mm; right:15mm; bottom:9mm;
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:7.4pt; letter-spacing:.06em; color:var(--muted);
+  text-transform:uppercase; border-top:.6pt solid var(--line); padding-top:2.6mm;
+}
+.pfoot .n{ font-weight:700; color:var(--green); letter-spacing:.02em; }
+
+/* ============================== COVER ============================== */
+.cover{ padding:0; color:#fff; background:#0a2b1b; }
+.cover .bgwrap{ position:absolute; inset:0; }
+.cover .content{ position:absolute; inset:0; padding:20mm 18mm; display:flex; flex-direction:column; }
+.cover .eyebrow{ font-size:8.2pt; letter-spacing:.28em; text-transform:uppercase; color:#8ad9a8; font-weight:600; }
+.cover h1{ font-family:Georgia,"Times New Roman",serif; font-size:35pt; line-height:1.06; margin:6mm 0 0; font-weight:400; letter-spacing:-.5pt; }
+.cover h1 em{ font-style:italic; color:#9ff0bd; }
+.cover .rule{ width:34mm; height:2.4pt; background:#22c55e; margin:8mm 0 7mm; }
+.cover .lede{ font-size:11.4pt; line-height:1.55; color:#d8ece0; max-width:120mm; font-weight:300; }
+.cover .metagrid{ margin-top:auto; display:grid; grid-template-columns:repeat(2,1fr); gap:6mm 10mm; border-top:.8pt solid rgba(255,255,255,.22); padding-top:7mm; }
+.cover .metagrid div span{ display:block; font-size:7.4pt; letter-spacing:.2em; text-transform:uppercase; color:#7fc79c; margin-bottom:1.6mm; }
+.cover .metagrid div strong{ font-size:10pt; font-weight:600; color:#fff; }
+.cover .metagrid div code{ font-size:9pt; color:#c9e6d5; font-family:Consolas,"DejaVu Sans Mono",monospace; background:none; padding:0; }
+.cover .chips{ display:flex; gap:2.4mm; flex-wrap:wrap; margin-top:9mm; }
+.cover .chip{ border:.8pt solid rgba(154,240,189,.5); color:#c9f2d9; border-radius:100px; padding:1.5mm 4mm; font-size:8pt; letter-spacing:.05em; }
+
+/* ============================== HEADINGS ============================== */
+.sectnum{ font-size:7.6pt; letter-spacing:.24em; text-transform:uppercase; color:var(--green3); font-weight:700; margin-bottom:2mm; }
+h2.sect{ font-family:Georgia,serif; font-weight:400; font-size:19pt; line-height:1.14; margin:0 0 3mm; color:var(--green); letter-spacing:-.3pt; }
+h2.sect + .dek{ font-size:9.6pt; color:var(--muted); margin:0 0 5mm; max-width:152mm; }
+h3{ font-size:10.4pt; margin:4.6mm 0 2.2mm; color:var(--green2); font-weight:700; }
+h3:first-child{ margin-top:0; }
+h4{ font-size:9.3pt; margin:4mm 0 1.6mm; color:var(--ink2); font-weight:700; }
+p{ margin:0 0 2.3mm; }
+.hr{ height:.6pt; background:var(--line); margin:5mm 0; border:0; }
+ul,ol{ margin:0 0 2.6mm; padding-left:5.2mm; }
+li{ margin-bottom:1.1mm; }
+li::marker{ color:var(--green3); }
+code,kbd{ font-family:Consolas,"DejaVu Sans Mono",monospace; font-size:8.3pt; color:#0d4f36; background:var(--soft2); padding:.3mm 1.1mm; border-radius:2px; }
+pre{
+  font-family:Consolas,"DejaVu Sans Mono",monospace; font-size:7.4pt; line-height:1.5;
+  background:#0d251a; color:#d6ecdf; border-radius:3px; padding:3.4mm 4mm;
+  margin:0 0 3.4mm; overflow:hidden; white-space:pre-wrap; border-left:2.4pt solid var(--green3);
+}
+pre .c{ color:#7fa892; } pre .k{ color:#8ad9a8; } pre .s{ color:#f0d59b; }
+
+/* ============================== TABLES ============================== */
+table{ width:100%; border-collapse:collapse; margin:0 0 3.6mm; font-size:8.4pt; }
+th{ text-align:left; font-size:7.4pt; letter-spacing:.13em; text-transform:uppercase; color:var(--green); border-bottom:1pt solid var(--green2); padding:1.8mm 2mm; font-weight:700; vertical-align:bottom; }
+td{ padding:1.8mm 2mm; border-bottom:.5pt solid var(--line); vertical-align:top; line-height:1.42; }
+tr:nth-child(even) td{ background:#fafcfb; }
+td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+table.tight td, table.tight th{ padding:1.15mm 1.8mm; }
+
+/* ============================== COMPONENTS ============================== */
+.cols2{ display:grid; grid-template-columns:1fr 1fr; gap:7mm; }
+.cols3{ display:grid; grid-template-columns:repeat(3,1fr); gap:5mm; }
+.card{ border:.7pt solid var(--line); border-radius:3px; padding:4mm; background:#fff; }
+.card.soft{ background:var(--soft); border-color:var(--line2); }
+.card h4{ margin-top:0; }
+.kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:3.4mm; margin-bottom:5mm; }
+.kpi{ border:.7pt solid var(--line); border-top:2.4pt solid var(--green2); border-radius:2px; padding:3.4mm; }
+.kpi b{ display:block; font-family:Georgia,serif; font-size:19pt; line-height:1; color:var(--green); font-weight:400; }
+.kpi span{ display:block; font-size:7.3pt; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:2mm; }
+.callout{ border-left:2.6pt solid var(--green3); background:var(--soft); padding:3.4mm 4mm; margin:0 0 4mm; font-size:8.7pt; }
+.callout.warn{ border-left-color:var(--amber); background:#fdf8ef; }
+.callout.risk{ border-left-color:var(--red); background:#fdf4f6; }
+.callout b{ color:var(--green); }
+.callout.warn b{ color:var(--amber); }
+.callout.risk b{ color:var(--red); }
+.callout :last-child{ margin-bottom:0; }
+.tag{ display:inline-block; font-size:7pt; font-weight:700; letter-spacing:.09em; text-transform:uppercase; padding:.9mm 2.2mm; border-radius:2px; white-space:nowrap; }
+.t-none{ background:#fdeaee; color:#9f1239; }
+.t-low{ background:#fdf3e3; color:#a35b06; }
+.t-mid{ background:#e8f4ec; color:#166534; }
+.t-good{ background:#dcf3e5; color:#0d4f2c; }
+.t-tf{ background:#ede9fe; color:#5b21b6; }
+.t-gh{ background:#e5e9f0; color:#293546; }
+.t-k8s{ background:#e0edfb; color:#1b4f8a; }
+.t-obs{ background:#fdeee2; color:#9a4a10; }
+.mat{ font-size:8.3pt; }
+.mat .row{ display:grid; grid-template-columns:54mm 1fr 15mm; gap:3mm; align-items:center; margin-bottom:2.3mm; }
+.mat .track{ height:4.6mm; background:var(--line2); border-radius:1px; position:relative; overflow:hidden; }
+.mat .fill{ position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,#166534,#22c55e); }
+.mat .sc{ font-size:7.6pt; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
+.phasehead{ display:flex; align-items:flex-start; gap:5mm; border-bottom:1pt solid var(--green2); padding-bottom:3.4mm; margin-bottom:4.6mm; }
+.phasehead .badge{ flex:0 0 auto; width:19mm; height:19mm; border-radius:2px; background:var(--green); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.phasehead .badge span{ font-size:6.4pt; letter-spacing:.16em; text-transform:uppercase; opacity:.75; }
+.phasehead .badge b{ font-family:Georgia,serif; font-size:21pt; line-height:1; font-weight:400; }
+.phasehead .txt h2{ margin:0 0 1.6mm; font-family:Georgia,serif; font-size:16.5pt; font-weight:400; color:var(--green); }
+.phasehead .txt .meta{ font-size:8.1pt; color:var(--muted); }
+.phasehead .txt .meta b{ color:var(--ink2); }
+.toc{ font-size:9.1pt; }
+.toc .ti{ display:flex; align-items:baseline; gap:2.6mm; padding:1.9mm 0; border-bottom:.5pt dotted var(--line); }
+.toc .ti .no{ flex:0 0 9mm; font-size:7.6pt; letter-spacing:.1em; color:var(--green3); font-weight:700; }
+.toc .ti .tt{ flex:1 1 auto; }
+.toc .ti .tt small{ display:block; color:var(--muted); font-size:7.7pt; }
+.toc .ti .pg{ flex:0 0 auto; font-variant-numeric:tabular-nums; color:var(--muted); font-size:8.2pt; font-weight:600; }
+figure{ margin:0 0 4mm; }
+figcaption{ font-size:7.6pt; color:var(--muted); margin-top:2mm; }
+svg{ display:block; width:100%; height:auto; }
+.contd{ font-size:8pt; color:var(--muted); letter-spacing:.14em; text-transform:uppercase; margin-bottom:3mm; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ COVER -->
+<section class="page cover">
+  <div class="bgwrap">
+    <svg viewBox="0 0 794 1123" preserveAspectRatio="none" style="height:100%">
+      <defs>
+        <linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0d3623"/><stop offset="52%" stop-color="#0a2b1b"/><stop offset="100%" stop-color="#061b11"/>
+        </linearGradient>
+        <radialGradient id="cglow" cx="88%" cy="8%" r="62%">
+          <stop offset="0%" stop-color="#22c55e" stop-opacity=".34"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+        </radialGradient>
+        <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+          <path d="M34 0H0V34" fill="none" stroke="#7fd8a4" stroke-opacity=".07" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="794" height="1123" fill="url(#cg)"/>
+      <rect width="794" height="1123" fill="url(#grid)"/>
+      <rect width="794" height="1123" fill="url(#cglow)"/>
+      <g fill="none" stroke="#22c55e" stroke-opacity=".2" stroke-width="1.4">
+        <path d="M-40 812 C 150 700, 300 900, 520 760 S 760 690, 860 730"/>
+        <path d="M-40 872 C 170 770, 320 950, 540 820 S 780 760, 880 796"/>
+        <path d="M-40 932 C 190 840, 340 1000, 560 880 S 800 830, 900 862"/>
+      </g>
+      <g fill="#9ff0bd"><circle cx="520" cy="760" r="3.4"/><circle cx="540" cy="820" r="3.4"/><circle cx="560" cy="880" r="3.4"/></g>
+    </svg>
+  </div>
+  <div class="content">
+    <div class="eyebrow">Platform Engineering &middot; Technical Roadmap</div>
+    <h1>GardenWise&nbsp;/&nbsp;RootVio<br/><em>Cloud Platform</em> Roadmap</h1>
+    <div class="rule"></div>
+    <div class="lede">
+      A staged, 22-week plan to take the current GitHub&nbsp;Pages + hand-provisioned AWS
+      estate to a fully codified platform: Terraform infrastructure-as-code, hardened
+      GitHub&nbsp;Actions delivery, containerised workloads on Amazon&nbsp;EKS, and
+      first-class observability with Prometheus and Grafana.
+    </div>
+    <div class="chips">
+      <div class="chip">Terraform</div><div class="chip">GitHub Actions + OIDC</div>
+      <div class="chip">Amazon EKS</div><div class="chip">Prometheus &amp; Grafana</div>
+      <div class="chip">SLO-driven ops</div>
+    </div>
+    <div class="metagrid">
+      <div><span>Repository</span><code>github.com/imhero2k/GardenWise</code></div>
+      <div><span>Baseline commit</span><code>main @ dc4e305</code></div>
+      <div><span>Live surface</span><strong>rootivio.app &middot; ap-southeast-2</strong></div>
+      <div><span>Document</span><strong>v1.0 &middot; 10 September 2026</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CONTENTS -->
+<section class="page">
+  <div class="sectnum">Contents</div>
+  <h2 class="sect">What this document covers</h2>
+  <div class="toc">
+    <div class="ti"><div class="no">01</div><div class="tt">Executive summary<small>Where the platform stands, and what the five phases buy you</small></div><div class="pg" data-ref="#p-exec"></div></div>
+    <div class="ti"><div class="no">02</div><div class="tt">Current-state assessment<small>Verified inventory of the repo, AWS estate and CI, with maturity scoring</small></div><div class="pg" data-ref="#p-state"></div></div>
+    <div class="ti"><div class="no">03</div><div class="tt">Gap analysis<small>The ten gaps that gate every later phase</small></div><div class="pg" data-ref="#p-gaps"></div></div>
+    <div class="ti"><div class="no">04</div><div class="tt">Target architecture<small>Reference topology on completion of Phase&nbsp;4</small></div><div class="pg" data-ref="#p-arch"></div></div>
+    <div class="ti"><div class="no">05</div><div class="tt">Roadmap timeline<small>Six workstreams across 22 weeks with milestone gates</small></div><div class="pg" data-ref="#p-time"></div></div>
+    <div class="ti"><div class="no">06</div><div class="tt">Phase&nbsp;0 &mdash; Baseline &amp; guardrails<small>Branch protection, secret inventory, OIDC trust, state bootstrap</small></div><div class="pg" data-ref="#p-ph0"></div></div>
+    <div class="ti"><div class="no">07</div><div class="tt">Phase&nbsp;1 &mdash; Terraform foundation<small>Import the existing estate, then own it in code</small></div><div class="pg" data-ref="#p-ph1"></div></div>
+    <div class="ti"><div class="no">08</div><div class="tt">Phase&nbsp;2 &mdash; GitHub Actions delivery<small>Quality gates, reusable workflows, plan/apply gating</small></div><div class="pg" data-ref="#p-ph2"></div></div>
+    <div class="ti"><div class="no">09</div><div class="tt">Phase&nbsp;3 &mdash; Containers &amp; Amazon EKS<small>Images, cluster, add-ons, progressive traffic shift</small></div><div class="pg" data-ref="#p-ph3"></div></div>
+    <div class="ti"><div class="no">10</div><div class="tt">Phase&nbsp;4 &mdash; Observability with Prometheus<small>Metrics, dashboards, alert rules, SLOs, logs and traces</small></div><div class="pg" data-ref="#p-ph4"></div></div>
+    <div class="ti"><div class="no">11</div><div class="tt">Phase&nbsp;5 &mdash; Hardening, DR &amp; FinOps<small>Resilience, security posture, cost control</small></div><div class="pg" data-ref="#p-ph5"></div></div>
+    <div class="ti"><div class="no">12</div><div class="tt">Cost model<small>Monthly run-rate today, after Phase&nbsp;1, and after Phase&nbsp;4</small></div><div class="pg" data-ref="#p-cost"></div></div>
+    <div class="ti"><div class="no">13</div><div class="tt">Risk register<small>Ten risks with likelihood, impact and mitigation</small></div><div class="pg" data-ref="#p-risk"></div></div>
+    <div class="ti"><div class="no">14</div><div class="tt">Appendix<small>Configuration migration, repository file map, open decisions</small></div><div class="pg" data-ref="#p-appx"></div></div>
+  </div>
+
+  <hr class="hr"/>
+
+  <h3>How to read this roadmap</h3>
+  <p>Each phase has a fixed structure: what it delivers, the week-by-week activity, the code or
+  configuration that embodies it, and a definition of done expressed as things that can be
+  demonstrated rather than claimed. Every phase ends at a numbered gate, and the next phase does not
+  begin until that gate's exit criteria are met.</p>
+  <p>The current-state section is deliberately blunt about what is missing. Every absence recorded in
+  section&nbsp;02 was verified directly against the repository at commit <code>dc4e305</code>, because a
+  roadmap built on an optimistic reading of the codebase is worse than no roadmap at all.</p>
+
+  <div class="pfoot"><span>GardenWise / RootVio &mdash; Cloud Platform Roadmap</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ EXEC SUMMARY -->
+<section class="page" id="p-exec">
+  <div class="sectnum">01 &middot; Executive summary</div>
+  <h2 class="sect">The application is healthy; the platform underneath it is undocumented</h2>
+
+  <p>GardenWise (shipped as <strong>RootVio</strong>) is a React&nbsp;19 + Vite&nbsp;8 single-page app with an
+  Express API that runs both locally and as an AWS Lambda, backed by PostgreSQL/PostGIS on RDS and a
+  DynamoDB table for garden-planner layouts. The frontend has a genuinely good delivery story: every push
+  to <code>main</code>, <code>iteration1</code> or <code>iteration2</code> builds and publishes to GitHub
+  Pages behind the custom domain <code>rootivio.app</code>.</p>
+
+  <p>Everything below the frontend is the problem. There is <strong>no infrastructure-as-code anywhere in
+  the repository</strong> &mdash; no Terraform, CloudFormation, SAM or CDK. API Gateway, both Lambda
+  functions, the RDS instance and the DynamoDB table exist only as console-created resources and hard-coded
+  URLs. The backend has no automated deployment at all: shipping an API change means hand-building a zip.
+  There are zero automated tests, and observability consists of one <code>/api/health</code> endpoint plus
+  <code>console.log</code>. A Docker and LocalStack/EKS packaging attempt was merged and then reverted in
+  commits <code>6be8279</code>&nbsp;&rarr;&nbsp;<code>dc4e305</code>, so that work is recoverable but not
+  active.</p>
+
+  <div class="kpis">
+    <div class="kpi"><b>0</b><span>IaC files in repo</span></div>
+    <div class="kpi"><b>0</b><span>Automated tests</span></div>
+    <div class="kpi"><b>1&nbsp;of&nbsp;2</b><span>Tiers with CD</span></div>
+    <div class="kpi"><b>22</b><span>Weeks to target</span></div>
+  </div>
+
+  <h3>What the five phases deliver</h3>
+  <table class="tight">
+    <thead><tr><th style="width:34mm">Phase</th><th style="width:16mm">Weeks</th><th>Outcome</th></tr></thead>
+    <tbody>
+      <tr><td><strong>0 &middot; Baseline</strong></td><td>1&ndash;2</td><td>The repository can be trusted: protected branches, rescued documentation, a complete configuration inventory, and a keyless path from CI into AWS</td></tr>
+      <tr><td><strong>1 &middot; Terraform</strong></td><td>3&ndash;6</td><td>The production estate becomes reviewable and rebuildable, and a staging environment exists for the first time</td></tr>
+      <tr><td><strong>2 &middot; Actions</strong></td><td>5&ndash;8</td><td>Tests actually gate merges, and the API deploys itself instead of being uploaded by hand</td></tr>
+      <tr><td><strong>3 &middot; EKS</strong></td><td>9&ndash;14</td><td>Web and API run as scanned, signed containers on a cluster that Terraform can destroy and rebuild</td></tr>
+      <tr><td><strong>4 &middot; Prometheus</strong></td><td>13&ndash;18</td><td>Failures are detected by alerts rather than by users, and incidents can be diagnosed after the fact</td></tr>
+      <tr><td><strong>5 &middot; Hardening</strong></td><td>17&ndash;22</td><td>Backups are proven by restore, the auth migration finishes, and cost is governed rather than discovered</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>If only three things get done.</b> Terraform-import the existing estate, build the
+  integration test suite with an automated API deploy, and ship <code>prom-client</code> with four alert
+  rules. Those three &mdash; roughly nine weeks of work &mdash; remove every <em>critical</em> gap in
+  section&nbsp;03, and are worth more than the whole of Phases&nbsp;3&nbsp;and&nbsp;5 combined.</div>
+
+  <div class="pfoot"><span>Executive summary</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ STATE 1 -->
+<section class="page" id="p-state">
+  <div class="sectnum">02 &middot; Current-state assessment</div>
+  <h2 class="sect">Verified inventory</h2>
+  <p class="dek">Every row below was confirmed against <code>main&nbsp;@&nbsp;dc4e305</code>. Absences are
+  stated as explicitly as presences, because the absences are what the roadmap has to fund.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:28mm">Layer</th><th>What is actually there</th><th style="width:20mm">State</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Frontend</strong></td><td>React 19.2, Vite 8, React Router 7, TypeScript 5.9. SPA fallback via a <code>postbuild</code> step copying <code>index.html</code>&nbsp;&rarr;&nbsp;<code>404.html</code>. Leaflet map and a Three.js 3D planner. Source: <code>package.json</code>, <code>vite.config.ts</code>.</td><td><span class="tag t-good">Solid</span></td></tr>
+      <tr><td><strong>API</strong></td><td>A single Express&nbsp;4 app exposing 10 routes, with dual entry points: <code>server/index.mjs</code> for local development and <code>server/lambda.mjs</code> through <code>@vendia/serverless-express</code>. Source: <code>server/app.mjs</code>.</td><td><span class="tag t-mid">Works</span></td></tr>
+      <tr><td><strong>Relational data</strong></td><td>PostgreSQL with PostGIS through a <code>pg</code> pool on <code>DATABASE_URL</code>. Tables <code>bioregion</code>, <code>plant</code>, <code>bioregion_plant</code>, <code>weed_info</code> and <code>plant_trait</code>, with ETL under <code>database/</code>.</td><td><span class="tag t-mid">Works</span></td></tr>
+      <tr><td><strong>Key-value data</strong></td><td>DynamoDB planner layouts, partition key <code>userId</code>, sort key <code>layoutId</code>. The table name comes from <code>DYNAMODB_PLANNER_LAYOUT_TABLE</code>, but the table itself was created by hand and is tracked nowhere.</td><td><span class="tag t-low">Untracked</span></td></tr>
+      <tr><td><strong>Auth</strong></td><td>Firebase Auth (Google, Apple, email) on the client, with Firebase Admin ID-token verification guarding the two planner-layout routes. Cognito work exists only on the <code>cognito-migration</code> branch.</td><td><span class="tag t-low">In flux</span></td></tr>
+      <tr><td><strong>ML inference</strong></td><td>A Python 3.11 ONNX weed classifier packaged as a container Lambda, with model weights tracked in <code>lambda_weedscan/</code>.</td><td><span class="tag t-mid">Works</span></td></tr>
+      <tr><td><strong>CI / CD</strong></td><td><code>pages.yml</code> runs <code>npm ci</code>, <code>typecheck</code>, <code>lint</code> and <code>build</code> for three branches and publishes to Pages. <code>jekyll-gh-pages.yml</code> is a deliberate no-op. There is no backend deploy job.</td><td><span class="tag t-low">Partial</span></td></tr>
+      <tr><td><strong>Infrastructure as code</strong></td><td>None. No <code>.tf</code>, no CloudFormation, no SAM, no CDK, no <code>serverless.yml</code>. The API Gateway identifiers <code>tcal5txtn8</code> and <code>7muezhf0bl</code> appear as literals in source and CI.</td><td><span class="tag t-none">Absent</span></td></tr>
+      <tr><td><strong>Containers</strong></td><td>Only <code>lambda_weedscan/Dockerfile</code>. A root <code>Dockerfile</code>, <code>Dockerfile.api</code>, <code>docker-compose.yml</code> and <code>nginx.conf</code> were added and then reverted in <code>dc4e305</code>.</td><td><span class="tag t-low">Reverted</span></td></tr>
+      <tr><td><strong>Orchestration</strong></td><td>No cluster and no manifests. <code>k8s/</code> and <code>scripts/deploy-localstack-eks.sh</code> were removed by the same revert.</td><td><span class="tag t-none">Absent</span></td></tr>
+      <tr><td><strong>Observability</strong></td><td><code>GET /api/health</code> reports database, planner-storage and Firebase Admin status. Otherwise <code>console.*</code>. No metrics endpoint, no Prometheus, no tracing, no error tracking.</td><td><span class="tag t-none">Minimal</span></td></tr>
+      <tr><td><strong>Testing</strong></td><td>No test runner in <code>package.json</code>, no <code>*.test.*</code> files, no end-to-end suite, no coverage. The README's reference to <code>npm test</code> is stale.</td><td><span class="tag t-none">Absent</span></td></tr>
+      <tr><td><strong>Secrets</strong></td><td>Seven <code>VITE_FIREBASE_*</code> values plus a PlantNet key held as GitHub secrets. Server secrets such as <code>DATABASE_URL</code> and the service-account JSON live in operator-managed Lambda environment variables.</td><td><span class="tag t-low">Ad hoc</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Current-state assessment</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ STATE 2 -->
+<section class="page">
+  <div class="contd">02 &middot; Current-state assessment, continued</div>
+  <h2 class="sect">Platform maturity, scored 0&ndash;5</h2>
+  <p class="dek">Scores reflect what can be demonstrated today, not what is intended. The two dimensions
+  sitting at zero are the ones that make every other number fragile.</p>
+
+  <div class="mat">
+    <div class="row"><div>Source control &amp; branching</div><div class="track"><div class="fill" style="width:60%"></div></div><div class="sc">3.0</div></div>
+    <div class="row"><div>Frontend continuous delivery</div><div class="track"><div class="fill" style="width:80%"></div></div><div class="sc">4.0</div></div>
+    <div class="row"><div>Build quality gates</div><div class="track"><div class="fill" style="width:40%"></div></div><div class="sc">2.0</div></div>
+    <div class="row"><div>Backend / API continuous delivery</div><div class="track"><div class="fill" style="width:10%"></div></div><div class="sc">0.5</div></div>
+    <div class="row"><div>Infrastructure as code</div><div class="track"><div class="fill" style="width:2%"></div></div><div class="sc">0.0</div></div>
+    <div class="row"><div>Containerisation</div><div class="track"><div class="fill" style="width:20%"></div></div><div class="sc">1.0</div></div>
+    <div class="row"><div>Orchestration &amp; scaling</div><div class="track"><div class="fill" style="width:2%"></div></div><div class="sc">0.0</div></div>
+    <div class="row"><div>Observability &amp; alerting</div><div class="track"><div class="fill" style="width:16%"></div></div><div class="sc">0.8</div></div>
+    <div class="row"><div>Automated testing</div><div class="track"><div class="fill" style="width:2%"></div></div><div class="sc">0.0</div></div>
+    <div class="row"><div>Secrets &amp; identity management</div><div class="track"><div class="fill" style="width:36%"></div></div><div class="sc">1.8</div></div>
+    <div class="row"><div>Backup &amp; disaster recovery</div><div class="track"><div class="fill" style="width:16%"></div></div><div class="sc">0.8</div></div>
+    <div class="row"><div>Cost visibility &amp; governance</div><div class="track"><div class="fill" style="width:16%"></div></div><div class="sc">0.8</div></div>
+  </div>
+
+  <p style="margin-top:4mm">Weighted mean: <strong>1.3&nbsp;/&nbsp;5</strong>. The target on completion of
+  Phase&nbsp;5 is <strong>3.8&nbsp;/&nbsp;5</strong> &mdash; deliberately not 5, since several dimensions such
+  as multi-region disaster recovery and chaos engineering are out of scope for a project of this size and
+  would cost more than they return.</p>
+
+  <h3>Branch topology worth resolving</h3>
+  <table class="tight">
+    <thead><tr><th style="width:44mm">Branch</th><th>Signal</th></tr></thead>
+    <tbody>
+      <tr><td><code>cognito-migration</code></td><td>Real, active work: an auth abstraction, an Amplify Cognito provider, and <code>server/cognitoAuth.mjs</code> doing dual Cognito/Firebase verification. Not yet merged.</td></tr>
+      <tr><td><code>migratingAuth</code></td><td>Misleading name. The tip is an old frost-alert commit with no migration code in it. Rename or delete.</td></tr>
+      <tr><td><code>origin/production</code></td><td>Carries a <code>netlify.toml</code> that contradicts the GitHub Pages deploy on <code>main</code>.</td></tr>
+      <tr><td><code>cloudflare/workers-autoconfig</code> &times;3</td><td>Three near-duplicate branches proposing Cloudflare Workers hosting. Pick one or drop all three.</td></tr>
+      <tr><td>Dangling <code>107129f</code></td><td>Holds the security plan and peer-coding COP. Reachable from no branch, so one <code>git gc</code> from permanent loss.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Current-state assessment</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ GAPS 1 -->
+<section class="page" id="p-gaps">
+  <div class="sectnum">03 &middot; Gap analysis</div>
+  <h2 class="sect">The ten gaps, ordered by what they block</h2>
+  <p class="dek">Severity reflects blast radius today, not effort. The <em>Blocks</em> column is why the phase
+  ordering in section&nbsp;05 is the way it is.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:6mm">#</th><th style="width:42mm">Gap</th><th>Consequence today</th><th style="width:16mm">Severity</th><th style="width:14mm">Blocks</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>No infrastructure as code</strong></td><td>The production estate cannot be reviewed, diffed, rebuilt or reasoned about. A deleted API Gateway stage is an unrecoverable outage, and nobody can answer "what changed?"</td><td><span class="tag t-none">Critical</span></td><td>P1&ndash;P5</td></tr>
+      <tr><td class="num">2</td><td><strong>No backend deployment pipeline</strong></td><td>API releases are manual zip uploads from a laptop. No provenance, no rollback, no repeatability, and the artefact depends on one machine's <code>node_modules</code>.</td><td><span class="tag t-none">Critical</span></td><td>P3</td></tr>
+      <tr><td class="num">3</td><td><strong>No automated tests</strong></td><td><code>typecheck</code> and <code>lint</code> cannot catch a broken SQL query, a bad DynamoDB key or a regressed auth guard. Every deploy is an untested deploy.</td><td><span class="tag t-none">Critical</span></td><td>P2, P3</td></tr>
+      <tr><td class="num">4</td><td><strong>No metrics or alerting</strong></td><td>Failures are discovered by users. There is no latency, error-rate, saturation or pool-exhaustion signal, so no incident can be diagnosed after the fact.</td><td><span class="tag t-none">Critical</span></td><td>P4, P5</td></tr>
+      <tr><td class="num">5</td><td><strong>Long-lived AWS credentials</strong></td><td>Deployment relies on static keys held outside the repository. There is no short-lived, auditable, per-workflow identity.</td><td><span class="tag t-low">High</span></td><td>P1, P2</td></tr>
+      <tr><td class="num">6</td><td><strong>Endpoints hard-coded in source</strong></td><td><code>tcal5txtn8</code> and <code>7muezhf0bl</code> are baked into <code>vite.config.ts</code>, <code>src/lib/predict.ts</code> and <code>pages.yml</code>, so a stack rebuild forces a source edit and there is no clean staging environment.</td><td><span class="tag t-low">High</span></td><td>P1, P2</td></tr>
+      <tr><td class="num">7</td><td><strong>Unfinished auth migration</strong></td><td>Firebase on <code>main</code>, Cognito on a side branch, and a misleadingly named <code>migratingAuth</code> branch with no migration in it. Two identity providers to secure and no cut-over date.</td><td><span class="tag t-low">High</span></td><td>P1, P5</td></tr>
+      <tr><td class="num">8</td><td><strong>Reverted container work</strong></td><td>Docker, compose and <code>k8s/</code> manifests were written and then discarded, so the effort has been spent but the benefit is not banked.</td><td><span class="tag t-mid">Medium</span></td><td>P3</td></tr>
+      <tr><td class="num">9</td><td><strong>Architecture docs unreachable</strong></td><td>The security plan and peer-coding COP live in dangling commit <code>107129f</code>, reachable from no branch and one <code>git gc</code> from permanent loss.</td><td><span class="tag t-mid">Medium</span></td><td>P0</td></tr>
+      <tr><td class="num">10</td><td><strong>Divergent hosting strategies</strong></td><td>GitHub Pages on <code>main</code>, Netlify on <code>production</code>, Cloudflare Workers on three <code>cloudflare/*</code> branches. Three answers to one question.</td><td><span class="tag t-mid">Medium</span></td><td>P3</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Gap analysis</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ GAPS 2 -->
+<section class="page">
+  <div class="contd">03 &middot; Gap analysis, continued</div>
+  <h2 class="sect">Two things to do before anything else</h2>
+
+  <div class="cols2">
+    <div class="callout warn"><b>Sequencing rule.</b> Do not create new AWS resources by hand during
+    Phase&nbsp;1. Every resource added outside Terraform after the import baseline widens the drift the
+    project is trying to close, and unmanaged drift is the single most common reason
+    infrastructure-as-code adoptions stall halfway and get abandoned.</div>
+    <div class="callout risk"><b>Do this in week one.</b> Rescue commit <code>107129f</code> before it is
+    garbage-collected: <code>git branch rescue/docs 107129f</code>, then open a pull request. The security
+    plan is the only written record of the intended AWS topology, and it is the reference input for the
+    Terraform import work in Phase&nbsp;1.</div>
+  </div>
+
+  <h3>Guiding principles</h3>
+  <div class="cols3">
+    <div class="card soft"><h4>Codify before you change</h4><p style="margin:0;font-size:8.3pt">Import the
+    estate exactly as it is and reach a clean <code>terraform plan</code> with no diff. Only then refactor.
+    Mixing discovery with redesign is how a weekend disappears into a broken API Gateway.</p></div>
+    <div class="card soft"><h4>One environment shape</h4><p style="margin:0;font-size:8.3pt">Staging and
+    production differ only by variable values, never by structure. If a change works in staging it works in
+    production, which is the entire point of having a staging environment at all.</p></div>
+    <div class="card soft"><h4>Instrument before you migrate</h4><p style="margin:0;font-size:8.3pt">Metrics
+    land in the Express app in Phase&nbsp;4's first week, before any traffic moves to EKS, so the migration
+    has a real before-and-after baseline rather than a hunch.</p></div>
+  </div>
+
+  <h3>What each gap costs to close</h3>
+  <table class="tight">
+    <thead><tr><th style="width:14mm">Gap</th><th style="width:22mm">Phase</th><th style="width:22mm">Effort</th><th>The single highest-value move</th></tr></thead>
+    <tbody>
+      <tr><td>1 &middot; IaC</td><td>Phase 1</td><td>8 person-weeks</td><td>Declarative <code>import</code> blocks reviewed in a pull request, iterated to a zero-diff plan</td></tr>
+      <tr><td>2 &middot; Backend CD</td><td>Phase 2</td><td>2 person-weeks</td><td>Build the artefact in CI and deploy to staging on every merge to <code>main</code></td></tr>
+      <tr><td>3 &middot; Tests</td><td>Phase 2</td><td>3 person-weeks</td><td>Supertest against a real PostGIS service container covers all 10 routes</td></tr>
+      <tr><td>4 &middot; Metrics</td><td>Phase 4</td><td>1 person-week</td><td><code>prom-client</code> histogram middleware plus a <code>/metrics</code> endpoint</td></tr>
+      <tr><td>5 &middot; Credentials</td><td>Phase 0</td><td>0.5 person-weeks</td><td>GitHub OIDC provider with a narrowly scoped <code>sub</code> condition</td></tr>
+      <tr><td>6 &middot; Hard-coded endpoints</td><td>Phase 0&ndash;1</td><td>0.5 person-weeks</td><td>Terraform outputs feeding build arguments, so identifiers stop living in source</td></tr>
+      <tr><td>7 &middot; Auth migration</td><td>Phase 5</td><td>3 person-weeks</td><td>Dual-verify window gated on a per-provider failure metric</td></tr>
+      <tr><td>8 &middot; Containers</td><td>Phase 3</td><td>2 person-weeks</td><td>Cherry-pick <code>6be8279</code> rather than starting from a blank page</td></tr>
+      <tr><td>9 &middot; Lost docs</td><td>Phase 0</td><td>1 hour</td><td>One <code>git branch</code> command, this week</td></tr>
+      <tr><td>10 &middot; Hosting</td><td>Phase 1&ndash;3</td><td>1 person-week</td><td>Commit to CloudFront and delete the alternatives</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Gap analysis</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ ARCHITECTURE -->
+<section class="page" id="p-arch">
+  <div class="sectnum">04 &middot; Target architecture</div>
+  <h2 class="sect">Reference topology on completion of Phase&nbsp;4</h2>
+  <p class="dek">Every box below is created and owned by Terraform. Nothing in this diagram is provisioned by
+  hand, and nothing in it is addressed by a hard-coded identifier.</p>
+
+  <figure>
+  <svg viewBox="0 0 920 590" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#6b8479"/>
+      </marker>
+      <style>
+        .bx{fill:#fff;stroke:#c9d8d0;stroke-width:1.2;rx:5}
+        .bt{font-size:11.5px;fill:#12301f;font-weight:600}
+        .bs{font-size:9.5px;fill:#668073}
+        .zn{fill:#f6faf7;stroke:#cfe0d5;stroke-width:1.2;stroke-dasharray:5 4;rx:8}
+        .zl{font-size:9.5px;fill:#3f6b52;font-weight:700;letter-spacing:1.3px}
+        .ln{stroke:#98ada3;stroke-width:1.3;fill:none}
+        .tier{font-size:9px;fill:#8aa096;font-weight:700;letter-spacing:1.6px}
+      </style>
+    </defs>
+    <text class="tier" x="8" y="20">EDGE</text>
+    <rect class="bx" x="8" y="30" width="196" height="50"/>
+    <text class="bt" x="22" y="50">Route 53 + ACM</text><text class="bs" x="22" y="66">rootivio.app, api.rootivio.app</text>
+    <rect class="bx" x="220" y="30" width="196" height="50"/>
+    <text class="bt" x="234" y="50">CloudFront + AWS WAF</text><text class="bs" x="234" y="66">SPA cache, rate limit, bot rules</text>
+    <rect class="bx" x="432" y="30" width="196" height="50"/>
+    <text class="bt" x="446" y="50">S3 static origin</text><text class="bs" x="446" y="66">versioned SPA bundles</text>
+    <rect class="bx" x="644" y="30" width="268" height="50"/>
+    <text class="bt" x="658" y="50">Application Load Balancer</text><text class="bs" x="658" y="66">managed by AWS LB Controller + external-dns</text>
+    <path class="ln" d="M318 80 V104" marker-end="url(#ar)"/>
+    <path class="ln" d="M778 80 V104" marker-end="url(#ar)"/>
+
+    <rect class="zn" x="8" y="106" width="904" height="286"/>
+    <text class="zl" x="24" y="128">AMAZON EKS 1.31 &#183; ap-southeast-2 &#183; 3 AVAILABILITY ZONES &#183; PRIVATE NODE SUBNETS</text>
+
+    <rect class="zn" x="24" y="142" width="436" height="236" style="fill:#fff;stroke:#dbe7e0;stroke-dasharray:none"/>
+    <text class="zl" x="38" y="162" style="fill:#166534">NAMESPACE &#183; ROOTVIO</text>
+    <rect class="bx" x="38" y="172" width="200" height="56" style="fill:#f2f9f4"/>
+    <text class="bt" x="52" y="192">web &#183; Deployment</text><text class="bs" x="52" y="208">nginx + SPA &#183; 3 replicas &#183; HPA 3&#8211;10</text>
+    <rect class="bx" x="248" y="172" width="198" height="56" style="fill:#f2f9f4"/>
+    <text class="bt" x="262" y="192">api &#183; Deployment</text><text class="bs" x="262" y="208">Express &#183; 3 replicas &#183; HPA 3&#8211;12</text>
+    <rect class="bx" x="38" y="238" width="200" height="52"/>
+    <text class="bt" x="52" y="258">weedscan &#183; KEDA job</text><text class="bs" x="52" y="274">ONNX inference, scale-to-zero</text>
+    <rect class="bx" x="248" y="238" width="198" height="52"/>
+    <text class="bt" x="262" y="258">External Secrets Operator</text><text class="bs" x="262" y="274">SSM / Secrets Manager &rarr; Secret</text>
+    <rect class="bx" x="38" y="300" width="408" height="52"/>
+    <text class="bt" x="52" y="320">IRSA service accounts</text><text class="bs" x="52" y="336">per-workload IAM roles: RDS IAM auth, DynamoDB GetItem/PutItem, S3 model read</text>
+
+    <rect class="zn" x="472" y="142" width="424" height="236" style="fill:#fff;stroke:#e9ded4;stroke-dasharray:none"/>
+    <text class="zl" x="486" y="162" style="fill:#9a4a10">NAMESPACE &#183; OBSERVABILITY</text>
+    <rect class="bx" x="486" y="172" width="194" height="56" style="fill:#fdf6f0"/>
+    <text class="bt" x="500" y="192">Prometheus</text><text class="bs" x="500" y="208">kube-prometheus-stack &#183; 15d local</text>
+    <rect class="bx" x="690" y="172" width="192" height="56" style="fill:#fdf6f0"/>
+    <text class="bt" x="704" y="192">Grafana</text><text class="bs" x="704" y="208">dashboards as code, SSO</text>
+    <rect class="bx" x="486" y="238" width="194" height="52"/>
+    <text class="bt" x="500" y="258">Alertmanager</text><text class="bs" x="500" y="274">Slack + PagerDuty routes</text>
+    <rect class="bx" x="690" y="238" width="192" height="52"/>
+    <text class="bt" x="704" y="258">Loki + Promtail</text><text class="bs" x="704" y="274">structured pod logs</text>
+    <rect class="bx" x="486" y="300" width="396" height="52"/>
+    <text class="bt" x="500" y="320">OpenTelemetry Collector &rarr; Tempo</text><text class="bs" x="500" y="336">HTTP &rarr; SQL &rarr; DynamoDB spans, exemplar-linked from Prometheus</text>
+
+    <path class="ln" d="M140 392 V420" marker-end="url(#ar)"/>
+    <path class="ln" d="M348 392 V420" marker-end="url(#ar)"/>
+    <path class="ln" d="M560 392 V420" marker-end="url(#ar)"/>
+    <path class="ln" d="M770 392 V420" marker-end="url(#ar)"/>
+
+    <text class="tier" x="8" y="414">STATEFUL SERVICES &#183; PRIVATE SUBNETS</text>
+    <rect class="bx" x="8" y="422" width="218" height="56"/>
+    <text class="bt" x="22" y="442">RDS PostgreSQL + PostGIS</text><text class="bs" x="22" y="458">Multi-AZ, 7-day PITR, IAM auth</text>
+    <rect class="bx" x="238" y="422" width="218" height="56"/>
+    <text class="bt" x="252" y="442">DynamoDB planner layouts</text><text class="bs" x="252" y="458">on-demand, PITR, userId / layoutId</text>
+    <rect class="bx" x="468" y="422" width="218" height="56"/>
+    <text class="bt" x="482" y="442">S3 + ECR</text><text class="bs" x="482" y="458">ONNX models, scanned images</text>
+    <rect class="bx" x="698" y="422" width="214" height="56"/>
+    <text class="bt" x="712" y="442">Amazon Cognito</text><text class="bs" x="712" y="458">user pool, Firebase retired in P5</text>
+
+    <rect class="zn" x="8" y="496" width="904" height="80" style="fill:#f4f6fa;stroke:#ccd6e4"/>
+    <text class="zl" x="24" y="518" style="fill:#293546">DELIVERY PLANE &#183; NO LONG-LIVED AWS CREDENTIALS</text>
+    <rect class="bx" x="24" y="526" width="200" height="38"/><text class="bt" x="38" y="550">GitHub Actions</text>
+    <rect class="bx" x="236" y="526" width="188" height="38"/><text class="bt" x="250" y="550">OIDC &rarr; assume role</text>
+    <rect class="bx" x="436" y="526" width="188" height="38"/><text class="bt" x="450" y="550">Terraform + S3 state</text>
+    <rect class="bx" x="636" y="526" width="260" height="38"/><text class="bt" x="650" y="550">Argo CD &rarr; cluster reconciliation</text>
+    <path class="ln" d="M224 545 H232" marker-end="url(#ar)"/>
+    <path class="ln" d="M424 545 H432" marker-end="url(#ar)"/>
+    <path class="ln" d="M624 545 H632" marker-end="url(#ar)"/>
+    <path class="ln" d="M766 526 V500" marker-end="url(#ar)"/>
+  </svg>
+  <figcaption>Figure 1 &mdash; Target topology. The delivery plane at the bottom holds no static AWS keys:
+  GitHub Actions assumes a role through OIDC, Terraform owns AWS resources, and Argo CD reconciles cluster
+  state from the repository.</figcaption>
+  </figure>
+
+  <h3>What changes for a developer</h3>
+  <table class="tight">
+    <thead><tr><th style="width:46mm">Task</th><th>Today</th><th>After Phase 4</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Ship an API change</strong></td><td>Build a zip locally, upload through the console</td><td>Merge a pull request; the image builds, Argo CD rolls it out, metrics confirm</td></tr>
+      <tr><td><strong>Add an AWS resource</strong></td><td>Click through the console, tell nobody</td><td>A Terraform module change with a reviewed <code>plan</code> on the pull request</td></tr>
+      <tr><td><strong>Diagnose a slow request</strong></td><td>Read <code>console.log</code> in CloudWatch</td><td>Grafana latency panel, exemplar, Tempo trace, the slow SQL statement</td></tr>
+      <tr><td><strong>Roll back</strong></td><td>Find the previous zip, hope it still works</td><td><code>kubectl rollout undo</code>, or revert the pull request</td></tr>
+      <tr><td><strong>Stand up an environment</strong></td><td>Not feasible</td><td><code>terraform apply -var-file=staging.tfvars</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Target architecture</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ TIMELINE -->
+<section class="page" id="p-time">
+  <div class="sectnum">05 &middot; Roadmap timeline</div>
+  <h2 class="sect">Six workstreams, 22 weeks, five milestone gates</h2>
+  <p class="dek">Phases overlap deliberately. Terraform work continues while pipelines are being built, and
+  observability instrumentation starts inside the EKS phase so the cut-over is measured rather than hoped
+  for.</p>
+
+  <figure>
+  <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+    <defs><style>
+      .wk{font-size:9px;fill:#8aa096}
+      .rl{font-size:10.5px;fill:#12301f;font-weight:600}
+      .rs{font-size:8.5px;fill:#7d938a}
+      .gl{stroke:#e7eeea;stroke-width:1}
+      .bl{font-size:9px;fill:#fff;font-weight:600}
+    </style></defs>
+    <g class="gl">
+      <line x1="200" y1="34" x2="200" y2="266"/><line x1="261.8" y1="34" x2="261.8" y2="266"/>
+      <line x1="323.6" y1="34" x2="323.6" y2="266"/><line x1="385.4" y1="34" x2="385.4" y2="266"/>
+      <line x1="447.2" y1="34" x2="447.2" y2="266"/><line x1="509" y1="34" x2="509" y2="266"/>
+      <line x1="570.8" y1="34" x2="570.8" y2="266"/><line x1="632.6" y1="34" x2="632.6" y2="266"/>
+      <line x1="694.4" y1="34" x2="694.4" y2="266"/><line x1="756.2" y1="34" x2="756.2" y2="266"/>
+      <line x1="818" y1="34" x2="818" y2="266"/><line x1="879.8" y1="34" x2="879.8" y2="266"/>
+    </g>
+    <g class="wk" text-anchor="middle">
+      <text x="200" y="26">W1</text><text x="261.8" y="26">W3</text><text x="323.6" y="26">W5</text>
+      <text x="385.4" y="26">W7</text><text x="447.2" y="26">W9</text><text x="509" y="26">W11</text>
+      <text x="570.8" y="26">W13</text><text x="632.6" y="26">W15</text><text x="694.4" y="26">W17</text>
+      <text x="756.2" y="26">W19</text><text x="818" y="26">W21</text><text x="879.8" y="26">W23</text>
+    </g>
+    <line x1="200" y1="34" x2="879.8" y2="34" stroke="#b9cdc3" stroke-width="1.2"/>
+    <g>
+      <text class="rl" x="8" y="58">Phase 0 &#183; Baseline</text><text class="rs" x="8" y="71">Guardrails, OIDC, state</text>
+      <rect x="200" y="46" width="61.8" height="20" rx="4" fill="#4b5b53"/><text class="bl" x="208" y="60">2w</text>
+      <polygon points="261.8,56 268,49.8 274.2,56 268,62.2" fill="#0f3d26"/>
+    </g>
+    <g>
+      <text class="rl" x="8" y="98">Phase 1 &#183; Terraform</text><text class="rs" x="8" y="111">Import, modules, envs</text>
+      <rect x="261.8" y="86" width="123.6" height="20" rx="4" fill="#6d28d9"/><text class="bl" x="270" y="100">4w</text>
+      <polygon points="385.4,96 391.6,89.8 397.8,96 391.6,102.2" fill="#0f3d26"/>
+    </g>
+    <g>
+      <text class="rl" x="8" y="138">Phase 2 &#183; GitHub Actions</text><text class="rs" x="8" y="151">Tests, gates, deploy jobs</text>
+      <rect x="323.6" y="126" width="123.6" height="20" rx="4" fill="#293546"/><text class="bl" x="332" y="140">4w</text>
+      <polygon points="447.2,136 453.4,129.8 459.6,136 453.4,142.2" fill="#0f3d26"/>
+    </g>
+    <g>
+      <text class="rl" x="8" y="178">Phase 3 &#183; Containers &amp; EKS</text><text class="rs" x="8" y="191">Images, cluster, add-ons</text>
+      <rect x="447.2" y="166" width="185.4" height="20" rx="4" fill="#1b4f8a"/><text class="bl" x="455" y="180">6w</text>
+      <polygon points="632.6,176 638.8,169.8 645,176 638.8,182.2" fill="#0f3d26"/>
+    </g>
+    <g>
+      <text class="rl" x="8" y="218">Phase 4 &#183; Observability</text><text class="rs" x="8" y="231">Prometheus, Grafana, SLOs</text>
+      <rect x="570.8" y="206" width="185.4" height="20" rx="4" fill="#c2410c"/><text class="bl" x="579" y="220">6w</text>
+      <polygon points="756.2,216 762.4,209.8 768.6,216 762.4,222.2" fill="#0f3d26"/>
+    </g>
+    <g>
+      <text class="rl" x="8" y="258">Phase 5 &#183; Harden &amp; FinOps</text><text class="rs" x="8" y="271">DR, WAF, cost, auth cut-over</text>
+      <rect x="694.4" y="246" width="185.4" height="20" rx="4" fill="#166534"/><text class="bl" x="702" y="260">6w</text>
+    </g>
+    <text class="rs" x="560" y="292">&#9670; = milestone gate; the next phase does not start until the gate's exit criteria are met</text>
+  </svg>
+  <figcaption>Figure 2 &mdash; Phase schedule. Total elapsed time is 22 weeks; total effort is roughly
+  40&ndash;46 person-weeks, which fits two engineers at about 60&nbsp;% allocation.</figcaption>
+  </figure>
+
+  <div class="callout"><b>On the overlaps.</b> Phase&nbsp;2 starts in week&nbsp;5 rather than week&nbsp;7
+  because the test suite is on the critical path for Phase&nbsp;3 and has no dependency on Terraform.
+  Phase&nbsp;4 starts in week&nbsp;13 because <code>prom-client</code> instrumentation is a change to the
+  Express app rather than to the cluster, and shipping it early gives the EKS cut-over a Lambda-era baseline
+  to compare against.</div>
+
+  <div class="pfoot"><span>Roadmap timeline</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ GATES -->
+<section class="page">
+  <div class="contd">05 &middot; Roadmap timeline, continued</div>
+  <h2 class="sect">Milestone gates</h2>
+  <p class="dek">A gate is passed by demonstration, not by assertion. Each exit criterion below is written so
+  that it can be shown working in a review.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:14mm">Gate</th><th style="width:16mm">Week</th><th>Exit criteria &mdash; all must be demonstrably true</th></tr></thead>
+    <tbody>
+      <tr><td><strong>G0</strong></td><td>2</td><td>Branch protection active on <code>main</code>; docs commit <code>107129f</code> rescued and merged; a complete secret and endpoint inventory published; the GitHub OIDC provider and deploy role assumable from a real workflow run.</td></tr>
+      <tr><td><strong>G1</strong></td><td>6</td><td><code>terraform plan</code> against production returns <strong>no changes</strong> for all imported resources; remote state in S3 with DynamoDB locking; a staging environment created purely from code.</td></tr>
+      <tr><td><strong>G2</strong></td><td>9</td><td>Unit and integration tests run on every pull request with a coverage floor; the API artefact is built in CI and deployed to staging without human hands; <code>plan</code> auto-posted to pull requests and <code>apply</code> gated on an environment approval.</td></tr>
+      <tr><td><strong>G3</strong></td><td>15</td><td>Web and API images in ECR with a passing vulnerability scan; the EKS cluster serving staging end to end; production traffic shifted 10&nbsp;% through the ALB with a documented rollback.</td></tr>
+      <tr><td><strong>G4</strong></td><td>19</td><td>Prometheus scraping both workloads and all cluster components; four golden-signal dashboards live; alert rules paging a real on-call route; two SLOs with error budgets published and burning correctly.</td></tr>
+      <tr><td><strong>G5</strong></td><td>22</td><td>Restore from backup rehearsed and timed; WAF in blocking mode; Firebase decommissioned; monthly cost within 10&nbsp;% of the model in section&nbsp;12.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Effort distribution</h3>
+  <table class="tight">
+    <thead><tr><th style="width:42mm">Phase</th><th class="num" style="width:26mm">Person-weeks</th><th>Dominant cost</th></tr></thead>
+    <tbody>
+      <tr><td>Phase 0 &middot; Baseline</td><td class="num">2</td><td>Discovery and documentation, not engineering</td></tr>
+      <tr><td>Phase 1 &middot; Terraform</td><td class="num">8</td><td>Import iteration against live resources; the RDS import is the slow part</td></tr>
+      <tr><td>Phase 2 &middot; Actions</td><td class="num">7</td><td>Writing the first real test suite from nothing</td></tr>
+      <tr><td>Phase 3 &middot; EKS</td><td class="num">12</td><td>Cluster add-ons and the traffic cut-over rehearsals</td></tr>
+      <tr><td>Phase 4 &middot; Observability</td><td class="num">9</td><td>Dashboards and alert tuning; the instrumentation itself is a week</td></tr>
+      <tr><td>Phase 5 &middot; Hardening</td><td class="num">8</td><td>The auth migration and the disaster-recovery rehearsal</td></tr>
+      <tr style="background:#eef5f0"><td><strong>Total</strong></td><td class="num"><strong>46</strong></td><td><strong>Two engineers at ~60&nbsp;% over 22 weeks</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn"><b>Where the schedule is most likely to slip.</b> Phase&nbsp;1's import work is
+  estimated from a resource inventory that does not exist yet, and Phase&nbsp;3 depends on a decision
+  (&sect;9.1) that has not been made. Treat the 22 weeks as a plan for Phases&nbsp;0&ndash;2, which are well
+  understood, and as a forecast for Phases&nbsp;3&ndash;5, which are not.</div>
+
+  <div class="pfoot"><span>Roadmap timeline</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 0 a -->
+<section class="page" id="p-ph0">
+  <div class="phasehead">
+    <div class="badge"><span>Phase</span><b>0</b></div>
+    <div class="txt">
+      <h2>Baseline &amp; guardrails</h2>
+      <div class="meta"><b>Weeks 1&ndash;2</b> &nbsp;&middot;&nbsp; 2 person-weeks &nbsp;&middot;&nbsp; Gate <b>G0</b>
+      &nbsp;&middot;&nbsp; No new AWS spend</div>
+    </div>
+  </div>
+
+  <p>Two weeks of unglamorous work that makes every later phase cheaper. Nothing here changes runtime
+  behaviour; it establishes what exists, who is allowed to change it, and how automation authenticates.</p>
+
+  <h3>6.1 &nbsp;Rescue and consolidate the repository</h3>
+  <ul>
+    <li>Recover dangling commit <code>107129f</code> to a branch and merge it, bringing <code>docs/security-plan.md</code> and the peer-coding COP onto <code>main</code>.</li>
+    <li>Cherry-pick the reverted Docker and <code>k8s/</code> work from <code>6be8279</code> onto a <code>feat/containers</code> branch. It is a head start for Phase&nbsp;3, not wasted effort.</li>
+    <li>Delete or clearly rename the misleading <code>migratingAuth</code> branch, and pick one of the three <code>cloudflare/workers-autoconfig*</code> branches to keep.</li>
+    <li>Correct the stale README: there is no <code>lambda/</code> directory, no <code>npm test</code> script, and the versions it lists are behind the actual <code>package.json</code>.</li>
+  </ul>
+
+  <h3>6.2 &nbsp;Branch protection and repository policy</h3>
+  <table class="tight">
+    <thead><tr><th style="width:56mm">Control</th><th>Setting</th></tr></thead>
+    <tbody>
+      <tr><td>Required pull request reviews</td><td>One approval on <code>main</code>; stale approvals dismissed on new pushes</td></tr>
+      <tr><td>Required status checks</td><td><code>typecheck</code> and <code>lint</code> now; <code>test</code> and <code>terraform-plan</code> from Phase&nbsp;2</td></tr>
+      <tr><td>Linear history</td><td>Enforced, squash merges only, so a revert is always exactly one commit</td></tr>
+      <tr><td>Force push and deletion</td><td>Blocked on <code>main</code>, <code>staging</code> and <code>production</code></td></tr>
+      <tr><td>Secret scanning</td><td>Enabled with push protection; Dependabot for npm, pip, Actions and Docker</td></tr>
+      <tr><td>Environments</td><td><code>staging</code> deploys automatically; <code>production</code> requires a reviewer</td></tr>
+      <tr><td><code>CODEOWNERS</code></td><td><code>/terraform/</code>, <code>/.github/</code> and <code>/k8s/</code> owned by the platform reviewers</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.3 &nbsp;Configuration and endpoint inventory</h3>
+  <p>Produce the authoritative table of the 13 <code>VITE_*</code> variables and 10 server variables, mapping
+  each to its future home: a build-time input, SSM Parameter Store, or Secrets Manager. Appendix&nbsp;A
+  carries the current draft. In the same pass, replace the hard-coded API Gateway hosts in
+  <code>vite.config.ts</code>, <code>src/lib/predict.ts</code> and <code>pages.yml</code> with variables, so
+  that Phase&nbsp;1 can move endpoints without touching application source.</p>
+
+  <div class="pfoot"><span>Phase 0 &mdash; Baseline &amp; guardrails</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 0 b -->
+<section class="page">
+  <div class="contd">06 &middot; Phase 0, continued</div>
+  <h2 class="sect">GitHub OIDC trust and Terraform state bootstrap</h2>
+
+  <p>The single most valuable artefact of this phase is a keyless path from GitHub Actions into AWS, scoped
+  so that only this repository, and only specific branches and environments, can assume the deploy role.</p>
+
+<pre><span class="c"># terraform/bootstrap/main.tf &mdash; applied once, by hand, then committed</span>
+<span class="k">resource</span> <span class="s">"aws_iam_openid_connect_provider"</span> <span class="s">"github"</span> {
+  url             = <span class="s">"https://token.actions.githubusercontent.com"</span>
+  client_id_list  = [<span class="s">"sts.amazonaws.com"</span>]
+  thumbprint_list = [<span class="s">"6938fd4d98bab03faadb97b34396831e3780aea1"</span>]
+}
+
+<span class="k">data</span> <span class="s">"aws_iam_policy_document"</span> <span class="s">"assume"</span> {
+  <span class="k">statement</span> {
+    actions = [<span class="s">"sts:AssumeRoleWithWebIdentity"</span>]
+    principals {
+      type        = <span class="s">"Federated"</span>
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
+    <span class="k">condition</span> {
+      test     = <span class="s">"StringLike"</span>
+      variable = <span class="s">"token.actions.githubusercontent.com:sub"</span>
+      <span class="c"># Scope narrowly. Without this condition ANY GitHub repository</span>
+      <span class="c"># in the world can assume this role.</span>
+      values = [
+        <span class="s">"repo:imhero2k/GardenWise:ref:refs/heads/main"</span>,
+        <span class="s">"repo:imhero2k/GardenWise:environment:staging"</span>,
+        <span class="s">"repo:imhero2k/GardenWise:environment:production"</span>,
+      ]
+    }
+  }
+}
+
+<span class="c"># Remote state: a versioned, encrypted bucket plus a lock table.</span>
+<span class="k">resource</span> <span class="s">"aws_s3_bucket"</span>      <span class="s">"tfstate"</span> { bucket   = <span class="s">"rootvio-tfstate-apse2"</span> }
+<span class="k">resource</span> <span class="s">"aws_dynamodb_table"</span> <span class="s">"tflock"</span>  { hash_key = <span class="s">"LockID"</span> }</pre>
+
+  <div class="cols2">
+    <div class="card"><h4>Deliverables</h4><ul style="margin:0;font-size:8.4pt">
+      <li>Protected <code>main</code> with required checks and <code>CODEOWNERS</code></li>
+      <li>Documentation and container work rescued onto branches</li>
+      <li>Published configuration inventory (Appendix&nbsp;A)</li>
+      <li>OIDC provider, deploy role, state bucket, lock table</li>
+      <li><code>terraform/bootstrap/</code> committed to the repository</li>
+    </ul></div>
+    <div class="card soft"><h4>Watch out for</h4><ul style="margin:0;font-size:8.4pt">
+      <li>An over-broad trust policy. Omitting the <code>sub</code> condition is the classic OIDC mistake.</li>
+      <li>The seven <code>VITE_FIREBASE_*</code> values are compiled into a public bundle. They are configuration, not secrets; enforce Firebase security rules instead of hiding them.</li>
+      <li>Bootstrap state is chicken-and-egg. Apply locally once, then migrate its own state into the bucket it just created.</li>
+    </ul></div>
+  </div>
+
+  <h3>Definition of done</h3>
+  <table class="tight">
+    <thead><tr><th style="width:60mm">Criterion</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Documentation is reachable</td><td><code>git log main -- docs/security-plan.md</code> returns a commit</td></tr>
+      <tr><td>CI can reach AWS without keys</td><td>A workflow run performs <code>sts:GetCallerIdentity</code> using only OIDC</td></tr>
+      <tr><td>State backend is live</td><td><code>terraform init</code> succeeds against the S3 backend with locking</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Phase 0 &mdash; Baseline &amp; guardrails</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 1 a -->
+<section class="page" id="p-ph1">
+  <div class="phasehead">
+    <div class="badge" style="background:#5b21b6"><span>Phase</span><b>1</b></div>
+    <div class="txt">
+      <h2>Terraform foundation</h2>
+      <div class="meta"><b>Weeks 3&ndash;6</b> &nbsp;&middot;&nbsp; 8 person-weeks &nbsp;&middot;&nbsp; Gate <b>G1</b>
+      &nbsp;&middot;&nbsp; <span class="tag t-tf">Terraform 1.9 &middot; AWS provider 5.x</span></div>
+    </div>
+  </div>
+
+  <p>The estate becomes reviewable. The discipline that matters here is <strong>import first, refactor
+  second</strong>: bring every existing resource under management and reach a zero-diff plan before changing
+  a single setting.</p>
+
+  <h3>7.1 &nbsp;Repository layout</h3>
+<pre>terraform/
+  bootstrap/                 <span class="c"># OIDC provider, state bucket, lock table (Phase 0)</span>
+  modules/
+    network/                 <span class="c"># VPC, 3 AZ public+private subnets, NAT, endpoints, flow logs</span>
+    data-postgres/           <span class="c"># RDS PostGIS, subnet group, params, IAM auth, PITR</span>
+    data-dynamo/             <span class="c"># planner-layout table, PITR, autoscaling</span>
+    api-lambda/              <span class="c"># Phase 1 runtime: Lambda + API Gateway (retired in Phase 3)</span>
+    weedscan-lambda/         <span class="c"># container Lambda + ECR repo for the ONNX model</span>
+    static-site/             <span class="c"># S3 + CloudFront + ACM + Route 53 (replaces GitHub Pages)</span>
+    identity/                <span class="c"># Cognito user pool, clients, hosted UI, IdP federation</span>
+    observability/           <span class="c"># CloudWatch groups, alarms, SNS (superseded by Phase 4)</span>
+    eks/                     <span class="c"># added in Phase 3</span>
+  envs/
+    staging/  { main.tf  backend.tf  terraform.tfvars }
+    prod/     { main.tf  backend.tf  terraform.tfvars }</pre>
+
+  <p>Environments are deliberately thin: they instantiate modules and set variables, nothing more. Any
+  <code>if prod</code> logic inside a module is a smell &mdash; lift it to a variable so the two environments
+  stay structurally identical, which is the property that makes staging a meaningful test.</p>
+
+  <h3>7.2 &nbsp;Import the existing estate</h3>
+  <p>Terraform&nbsp;1.5 and later support declarative <code>import</code> blocks, which are far safer than the
+  old <code>terraform import</code> command because the import is reviewed in a pull request and planned
+  before it is executed.</p>
+
+<pre><span class="c"># terraform/envs/prod/imports.tf &mdash; delete each block once state has settled</span>
+<span class="k">import</span> {
+  to = module.data_dynamo.aws_dynamodb_table.planner_layout
+  id = <span class="s">"rootvio-planner-layout"</span>
+}
+
+<span class="k">import</span> {
+  to = module.api_lambda.aws_apigatewayv2_api.main
+  id = <span class="s">"tcal5txtn8"</span>            <span class="c"># the identifier hard-coded in pages.yml</span>
+}
+
+<span class="k">import</span> {
+  to = module.weedscan_lambda.aws_apigatewayv2_api.predict
+  id = <span class="s">"7muezhf0bl"</span>            <span class="c"># the identifier in src/lib/predict.ts</span>
+}
+
+<span class="k">import</span> {
+  to = module.data_postgres.aws_db_instance.main
+  id = <span class="s">"rootvio-pg"</span>
+}
+
+<span class="c"># Then iterate until this is clean:</span>
+<span class="c">#   terraform plan -detailed-exitcode        (exit 0 = no changes)</span>
+<span class="c"># That zero-diff plan IS gate G1.</span></pre>
+
+  <div class="pfoot"><span>Phase 1 &mdash; Terraform foundation</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 1 b -->
+<section class="page">
+  <div class="contd">07 &middot; Phase 1, continued</div>
+  <h2 class="sect">Week-by-week activity</h2>
+
+  <table class="tight">
+    <thead><tr><th style="width:10mm">Wk</th><th style="width:42mm">Activity</th><th>Detail and acceptance</th></tr></thead>
+    <tbody>
+      <tr><td class="num">3</td><td><strong>Discover and document</strong></td><td>Enumerate the live estate with the AWS CLI: API Gateway stages, Lambda configuration and environment variables, RDS parameters, DynamoDB capacity, IAM roles. Reconcile against the rescued security plan. Output is a resource inventory with ARNs.</td></tr>
+      <tr><td class="num">3</td><td><strong>Network module</strong></td><td>The VPC is the one thing likely to be genuinely new. Three availability zones, private subnets for RDS and future EKS nodes, a single NAT for staging and one per zone for production, plus gateway endpoints for S3 and DynamoDB to cut NAT egress cost.</td></tr>
+      <tr><td class="num">4</td><td><strong>Import the data tier</strong></td><td>RDS and DynamoDB under management. Add what is missing: <code>deletion_protection</code>, point-in-time recovery, seven-day backup retention, storage encryption, and <code>prevent_destroy</code> lifecycle blocks.</td></tr>
+      <tr><td class="num">4&ndash;5</td><td><strong>Import the compute tier</strong></td><td>Both API Gateways and both Lambda functions, including the container-image weed-scan function and its ECR repository. Move all Lambda environment variables to SSM Parameter Store references.</td></tr>
+      <tr><td class="num">5</td><td><strong>Identity module</strong></td><td>Provision the Cognito user pool, app clients and hosted UI that the <code>cognito-migration</code> branch already expects. Provisioned now, cut over in Phase&nbsp;5 &mdash; this decouples infrastructure work from an application migration.</td></tr>
+      <tr><td class="num">5&ndash;6</td><td><strong>Static site module</strong></td><td>S3, CloudFront, ACM and Route&nbsp;53, giving one origin for the SPA and ending the GitHub Pages / Netlify / Cloudflare fork in the road recorded as gap&nbsp;10. Keep Pages running in parallel until DNS is cut.</td></tr>
+      <tr><td class="num">6</td><td><strong>Build staging from code</strong></td><td>The real proof of the phase. <code>terraform apply</code> in <code>envs/staging</code> must produce a working environment with no console clicks and no manual repair afterwards.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.3 &nbsp;Conventions worth agreeing before the first module</h3>
+  <table class="tight">
+    <thead><tr><th style="width:40mm">Convention</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Naming</strong></td><td><code>rootvio-{env}-{component}</code>, for example <code>rootvio-prod-planner-layout</code>. Set once in a <code>locals</code> block and never hand-typed again.</td></tr>
+      <tr><td><strong>Default tags</strong></td><td>Provider-level <code>default_tags</code> carrying <code>Project</code>, <code>Environment</code>, <code>Owner</code>, <code>ManagedBy</code> and <code>CostCentre</code>. This is what makes the cost model in section&nbsp;12 measurable rather than theoretical.</td></tr>
+      <tr><td><strong>Version pinning</strong></td><td><code>required_version = "~&gt; 1.9"</code>, AWS provider <code>~&gt; 5.60</code>, and a committed <code>.terraform.lock.hcl</code>. Unpinned providers are how a Tuesday morning becomes an unplanned upgrade.</td></tr>
+      <tr><td><strong>State isolation</strong></td><td>One state file per environment at <code>s3://rootvio-tfstate-apse2/{env}/terraform.tfstate</code>. A staging mistake must never be able to reach production state.</td></tr>
+      <tr><td><strong>Secret handling</strong></td><td>No secret values in <code>.tf</code> or <code>.tfvars</code>. Terraform creates the parameter; a human or a rotation Lambda writes the value. Outputs carrying anything sensitive are marked <code>sensitive</code>.</td></tr>
+      <tr><td><strong>Destroy protection</strong></td><td><code>lifecycle { prevent_destroy = true }</code> on RDS, the DynamoDB table, the state bucket and the Route&nbsp;53 zones.</td></tr>
+      <tr><td><strong>No inline policies</strong></td><td>IAM built from <code>aws_iam_policy_document</code> data sources, so intent is reviewable in the plan diff rather than buried in a JSON heredoc.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Phase 1 &mdash; Terraform foundation</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 1 c -->
+<section class="page">
+  <div class="contd">07 &middot; Phase 1, continued</div>
+  <h2 class="sect">Keeping drift closed, and knowing when the phase is finished</h2>
+
+  <h3>7.4 &nbsp;Drift control</h3>
+  <p>An infrastructure-as-code adoption fails when somebody fixes production in the console at 11&nbsp;pm and
+  never tells Terraform. Three mechanisms, in increasing order of teeth:</p>
+  <ul>
+    <li><strong>Nightly drift detection.</strong> A scheduled workflow runs <code>terraform plan -detailed-exitcode</code> against both environments and opens an issue on exit code&nbsp;2, so drift becomes visible within a day instead of at the next release.</li>
+    <li><strong>Read-only humans in production.</strong> Once G1 passes, engineers hold a <code>ReadOnlyAccess</code> role in the production account. Writes go through the Terraform deploy role that only Actions can assume. A break-glass admin role exists, requires MFA, and raises a CloudTrail alert whenever it is used.</li>
+    <li><strong>Policy as code.</strong> <code>tflint</code> and <code>checkov</code> in the pull-request pipeline, failing the build on public S3 buckets, unencrypted storage, <code>0.0.0.0/0</code> ingress on anything but the load balancer, and IAM wildcards.</li>
+  </ul>
+
+  <div class="callout warn"><b>The database is the risky import.</b> Some RDS attribute changes force
+  replacement, and a replacement here means data loss. Always read the plan output for
+  <code>#&nbsp;forces&nbsp;replacement</code> before applying, take a manual snapshot before the first RDS
+  apply, and rehearse the whole import against a snapshot-restored clone rather than the live instance.</div>
+
+  <h3>7.5 &nbsp;Definition of done</h3>
+  <table class="tight">
+    <thead><tr><th style="width:56mm">Criterion</th><th>How it is verified</th></tr></thead>
+    <tbody>
+      <tr><td>Zero-diff production plan</td><td><code>terraform plan -detailed-exitcode</code> in <code>envs/prod</code> exits&nbsp;0, with the output attached to the gate review</td></tr>
+      <tr><td>Staging built from code alone</td><td>A fresh apply into empty state produces a working staging stack, and the smoke test passes against it</td></tr>
+      <tr><td>Remote state and locking work</td><td>Two concurrent applies are attempted; the second blocks on the DynamoDB lock</td></tr>
+      <tr><td>No hard-coded endpoints remain</td><td><code>rg 'execute-api'</code> across <code>src/</code>, <code>vite.config.ts</code> and <code>.github/</code> returns no matches</td></tr>
+      <tr><td>Backups verified</td><td>Point-in-time recovery enabled on RDS and DynamoDB, and a restore to a scratch instance is performed and timed</td></tr>
+      <tr><td>Cost tags flowing</td><td>Cost Explorer can group the estate by <code>Project</code> and <code>Environment</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2">
+    <div class="card"><h4>Effort split</h4>
+      <table class="tight" style="margin:0"><tbody>
+        <tr><td>Discovery and inventory</td><td class="num">1.5 pw</td></tr>
+        <tr><td>Network module</td><td class="num">1.0 pw</td></tr>
+        <tr><td>Data tier import</td><td class="num">1.5 pw</td></tr>
+        <tr><td>Compute tier import</td><td class="num">1.5 pw</td></tr>
+        <tr><td>Identity and static site</td><td class="num">1.5 pw</td></tr>
+        <tr><td>Staging build and hardening</td><td class="num">1.0 pw</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card soft"><h4>Why Terraform rather than CDK or Pulumi?</h4>
+      <p style="margin:0;font-size:8.4pt">Both alternatives are defensible. Terraform is recommended here for
+      three reasons specific to this project: the declarative <code>import</code> workflow is the best
+      available tool for adopting a hand-built estate; <code>terraform-aws-modules/eks</code> removes weeks
+      of Phase&nbsp;3 work; and plan output is readable by reviewers who are not fluent in the language it
+      was written in. CDK's main advantage &mdash; sharing TypeScript with the application &mdash; matters
+      less when the infrastructure surface is this small.</p>
+    </div>
+  </div>
+
+  <div class="pfoot"><span>Phase 1 &mdash; Terraform foundation</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 2 a -->
+<section class="page" id="p-ph2">
+  <div class="phasehead">
+    <div class="badge" style="background:#293546"><span>Phase</span><b>2</b></div>
+    <div class="txt">
+      <h2>GitHub Actions delivery</h2>
+      <div class="meta"><b>Weeks 5&ndash;8</b> &nbsp;&middot;&nbsp; 7 person-weeks &nbsp;&middot;&nbsp; Gate <b>G2</b>
+      &nbsp;&middot;&nbsp; <span class="tag t-gh">Reusable workflows &middot; OIDC &middot; environments</span></div>
+    </div>
+  </div>
+
+  <p>Today CI proves that the TypeScript compiles. After this phase it proves that the software works, builds
+  every artefact reproducibly, and deploys the whole system without anyone touching the console.</p>
+
+  <h3>8.1 &nbsp;Target workflow set</h3>
+  <table class="tight">
+    <thead><tr><th style="width:36mm">Workflow</th><th style="width:28mm">Trigger</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>ci.yml</code></td><td>Pull request, push</td><td>Install, typecheck, lint, <strong>unit tests</strong>, <strong>API integration tests</strong> against a Postgres service container, coverage floor, bundle-size budget</td></tr>
+      <tr><td><code>terraform.yml</code></td><td>PR touching <code>terraform/**</code></td><td><code>fmt</code>, <code>validate</code>, <code>tflint</code>, <code>checkov</code>, then <code>plan</code> per environment posted as a sticky pull-request comment</td></tr>
+      <tr><td><code>terraform-apply.yml</code></td><td>Merge to <code>main</code></td><td>Apply to staging automatically, then to production behind the protected environment's required reviewer</td></tr>
+      <tr><td><code>build-images.yml</code></td><td>Merge to <code>main</code>, tags</td><td>Buildx multi-stage builds for web, api and weedscan; push to ECR tagged with the commit SHA; Trivy scan; SBOM attached; image signed with cosign</td></tr>
+      <tr><td><code>deploy-app.yml</code></td><td>After images</td><td>Phase&nbsp;2 updates the Lambda to the new artefact. Phase&nbsp;3 bumps the image tag in the Argo CD source and waits for a healthy rollout</td></tr>
+      <tr><td><code>e2e.yml</code></td><td>Post-deploy to staging</td><td>Playwright journeys: sign in, plant search, planner save and reload, weed scan upload</td></tr>
+      <tr><td><code>drift.yml</code></td><td>Nightly schedule</td><td><code>plan -detailed-exitcode</code> against both environments; opens an issue when drift is found</td></tr>
+      <tr><td><code>pages.yml</code></td><td>&mdash;</td><td><strong>Retired</strong> once CloudFront serves the SPA; the multi-branch <code>iteration1</code>/<code>iteration2</code> preview behaviour is replaced by per-pull-request preview deployments</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.2 &nbsp;Closing the testing gap</h3>
+  <div class="cols3">
+    <div class="card"><h4>Unit &mdash; Vitest</h4><p style="margin:0;font-size:8.3pt">Pure logic first, because it
+    is cheap and it is where the real bugs are: <code>plannerLayoutValidate.mjs</code> boundary cases,
+    weed-lookup normalisation, recommendation ranking, frost-date arithmetic. Target 70&nbsp;% statement
+    coverage on <code>server/</code>.</p></div>
+    <div class="card"><h4>Integration &mdash; Supertest</h4><p style="margin:0;font-size:8.3pt">All ten Express
+    routes against a real <code>postgis/postgis</code> service container seeded from
+    <code>database/create&nbsp;table.sql</code>, plus DynamoDB Local. Assert the auth guard: a
+    <code>PUT /api/planner/layout</code> without a bearer token must return 401.</p></div>
+    <div class="card"><h4>End-to-end &mdash; Playwright</h4><p style="margin:0;font-size:8.3pt">Four journeys
+    against deployed staging, run post-deploy rather than per-pull-request so they never become the flaky
+    check everyone learns to re-run. Traces and screenshots retained on failure.</p></div>
+  </div>
+
+  <div class="callout"><b>Sequencing note.</b> Write the integration tests <em>before</em> the Phase&nbsp;3
+  container work. They are the only mechanism that will tell you the containerised Express app behaves
+  identically to the Lambda one, and building them afterwards means migrating blind.</div>
+
+  <div class="pfoot"><span>Phase 2 &mdash; GitHub Actions delivery</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 2 b -->
+<section class="page">
+  <div class="contd">08 &middot; Phase 2, continued</div>
+  <h2 class="sect">Reusable quality workflow</h2>
+
+  <p>One called workflow holds the quality gate, so <code>ci.yml</code>, the nightly job and any future
+  release branch all run byte-identical checks rather than three drifting copies.</p>
+
+<pre><span class="c"># .github/workflows/_node-quality.yml &mdash; called, not triggered</span>
+<span class="k">on</span>:
+  workflow_call:
+    inputs:
+      node-version: { type: string, default: <span class="s">"22"</span> }
+
+<span class="k">jobs</span>:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rootvio_test
+        options: &gt;-
+          --health-cmd pg_isready --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: <span class="s">"${{ inputs.node-version }}"</span>
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:unit -- --coverage
+      - run: npm run test:integration
+        env:
+          DATABASE_URL: <span class="s">"postgres://postgres:postgres@localhost:5432/rootvio_test"</span>
+          DATABASE_SSL: <span class="s">"0"</span>
+      - uses: actions/upload-artifact@v4
+        <span class="k">if</span>: always()
+        with: { name: coverage, path: coverage/ }</pre>
+
+  <h3>8.3 &nbsp;Supply-chain controls</h3>
+  <ul>
+    <li><strong>Pin actions by commit SHA</strong>, not by tag. A moved tag on a third-party action is a credible supply-chain vector, and this pipeline holds a role that can write to production.</li>
+    <li><strong>Least-privilege <code>permissions:</code></strong> declared per job. The default token is read-only, and <code>id-token: write</code> appears only on jobs that actually assume a role.</li>
+    <li><strong>Concurrency groups</strong> per environment with <code>cancel-in-progress: false</code>, so two applies can never race for the state lock.</li>
+    <li><strong>Trivy and cosign</strong> on every image; the deploy job refuses an unsigned image or one carrying an unwaived critical CVE.</li>
+    <li><strong>Reproducible builds</strong> from <code>npm ci</code> against a committed lockfile, with the commit SHA as the only image tag. No <code>latest</code>, ever.</li>
+  </ul>
+
+  <div class="callout warn"><b>Watch the runner minutes.</b> The current <code>pages.yml</code> builds three
+  branch variants on every push to any of them, so a single change can trigger nine builds. Splitting
+  previews into per-pull-request deployments and caching <code>node_modules</code> and the Playwright
+  browsers typically cuts total pipeline time by well over half.</div>
+
+  <div class="pfoot"><span>Phase 2 &mdash; GitHub Actions delivery</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 2 c -->
+<section class="page">
+  <div class="contd">08 &middot; Phase 2, continued</div>
+  <h2 class="sect">Keyless deploys and gated applies</h2>
+
+<pre><span class="c"># .github/workflows/terraform.yml &mdash; plan stage</span>
+<span class="k">permissions</span>:
+  id-token: write        <span class="c"># required for OIDC</span>
+  contents: read
+  pull-requests: write
+
+<span class="k">jobs</span>:
+  plan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: { env: [staging, prod] }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4    <span class="c"># no static keys anywhere</span>
+        with:
+          role-to-assume: <span class="s">arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/rootvio-gha-plan</span>
+          aws-region: ap-southeast-2
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: <span class="s">"1.9.8"</span> }
+      - run: terraform init -input=false
+        working-directory: terraform/envs/${{ matrix.env }}
+      - run: terraform plan -no-color -input=false -out=tfplan | tee plan.txt
+        working-directory: terraform/envs/${{ matrix.env }}
+      - uses: marocchino/sticky-pull-request-comment@v2   <span class="c"># reviewers see the diff</span>
+        with:
+          header: <span class="s">"plan-${{ matrix.env }}"</span>
+          path: terraform/envs/${{ matrix.env }}/plan.txt</pre>
+
+  <table class="tight">
+    <thead><tr><th style="width:40mm">Role</th><th style="width:34mm">Assumable from</th><th>Permissions</th></tr></thead>
+    <tbody>
+      <tr><td><code>rootvio-gha-plan</code></td><td>Any pull-request ref</td><td><code>ReadOnlyAccess</code> plus read and write on the state bucket and lock table. It cannot mutate infrastructure, so a fork pull request cannot do damage.</td></tr>
+      <tr><td><code>rootvio-gha-apply-staging</code></td><td><code>environment:staging</code></td><td>Write access scoped to staging resources by tag and name-prefix condition</td></tr>
+      <tr><td><code>rootvio-gha-apply-prod</code></td><td><code>environment:production</code></td><td>Write access to production, reachable only after the environment's required reviewer approves</td></tr>
+      <tr><td><code>rootvio-gha-ecr-push</code></td><td><code>ref:refs/heads/main</code></td><td><code>ecr:PutImage</code> and layer upload on the three repositories, and nothing else</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>Why three roles rather than one.</b> A single powerful role assumable from any
+  workflow means a pull request from a fork, or a compromised third-party action, inherits the ability to
+  write to production. Splitting plan from apply, and staging from production, means the blast radius of
+  each credential matches the job that holds it.</div>
+
+  <div class="pfoot"><span>Phase 2 &mdash; GitHub Actions delivery</span><span class="n"></span></div>
+</section>
+
+<section class="page">
+  <div class="contd">08 &middot; Phase 2, continued</div>
+  <h2 class="sect">Definition of done</h2>
+  <table class="tight">
+    <thead><tr><th style="width:56mm">Criterion</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>The test suite gates merges</td><td>Unit and integration checks required on <code>main</code>; a deliberately broken SQL query fails the pull request</td></tr>
+      <tr><td>Coverage floor enforced</td><td>The build fails below 70&nbsp;% on <code>server/</code>, and the trend is published per pull request</td></tr>
+      <tr><td>The API deploys without hands</td><td>A merge to <code>main</code> reaches staging automatically; production waits for the environment approval</td></tr>
+      <tr><td>No static AWS credentials</td><td>Zero <code>AWS_SECRET_ACCESS_KEY</code> secrets in repository settings; CloudTrail shows only <code>AssumeRoleWithWebIdentity</code></td></tr>
+      <tr><td>Plans visible to reviewers</td><td>Every <code>terraform/**</code> pull request carries a sticky plan comment for both environments</td></tr>
+      <tr><td>Rollback rehearsed</td><td>A previous artefact is redeployed on purpose and timed; the target is under ten minutes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>Keep Pages until CloudFront is proven.</b> Retire <code>pages.yml</code> only after
+  the CloudFront distribution has served production traffic for a week. The custom domain
+  <code>rootivio.app</code> and the <code>CNAME</code> file are the cut-over point, so plan for DNS TTL and
+  keep the Pages rollback ready.</div>
+
+  <div class="pfoot"><span>Phase 2 &mdash; GitHub Actions delivery</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 3 a -->
+<section class="page" id="p-ph3">
+  <div class="phasehead">
+    <div class="badge" style="background:#1b4f8a"><span>Phase</span><b>3</b></div>
+    <div class="txt">
+      <h2>Containers &amp; Amazon EKS</h2>
+      <div class="meta"><b>Weeks 9&ndash;14</b> &nbsp;&middot;&nbsp; 12 person-weeks &nbsp;&middot;&nbsp; Gate <b>G3</b>
+      &nbsp;&middot;&nbsp; <span class="tag t-k8s">EKS 1.31 &middot; Karpenter &middot; Argo CD</span></div>
+    </div>
+  </div>
+
+  <h3>9.1 &nbsp;Decide this before week 9</h3>
+  <div class="callout warn"><b>EKS is the largest cost and complexity increase in this roadmap</b> &mdash;
+  roughly US$&nbsp;150&ndash;220 per month per environment, plus a permanent operational surface. If the
+  driver is a learning objective or a coursework requirement, proceed as written. If the driver is purely
+  production need at current traffic, Lambda with API Gateway is honestly the better fit, and the Terraform
+  and Actions work in Phases&nbsp;1&ndash;2 delivers most of the benefit without it. Phase&nbsp;4's Prometheus
+  stack does assume a cluster; the ECS Fargate alternative in &sect;9.6 is the middle path.</div>
+
+  <h3>9.2 &nbsp;Recover and finish the container work</h3>
+  <p>Commit <code>6be8279</code> already contains <code>Dockerfile</code>, <code>Dockerfile.api</code>,
+  <code>docker-compose.yml</code>, <code>nginx.conf</code> and four <code>k8s/</code> manifests. Start from
+  the cherry-pick made in Phase&nbsp;0 rather than a blank page, then harden it.</p>
+
+<pre><span class="c"># Dockerfile &mdash; web: build the SPA, serve it from a minimal nginx</span>
+<span class="k">FROM</span> node:22-alpine <span class="k">AS</span> build
+WORKDIR /app
+COPY package*.json ./
+<span class="k">RUN</span> npm ci
+COPY . .
+<span class="k">ARG</span> VITE_API_BASE_URL VITE_COGNITO_USER_POOL_ID VITE_BASE_PATH=/
+<span class="k">RUN</span> npm run build
+
+<span class="k">FROM</span> nginx:1.27-alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+<span class="k">USER</span> nginx                                    <span class="c"># never run as root</span>
+<span class="k">HEALTHCHECK</span> CMD wget -qO- http://127.0.0.1:8080/healthz || exit 1
+
+<span class="c"># Dockerfile.api &mdash; production dependencies only, non-root, no shell tooling</span>
+<span class="k">FROM</span> node:22-alpine <span class="k">AS</span> deps
+WORKDIR /app
+COPY package*.json ./
+<span class="k">RUN</span> npm ci --omit=dev
+
+<span class="k">FROM</span> node:22-alpine
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY server ./server
+<span class="k">ENV</span> NODE_ENV=production PORT=3001
+<span class="k">USER</span> node
+<span class="k">EXPOSE</span> 3001
+<span class="k">CMD</span> [<span class="s">"node"</span>, <span class="s">"server/index.mjs"</span>]</pre>
+
+  <div class="pfoot"><span>Phase 3 &mdash; Containers &amp; Amazon EKS</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 3 b -->
+<section class="page">
+  <div class="contd">09 &middot; Phase 3, continued</div>
+  <h2 class="sect">One required code change, and the cluster shape</h2>
+
+  <h3>9.3 &nbsp;Split the probe surface</h3>
+  <p><code>server/app.mjs</code> currently mounts everything on a single Express app that Lambda wraps. For
+  Kubernetes the probe surface has to be split, so that a saturated database does not cause the kubelet to
+  restart otherwise-healthy pods:</p>
+  <ul>
+    <li><code>GET /healthz</code> &mdash; liveness. Returns 200 if the process is responsive. <strong>No database check.</strong></li>
+    <li><code>GET /readyz</code> &mdash; readiness. Checks the <code>pg</code> pool and DynamoDB reachability; failing removes the pod from the Service but does not restart it.</li>
+    <li><code>GET /api/health</code> &mdash; kept as the existing rich, human-facing status payload.</li>
+    <li><code>GET /metrics</code> &mdash; added in Phase&nbsp;4, bound to the pod network only.</li>
+  </ul>
+  <p>The API also needs graceful <code>SIGTERM</code> handling in <code>server/index.mjs</code>, so that a
+  rolling update drains in-flight requests instead of dropping them, and JSON logging to stdout so that Loki
+  can parse it in Phase&nbsp;4.</p>
+
+  <h3>9.4 &nbsp;Cluster shape</h3>
+  <table class="tight">
+    <thead><tr><th style="width:34mm">Decision</th><th style="width:44mm">Choice</th><th>Reasoning</th></tr></thead>
+    <tbody>
+      <tr><td>Provisioning</td><td><code>terraform-aws-modules/eks</code> v20</td><td>Handles IRSA, add-ons and access entries, saving weeks versus hand-rolled resources</td></tr>
+      <tr><td>Version</td><td>EKS 1.31</td><td>One minor behind latest, with an upgrade cadence set at two per year</td></tr>
+      <tr><td>Compute</td><td>Karpenter on <code>t4g</code>/<code>m7g</code> Graviton spot, on-demand fallback</td><td>Roughly 20&nbsp;% cheaper per vCPU than x86, and it bin-packs far better than fixed node groups</td></tr>
+      <tr><td>Networking</td><td>VPC CNI, private nodes, public ALB only</td><td>Nodes are never reachable from the internet</td></tr>
+      <tr><td>Ingress</td><td>AWS Load Balancer Controller with external-dns</td><td>One ALB for both workloads; DNS records follow the Ingress objects</td></tr>
+      <tr><td>Secrets</td><td>External Secrets Operator reading SSM and Secrets Manager</td><td>No secret material in Git; Terraform owns the parameter, the operator syncs the value</td></tr>
+      <tr><td>Delivery</td><td>Argo CD, app-of-apps pattern</td><td>Cluster state is reconciled from the repository, and drift self-heals</td></tr>
+      <tr><td>Access</td><td>EKS access entries, IAM-mapped, no <code>aws-auth</code> edits</td><td>The modern mechanism; avoids the classic ConfigMap lockout</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Phase 3 &mdash; Containers &amp; Amazon EKS</span><span class="n"></span></div>
+</section>
+
+<section class="page">
+  <div class="contd">09 &middot; Phase 3, continued</div>
+  <h2 class="sect">Week-by-week activity</h2>
+  <table class="tight">
+    <thead><tr><th style="width:10mm">Wk</th><th style="width:38mm">Activity</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td class="num">9</td><td><strong>Images and ECR</strong></td><td>Finish the three Dockerfiles, create ECR repositories in Terraform with lifecycle policies and scan-on-push, and wire <code>build-images.yml</code>. Verify with <code>docker compose up</code> that the local stack still works.</td></tr>
+      <tr><td class="num">10</td><td><strong>Probes and configuration</strong></td><td>Split <code>/healthz</code> and <code>/readyz</code>, move all configuration to environment variables with no filesystem assumptions, and switch to JSON logging.</td></tr>
+      <tr><td class="num">10&ndash;11</td><td><strong>EKS module, staging</strong></td><td>Cluster, Karpenter node pools, IRSA roles for DynamoDB and RDS IAM auth, and the core add-ons: CoreDNS, kube-proxy, VPC CNI, EBS CSI.</td></tr>
+      <tr><td class="num">11&ndash;12</td><td><strong>Platform add-ons</strong></td><td>AWS Load Balancer Controller, external-dns, External Secrets Operator, metrics-server, and Argo CD with the app-of-apps root.</td></tr>
+      <tr><td class="num">12</td><td><strong>Helm chart</strong></td><td>One chart, two value files: Deployments for web and api, Services, a shared Ingress, HPAs, PodDisruptionBudgets, resource requests and limits, topology spread across three zones, and a <code>NetworkPolicy</code> restricting api ingress to the web pods and the ALB.</td></tr>
+      <tr><td class="num">13</td><td><strong>Staging end to end</strong></td><td>The Playwright suite green against the EKS-hosted staging URL, plus a load test to size requests and limits from evidence rather than guesswork.</td></tr>
+      <tr><td class="num">13&ndash;14</td><td><strong>Production and canary</strong></td><td>Apply the same module to production, then weight the ALB target groups 90/10 and watch for 48 hours. <strong>This is gate G3.</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Phase 3 &mdash; Containers &amp; Amazon EKS</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 3 c -->
+<section class="page">
+  <div class="contd">09 &middot; Phase 3, continued</div>
+  <h2 class="sect">Traffic cut-over</h2>
+
+  <table class="tight">
+    <thead><tr><th style="width:22mm">Step</th><th style="width:28mm">Split</th><th style="width:22mm">Hold</th><th>Abort condition</th></tr></thead>
+    <tbody>
+      <tr><td>Canary</td><td>90 Lambda / 10 EKS</td><td>48 hours</td><td>5xx rate above 0.5&nbsp;%, or p95 latency more than 20&nbsp;% worse than the Lambda baseline</td></tr>
+      <tr><td>Half</td><td>50 / 50</td><td>72 hours</td><td>Any Sev-1 incident, or database connections above 80&nbsp;% of the pool ceiling</td></tr>
+      <tr><td>Majority</td><td>10 / 90</td><td>1 week</td><td>Error-budget burn faster than twice the target rate</td></tr>
+      <tr><td>Complete</td><td>0 / 100</td><td>&mdash;</td><td>Lambda and API Gateway kept warm and deployable for 30 more days before removal</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout risk"><b>The connection-pool trap.</b> One Lambda concurrency unit holds one
+  <code>pg</code> connection, but twelve api pods each holding a pool of ten is 120 connections, and a
+  <code>db.t4g.micro</code> caps out well below that. Before the canary, either put RDS Proxy in front of
+  Postgres or set the pool <code>max</code> to
+  <code>ceil(db_max_connections &times; 0.8 / max_replicas)</code>. This is the most common way a
+  Lambda-to-Kubernetes migration falls over on day one, and it fails under load rather than in staging.</div>
+
+  <h3>Definition of done</h3>
+  <ul>
+    <li>Three images in ECR, signed, scanned and tagged by commit SHA, with no unwaived critical CVEs.</li>
+    <li>Staging and production clusters created entirely by Terraform; a cluster can be destroyed and rebuilt in under an hour.</li>
+    <li>Argo CD reconciling, demonstrated by a manual <code>kubectl edit</code> against a managed object being reverted automatically.</li>
+    <li>HPAs demonstrably scaling under load test, and PodDisruptionBudgets holding availability through a node drain.</li>
+    <li>Production serving at least 10&nbsp;% of live traffic from EKS with a written, rehearsed rollback.</li>
+  </ul>
+
+  <h3>9.6 &nbsp;If EKS is not justified &mdash; the ECS Fargate variant</h3>
+  <p>Should the week-9 decision go the other way, most of this phase still applies: the Dockerfiles, the ECR
+  repositories, the probe split, JSON logging and GitOps-style deploys are all unchanged. Swap the
+  <code>eks/</code> module for an <code>ecs-fargate/</code> module, and in Phase&nbsp;4 replace
+  kube-prometheus-stack with Amazon Managed Service for Prometheus scraping the same <code>/metrics</code>
+  endpoint through an ADOT sidecar. That path is roughly 60&nbsp;% cheaper and materially less to operate;
+  the trade-off is losing the Kubernetes ecosystem and the learning outcome.</p>
+
+  <h3>9.7 &nbsp;The weedscan decision</h3>
+  <p>The ONNX inference Lambda is bursty and idles at zero, which is precisely the workload shape AWS Lambda
+  is best at. Keeping it there is recommended. Moving it to a KEDA-scaled Kubernetes job is possible and is
+  drawn that way in Figure&nbsp;1, but it should be done because queue-depth scaling or GPU scheduling is
+  genuinely needed, not for the sake of uniformity.</p>
+
+  <div class="pfoot"><span>Phase 3 &mdash; Containers &amp; Amazon EKS</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 4 a -->
+<section class="page" id="p-ph4">
+  <div class="phasehead">
+    <div class="badge" style="background:#c2410c"><span>Phase</span><b>4</b></div>
+    <div class="txt">
+      <h2>Observability with Prometheus</h2>
+      <div class="meta"><b>Weeks 13&ndash;18</b> &nbsp;&middot;&nbsp; 9 person-weeks &nbsp;&middot;&nbsp; Gate <b>G4</b>
+      &nbsp;&middot;&nbsp; <span class="tag t-obs">kube-prometheus-stack &middot; Grafana &middot; Loki &middot; Tempo</span></div>
+    </div>
+  </div>
+
+  <p>The system currently emits one boolean health endpoint and unstructured console output. This phase makes
+  it answer three questions it cannot answer today: <em>is it broken</em>, <em>for whom</em>, and
+  <em>why</em>.</p>
+
+  <h3>10.1 &nbsp;Stack composition</h3>
+  <table class="tight">
+    <thead><tr><th style="width:36mm">Component</th><th style="width:36mm">Deployment</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Prometheus Operator</strong></td><td><code>kube-prometheus-stack</code> chart, via Argo CD</td><td>CRD-driven scrape configuration, so <code>ServiceMonitor</code> objects live beside the workloads they describe</td></tr>
+      <tr><td><strong>Prometheus</strong></td><td>2 replicas, 50&nbsp;GiB gp3 each</td><td>15-day local retention at a 30-second scrape interval</td></tr>
+      <tr><td><strong>Thanos or AMP</strong></td><td>Optional, week 18</td><td>Long-term retention, only if 15 days proves insufficient for capacity planning</td></tr>
+      <tr><td><strong>Grafana</strong></td><td>Dashboards as ConfigMaps, sidecar-loaded</td><td>Dashboards are code and are reviewed like code; SSO for access</td></tr>
+      <tr><td><strong>Alertmanager</strong></td><td>3 replicas with HA gossip</td><td>Routes by severity: <code>critical</code> pages, <code>warning</code> goes to Slack</td></tr>
+      <tr><td><strong>Exporters</strong></td><td>node-exporter, kube-state-metrics, <code>postgres_exporter</code>, CloudWatch exporter</td><td>Node, cluster, database and AWS-managed-service signals all in one query language</td></tr>
+      <tr><td><strong>Loki + Promtail</strong></td><td>Loki single-binary, S3 backend</td><td>Structured logs correlated to metrics by <code>trace_id</code></td></tr>
+      <tr><td><strong>OTel Collector + Tempo</strong></td><td>DaemonSet collector, Tempo on S3</td><td>Traces across HTTP, SQL and DynamoDB, linked from Prometheus exemplars</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 &nbsp;Rollout order</h3>
+  <table class="tight">
+    <thead><tr><th style="width:14mm">Week</th><th>Activity</th></tr></thead>
+    <tbody>
+      <tr><td>13</td><td><code>prom-client</code> shipped while the API is still on Lambda, capturing the pre-migration baseline</td></tr>
+      <tr><td>14</td><td>kube-prometheus-stack deployed to staging through Argo CD</td></tr>
+      <tr><td>15</td><td>ServiceMonitors, exporters, and the first two dashboards</td></tr>
+      <tr><td>16</td><td>Alert rules, Alertmanager routes, and a runbook per critical alert</td></tr>
+      <tr><td>17</td><td>Loki and Promtail; JSON logs correlated by trace identifier</td></tr>
+      <tr><td>18</td><td>OpenTelemetry and Tempo, exemplars, SLO dashboards. <strong>Gate G4.</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Phase 4 &mdash; Observability with Prometheus</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 4 b -->
+<section class="page">
+  <div class="contd">10 &middot; Phase 4, continued</div>
+  <h2 class="sect">Instrumenting the Express API</h2>
+
+  <p>This change is small and is the highest-leverage work in the phase. Ship it in week&nbsp;13, while the
+  API is still on Lambda, so the EKS cut-over has a genuine before-and-after baseline.</p>
+
+<pre><span class="c">// server/metrics.mjs &mdash; new file</span>
+<span class="k">import</span> client <span class="k">from</span> <span class="s">"prom-client"</span>;
+
+<span class="k">export const</span> registry = <span class="k">new</span> client.Registry();
+registry.setDefaultLabels({ service: <span class="s">"rootvio-api"</span>, env: process.env.APP_ENV });
+client.collectDefaultMetrics({ register: registry });   <span class="c">// event loop, GC, heap, RSS</span>
+<span class="k">export const</span> httpDuration = <span class="k">new</span> client.Histogram({
+  name: <span class="s">"http_request_duration_seconds"</span>,
+  help: <span class="s">"HTTP request latency"</span>,
+  labelNames: [<span class="s">"method"</span>, <span class="s">"route"</span>, <span class="s">"status"</span>],
+  <span class="c">// buckets chosen around the current p95, not the library defaults</span>
+  buckets: [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+});
+
+<span class="k">export const</span> dbQueryDuration = <span class="k">new</span> client.Histogram({
+  name: <span class="s">"db_query_duration_seconds"</span>, help: <span class="s">"Postgres query latency"</span>,
+  labelNames: [<span class="s">"query"</span>, <span class="s">"outcome"</span>], buckets: [0.005, 0.02, 0.1, 0.5, 2, 10],
+});
+
+<span class="c">// the metric that predicts the &sect;9 pool exhaustion before users feel it</span>
+<span class="k">export const</span> dbPoolInUse = <span class="k">new</span> client.Gauge({
+  name: <span class="s">"db_pool_connections_in_use"</span>, help: <span class="s">"Busy pg pool connections"</span>,
+});
+
+<span class="c">// the provider label makes the Firebase -&gt; Cognito cut-over observable</span>
+<span class="k">export const</span> authFailures = <span class="k">new</span> client.Counter({
+  name: <span class="s">"auth_verification_failures_total"</span>, help: <span class="s">"Rejected tokens"</span>,
+  labelNames: [<span class="s">"provider"</span>, <span class="s">"reason"</span>],
+});
+
+[httpDuration, dbQueryDuration, dbPoolInUse, authFailures]
+  .forEach((m) =&gt; registry.registerMetric(m));</pre>
+
+<pre><span class="c">// server/app.mjs &mdash; middleware, mounted before the routes</span>
+app.use((req, res, next) =&gt; {
+  <span class="k">const</span> end = httpDuration.startTimer();
+  res.on(<span class="s">"finish"</span>, () =&gt; end({
+    method: req.method,
+    <span class="c">// the route PATTERN, never req.path: /api/plants/:id must not</span>
+    <span class="c">// become thousands of distinct label values</span>
+    route: req.route?.path ?? req.baseUrl ?? <span class="s">"unmatched"</span>,
+    status: res.statusCode,
+  }));
+  next();
+});
+
+app.get(<span class="s">"/metrics"</span>, <span class="k">async</span> (_req, res) =&gt; {
+  res.set(<span class="s">"Content-Type"</span>, registry.contentType);
+  res.end(<span class="k">await</span> registry.metrics());
+});</pre>
+
+
+  <div class="callout warn"><b>Cardinality is the one way to break Prometheus.</b> Every distinct label
+  combination is a separate time series. Never label with a user identifier, a raw path or a full error
+  message. Ten routes by five methods by six status codes is a few thousand series and entirely fine;
+  adding <code>userId</code> turns it into millions and takes the server down.</div>
+
+  <div class="pfoot"><span>Phase 4 &mdash; Observability with Prometheus</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 4 c -->
+<section class="page">
+  <div class="contd">10 &middot; Phase 4, continued</div>
+  <h2 class="sect">Scrape targets and alert rules as Kubernetes objects</h2>
+
+<pre><span class="c"># k8s/observability/servicemonitor-api.yaml</span>
+<span class="k">apiVersion</span>: monitoring.coreos.com/v1
+<span class="k">kind</span>: ServiceMonitor
+<span class="k">metadata</span>:
+  name: rootvio-api
+  namespace: rootvio
+  labels: { release: kube-prom-stack }
+<span class="k">spec</span>:
+  selector:
+    matchLabels: { app.kubernetes.io/name: rootvio-api }
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      relabelings:                     <span class="c"># keep pod identity for drill-down</span>
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod</pre>
+
+<pre><span class="c"># k8s/observability/prometheusrule-slo.yaml &mdash; symptom-based, not cause-based</span>
+<span class="k">apiVersion</span>: monitoring.coreos.com/v1
+<span class="k">kind</span>: PrometheusRule
+<span class="k">spec</span>:
+  groups:
+    - name: rootvio-api.rules
+      rules:
+        - alert: ApiHighErrorRate
+          expr: |
+            sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m]))
+              / sum(rate(http_request_duration_seconds_count[5m])) &gt; 0.02
+          for: 10m
+          labels: { severity: critical }
+          annotations:
+            summary: <span class="s">"API 5xx above 2% for 10 minutes"</span>
+            runbook: <span class="s">"https://github.com/imhero2k/GardenWise/blob/main/docs/runbooks/api-5xx.md"</span>
+
+        - alert: ApiLatencyBudgetBurn
+          expr: |
+            histogram_quantile(0.95,
+              sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) &gt; 1.0
+          for: 15m
+          labels: { severity: warning }
+
+        <span class="c"># the &sect;9 failure mode, caught before users feel it</span>
+        - alert: DbPoolNearExhaustion
+          expr: db_pool_connections_in_use / db_pool_connections_max &gt; 0.85
+          for: 5m
+          labels: { severity: critical }
+
+        <span class="c"># the only write path in the product</span>
+        - alert: PlannerLayoutSaveFailing
+          expr: |
+            sum(rate(http_request_duration_seconds_count{
+              route="/api/planner/layout", method="PUT", status=~"5.."}[10m])) &gt; 0
+          for: 10m
+          labels: { severity: critical }</pre>
+
+  <div class="pfoot"><span>Phase 4 &mdash; Observability with Prometheus</span><span class="n"></span></div>
+</section>
+
+<section class="page">
+  <div class="contd">10 &middot; Phase 4, continued</div>
+  <h2 class="sect">Dashboards and service level objectives</h2>
+
+  <h3>10.3 &nbsp;Dashboards to build, in this order</h3>
+  <table class="tight">
+    <thead><tr><th style="width:40mm">Dashboard</th><th>Panels</th></tr></thead>
+    <tbody>
+      <tr><td><strong>API golden signals</strong></td><td>Request rate by route, error rate by status class, p50/p95/p99 latency, in-flight requests, saturation against the HPA target</td></tr>
+      <tr><td><strong>Data tier</strong></td><td>Pool in-use versus max, query latency by statement, slow-query count, DynamoDB consumed capacity, throttles and latency for the layout table</td></tr>
+      <tr><td><strong>Product journeys</strong></td><td>Sign-ins by provider, planner saves and load failures, weed-scan invocations and inference latency, PlantNet upstream error rate</td></tr>
+      <tr><td><strong>Cluster health</strong></td><td>Node CPU, memory and disk pressure, pod restarts and OOMKills, pending pods, Karpenter provisioning latency, spot interruption events</td></tr>
+      <tr><td><strong>SLO &amp; error budget</strong></td><td>Multi-window burn rate, budget remaining this period, and a deploy-annotation overlay so a regression is visibly tied to a release</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.4 &nbsp;Service level objectives</h3>
+  <table class="tight">
+    <thead><tr><th style="width:52mm">Service level indicator</th><th style="width:24mm">Objective</th><th style="width:26mm">Window</th><th>Error budget</th></tr></thead>
+    <tbody>
+      <tr><td>API availability &mdash; non-5xx over total requests</td><td>99.5&nbsp;%</td><td>30 days rolling</td><td>3 h 39 m</td></tr>
+      <tr><td>API latency &mdash; requests served under 500&nbsp;ms</td><td>95&nbsp;%</td><td>30 days rolling</td><td>5&nbsp;% of requests</td></tr>
+      <tr><td>Planner-layout save success</td><td>99.9&nbsp;%</td><td>30 days rolling</td><td>44 minutes</td></tr>
+      <tr><td>SPA availability at the edge</td><td>99.9&nbsp;%</td><td>30 days rolling</td><td>44 minutes</td></tr>
+    </tbody>
+  </table>
+
+  <p>Alert on multi-window burn rate rather than on raw thresholds: a 14.4&times; burn over one hour pages, and
+  a 6&times; burn over six hours raises a ticket. Threshold alerts on a low-traffic service page constantly at
+  3&nbsp;am for nothing, and a pager that people learn to ignore is worse than no pager at all.</p>
+
+  <div class="pfoot"><span>Phase 4 &mdash; Observability with Prometheus</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 4 d -->
+<section class="page">
+  <div class="contd">10 &middot; Phase 4, continued</div>
+  <h2 class="sect">Definition of done</h2>
+  <p class="dek">Observability is the phase where "we set it up" and "it works" diverge most often, so every
+  criterion below is written as something that has to be demonstrated against a real failure.</p>
+
+  <h3>10.5 &nbsp;Exit criteria</h3>
+  <table class="tight">
+    <thead><tr><th style="width:56mm">Criterion</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>All scrape targets healthy</td><td>The Prometheus targets page shows <code>up</code> for api, web, node-exporter, kube-state-metrics, postgres-exporter and the CloudWatch exporter</td></tr>
+      <tr><td>Dashboards provisioned from Git</td><td>Five dashboards load from ConfigMaps; none has been hand-edited in the Grafana UI</td></tr>
+      <tr><td>Alerts reach a human</td><td>An induced failure in staging delivers a page through the real on-call route, not a test webhook</td></tr>
+      <tr><td>SLOs published and burning</td><td>Four SLOs with visible burn-rate panels, and the arithmetic checked against a known incident</td></tr>
+      <tr><td>Runbooks exist</td><td>Every <code>severity: critical</code> rule carries a <code>runbook</code> annotation that resolves to a real document</td></tr>
+      <tr><td>An incident can be traced</td><td>One incident replayed end to end: alert, dashboard, log line, trace, root cause</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>The order matters more than the tooling.</b> Instrumentation before dashboards,
+  dashboards before alerts, alerts before SLOs. Teams that start with SLOs end up with objectives that
+  nothing measures, and teams that start with alerts end up paging on causes rather than on symptoms
+  users can actually feel.</div>
+
+  <div class="pfoot"><span>Phase 4 &mdash; Observability with Prometheus</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 5 a -->
+<section class="page" id="p-ph5">
+  <div class="phasehead">
+    <div class="badge" style="background:#166534"><span>Phase</span><b>5</b></div>
+    <div class="txt">
+      <h2>Hardening, DR &amp; FinOps</h2>
+      <div class="meta"><b>Weeks 17&ndash;22</b> &nbsp;&middot;&nbsp; 8 person-weeks &nbsp;&middot;&nbsp; Gate <b>G5</b></div>
+    </div>
+  </div>
+
+  <p>With the platform codified, delivered and observed, the last phase turns it into something that can be
+  operated by someone who did not build it.</p>
+
+  <h3>11.1 &nbsp;Security posture</h3>
+  <table class="tight">
+    <thead><tr><th style="width:38mm">Area</th><th>Work</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Finish the auth migration</strong></td><td>Merge <code>cognito-migration</code>, run the dual-verify window with the <code>authFailures{provider}</code> metric proving the traffic shift, then remove Firebase Admin, the seven <code>VITE_FIREBASE_*</code> secrets and the <code>firebase</code> dependency. This closes gap&nbsp;7.</td></tr>
+      <tr><td><strong>API authorisation</strong></td><td>Eight of the ten routes are unauthenticated today. Decide deliberately which stay public, and put API Gateway or WAF rate limiting in front of the expensive ones &mdash; particularly <code>POST /api/plantnet/identify</code>, which spends money with a third-party API on every call.</td></tr>
+      <tr><td><strong>WAF</strong></td><td>Managed rule groups plus a rate-based rule. Run in count mode for two weeks, review the false positives, then switch to blocking.</td></tr>
+      <tr><td><strong>Network policy</strong></td><td>Default-deny in the <code>rootvio</code> namespace, explicitly allowing web to api, api to RDS, and api to the DynamoDB endpoint only.</td></tr>
+      <tr><td><strong>Database credentials</strong></td><td>Switch from a password embedded in <code>DATABASE_URL</code> to RDS IAM authentication through IRSA, removing the last long-lived credential from the runtime.</td></tr>
+      <tr><td><strong>Pod security</strong></td><td>The <code>restricted</code> Pod Security Standard, a read-only root filesystem, dropped capabilities and seccomp profiles.</td></tr>
+      <tr><td><strong>Audit</strong></td><td>A CloudTrail organisation trail, GuardDuty, Security Hub, and EKS control-plane audit logs shipped to Loki.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.2 &nbsp;Resilience and disaster recovery</h3>
+  <table class="tight">
+    <thead><tr><th style="width:42mm">Scenario</th><th style="width:16mm">RTO</th><th style="width:16mm">RPO</th><th>Mechanism, and how it is proven</th></tr></thead>
+    <tbody>
+      <tr><td>Single pod failure</td><td>seconds</td><td>0</td><td>Replicas plus readiness probes; proven by deleting a pod under load</td></tr>
+      <tr><td>Node or zone loss</td><td>&lt; 5 min</td><td>0</td><td>Topology spread across three zones, PDBs, Karpenter replacement; proven by draining a node</td></tr>
+      <tr><td>Bad release</td><td>&lt; 10 min</td><td>0</td><td><code>kubectl rollout undo</code> or an Argo CD revert; rehearsed at gate G2</td></tr>
+      <tr><td>Database corruption</td><td>&lt; 2 h</td><td>&lt; 5 min</td><td>RDS point-in-time restore to a new instance, then repoint; <strong>rehearsed and timed at G5</strong></td></tr>
+      <tr><td>Accidental table deletion</td><td>&lt; 1 h</td><td>&lt; 5 min</td><td>DynamoDB PITR plus <code>prevent_destroy</code>; restore rehearsed</td></tr>
+      <tr><td>Cluster loss</td><td>&lt; 4 h</td><td>0</td><td>Terraform rebuild plus Argo CD reconciliation; rehearsed on staging</td></tr>
+      <tr><td>Region loss</td><td>Accepted</td><td>&lt; 24 h</td><td>Out of scope. Cross-region snapshot copies only, with the gap documented and formally accepted.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>A backup you have not restored is a hypothesis.</b> The single most valuable hour in
+  this phase is performing an actual point-in-time restore, timing it, and writing down every step that was
+  not obvious. Do it on staging first, then on production off-peak.</div>
+
+  <div class="pfoot"><span>Phase 5 &mdash; Hardening, DR &amp; FinOps</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ PHASE 5 b -->
+<section class="page">
+  <div class="contd">11 &middot; Phase 5, continued</div>
+  <h2 class="sect">Cost governance and operational readiness</h2>
+
+  <h3>11.3 &nbsp;FinOps</h3>
+  <ul>
+    <li><strong>Right-size from evidence.</strong> Phase&nbsp;4 provides four weeks of real CPU and memory data; set requests at observed p95 usage and limits at roughly twice requests, instead of guessing at both.</li>
+    <li><strong>Graviton and spot.</strong> Karpenter on <code>t4g</code> and <code>m7g</code> spot capacity for the stateless web and api pods, with an on-demand fallback pool for observability workloads that should not be interrupted mid-scrape.</li>
+    <li><strong>Scale staging to zero overnight.</strong> A scheduled workflow drops staging replicas outside working hours &mdash; typically 60&nbsp;% off the staging bill for one afternoon of work.</li>
+    <li><strong>Kill NAT egress.</strong> Gateway endpoints for S3 and DynamoDB, and interface endpoints for ECR, SSM and Secrets Manager. NAT data processing is frequently the largest surprise on a first EKS invoice.</li>
+    <li><strong>Budgets and anomaly detection.</strong> AWS Budgets at 80&nbsp;% and 100&nbsp;% of the section&nbsp;12 model, with Cost Anomaly Detection alerting into the same Slack channel as Alertmanager.</li>
+    <li><strong>Compute Savings Plan</strong> once three months of steady-state usage exists &mdash; not before, because committing early to the wrong baseline is worse than paying on demand.</li>
+  </ul>
+
+  <h3>11.4 &nbsp;Operational readiness</h3>
+  <p>The deliverable is a handover pack, on the assumption that the people operating this platform in a year
+  are not the people building it now:</p>
+  <table class="tight">
+    <thead><tr><th style="width:46mm">Artefact</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Architecture decision records</td><td>One per significant choice in this document, including the ones that were rejected and why &mdash; EKS versus ECS, Terraform versus CDK, Cognito versus Firebase</td></tr>
+      <tr><td>Runbooks</td><td>One per critical alert, linked from the alert's <code>runbook</code> annotation, each with a diagnosis path and a rollback step</td></tr>
+      <tr><td>On-call rotation</td><td>A named rotation with escalation, or an explicit written decision that alerts are business-hours best-effort</td></tr>
+      <tr><td>Incident process</td><td>Severity definitions, a communication channel, and a blameless review template</td></tr>
+      <tr><td>Upgrade calendar</td><td>Quarterly EKS and add-on upgrades, plus provider version bumps, scheduled rather than deferred</td></tr>
+      <tr><td>Corrected README</td><td>The current one references a <code>lambda/</code> directory and an <code>npm test</code> script that do not exist; the architecture diagram needs to match Figure&nbsp;1</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.5 &nbsp;Definition of done</h3>
+  <table class="tight">
+    <thead><tr><th style="width:56mm">Criterion</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Restore proven, not assumed</td><td>A point-in-time restore is performed and the elapsed time recorded against the stated RTO</td></tr>
+      <tr><td>WAF blocking</td><td>Rules moved out of count mode, with the false-positive review documented</td></tr>
+      <tr><td>Firebase gone</td><td>No <code>firebase</code> dependency in <code>package.json</code> and no Firebase secrets in repository settings</td></tr>
+      <tr><td>No long-lived database password</td><td>The API authenticates to RDS with an IAM token issued through IRSA</td></tr>
+      <tr><td>Cost within model</td><td>The monthly bill lands within 10&nbsp;% of section&nbsp;12, with variances explained</td></tr>
+      <tr><td>Someone else can operate it</td><td>An engineer who did not build the platform resolves a staged incident using only the runbooks</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Phase 5 &mdash; Hardening, DR &amp; FinOps</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ COST -->
+<section class="page" id="p-cost">
+  <div class="sectnum">12 &middot; Cost model</div>
+  <h2 class="sect">Monthly AWS run-rate, ap-southeast-2, USD</h2>
+  <p class="dek">List prices at the time of writing, covering both environments where relevant. Excludes
+  GitHub Actions minutes, which the free tier likely covers at this scale, and excludes engineering time.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:50mm">Component</th><th class="num" style="width:20mm">Today</th><th class="num" style="width:22mm">After P1</th><th class="num" style="width:24mm">After P3&ndash;P4</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>EKS control plane &times; 2 environments</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">146</td><td>$0.10 per hour per cluster, fixed regardless of load</td></tr>
+      <tr><td>Worker nodes</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">95</td><td>Graviton spot, 2&ndash;4 nodes; roughly $210 on demand</td></tr>
+      <tr><td>Observability nodes and EBS</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">62</td><td>Prometheus, Grafana, Loki and Tempo</td></tr>
+      <tr><td>Application Load Balancer</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">26</td><td>One shared ALB plus capacity units</td></tr>
+      <tr><td>NAT gateway and data</td><td class="num">&mdash;</td><td class="num">36</td><td class="num">48</td><td>Single NAT in staging; VPC endpoints cut this materially</td></tr>
+      <tr><td>RDS PostgreSQL</td><td class="num">18</td><td class="num">46</td><td class="num">46</td><td>Multi-AZ from Phase&nbsp;1; this is the Phase&nbsp;1 delta</td></tr>
+      <tr><td>DynamoDB</td><td class="num">2</td><td class="num">3</td><td class="num">3</td><td>On-demand capacity plus point-in-time recovery</td></tr>
+      <tr><td>Lambda and API Gateway</td><td class="num">6</td><td class="num">6</td><td class="num">2</td><td>Weedscan stays on Lambda; the API tier retires</td></tr>
+      <tr><td>CloudFront, S3 and WAF</td><td class="num">0</td><td class="num">14</td><td class="num">16</td><td>Replaces GitHub Pages hosting</td></tr>
+      <tr><td>ECR, Secrets Manager, CloudTrail</td><td class="num">0</td><td class="num">5</td><td class="num">11</td><td>Storage and API call volume</td></tr>
+      <tr><td>Cognito</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>Free below 50,000 monthly active users</td></tr>
+      <tr style="background:#eef5f0"><td><strong>Total per month</strong></td><td class="num"><strong>~26</strong></td><td class="num"><strong>~110</strong></td><td class="num"><strong>~455</strong></td><td><strong>~185 on the ECS Fargate variant</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2">
+    <div class="callout warn"><b>The EKS jump is not incidental.</b> The control plane and the always-on
+    observability stack account for well over half the post-Phase-4 figure, and both are fixed costs that do
+    not fall when traffic does. This is precisely why the week-9 decision in &sect;9.1 matters more than any
+    other single choice in this document.</div>
+    <div class="card soft"><h4>Levers, in order of return</h4>
+      <table class="tight" style="margin:0;font-size:8.2pt"><tbody>
+        <tr><td>Choose ECS Fargate over EKS</td><td class="num">&minus;$270</td></tr>
+        <tr><td>Single cluster, namespaced environments</td><td class="num">&minus;$73</td></tr>
+        <tr><td>Graviton spot rather than on-demand</td><td class="num">&minus;$115</td></tr>
+        <tr><td>Scale staging to zero overnight</td><td class="num">&minus;$40</td></tr>
+        <tr><td>VPC endpoints instead of NAT egress</td><td class="num">&minus;$25</td></tr>
+        <tr><td>Single-AZ RDS in staging</td><td class="num">&minus;$14</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <p style="font-size:8.4pt;color:var(--muted)">Applying the first lever alone brings the target-state
+  run-rate to roughly $185 per month while preserving every other outcome in this roadmap: Terraform-managed
+  infrastructure, automated delivery, containerised workloads and Prometheus observability. The only thing
+  lost is Kubernetes itself.</p>
+
+  <div class="pfoot"><span>Cost model</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ RISK -->
+<section class="page" id="p-risk">
+  <div class="sectnum">13 &middot; Risk register</div>
+  <h2 class="sect">Ten risks worth tracking</h2>
+  <p class="dek">Ordered by expected loss rather than by phase. Each mitigation is an action already
+  scheduled somewhere in this roadmap, not a general intention.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:6mm">#</th><th style="width:40mm">Risk</th><th style="width:13mm">Likely</th><th style="width:13mm">Impact</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td class="num">R1</td><td><strong>Terraform import damages production data</strong></td><td>Medium</td><td>Critical</td><td>Rehearse against a snapshot-restored clone; take a manual snapshot before the first RDS apply; scan every plan for <code>forces replacement</code>; <code>prevent_destroy</code> on all stateful resources</td></tr>
+      <tr><td class="num">R2</td><td><strong>Connection-pool exhaustion at cut-over</strong></td><td>High</td><td>High</td><td>RDS Proxy or a computed per-pod pool ceiling before the canary; ship the <code>DbPoolNearExhaustion</code> alert first; hold the canary at 10&nbsp;% for 48 hours</td></tr>
+      <tr><td class="num">R3</td><td><strong>EKS cost and complexity outrun the team</strong></td><td>High</td><td>High</td><td>Make the week-9 go/no-go explicit; keep the ECS Fargate variant in &sect;9.6 live as a fallback; budget alerts from day one</td></tr>
+      <tr><td class="num">R4</td><td><strong>Console drift reopens after gate G1</strong></td><td>High</td><td>Medium</td><td>Nightly drift workflow; read-only human access in production; an audited break-glass role</td></tr>
+      <tr><td class="num">R5</td><td><strong>Auth migration strands users</strong></td><td>Medium</td><td>High</td><td>Dual-verify window; per-provider failure metric as the cut-over gate; a documented rollback to Firebase-only</td></tr>
+      <tr><td class="num">R6</td><td><strong>Metric cardinality overwhelms Prometheus</strong></td><td>Medium</td><td>Medium</td><td>Route patterns only, never raw paths or identifiers; <code>sample_limit</code> on ServiceMonitors; alert on time-series growth</td></tr>
+      <tr><td class="num">R7</td><td><strong>Two engineers at 60&nbsp;% cannot hold 22 weeks</strong></td><td>Medium</td><td>Medium</td><td>Phases 0&ndash;2 deliver standalone value and are the true priority; Phases 3&ndash;5 can slip without wasting earlier work</td></tr>
+      <tr><td class="num">R8</td><td><strong>Dangling docs commit garbage-collected</strong></td><td>Medium</td><td>Low</td><td>Rescue <code>107129f</code> to a branch in week&nbsp;1 &mdash; the first task in Phase&nbsp;0</td></tr>
+      <tr><td class="num">R9</td><td><strong>Domain cut-over breaks the live site</strong></td><td>Low</td><td>High</td><td>Lower the DNS TTL a week ahead; run CloudFront and Pages in parallel; hold the <code>CNAME</code> rollback ready</td></tr>
+      <tr><td class="num">R10</td><td><strong>Third-party quota exhaustion</strong></td><td>Medium</td><td>Low</td><td>The PlantNet key is public in the bundle today; proxy it server-side, cache responses and rate-limit per user</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Review cadence</h3>
+  <p>Re-score this register at each milestone gate. R2 and R3 should be re-assessed specifically at the
+  week-9 decision point, since both are contingent on it, and R7 should be re-assessed at gate G2, which is
+  the earliest point where actual velocity can be compared against the estimate in section&nbsp;05.</p>
+
+  <div class="pfoot"><span>Risk register</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ APPENDIX A -->
+<section class="page" id="p-appx">
+  <div class="sectnum">14 &middot; Appendix A</div>
+  <h2 class="sect">Configuration migration &mdash; where each variable ends up</h2>
+  <p class="dek">Produced in Phase&nbsp;0 and maintained thereafter. Anything marked as a build argument is
+  compiled into the public bundle and must never hold a secret.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:52mm">Variable</th><th style="width:20mm">Today</th><th style="width:34mm">Target home</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td><code>VITE_API_BASE_URL</code></td><td>CI literal</td><td>Terraform output &rarr; build arg</td><td>Removes the <code>tcal5txtn8</code> hard-code</td></tr>
+      <tr><td><code>VITE_PREDICT_API_URL</code></td><td>Source literal</td><td>Terraform output &rarr; build arg</td><td>Removes the <code>7muezhf0bl</code> hard-code</td></tr>
+      <tr><td><code>VITE_FIREBASE_*</code> (&times;7)</td><td>GitHub secrets</td><td>Deleted in Phase 5</td><td>Public in the bundle; not secrets</td></tr>
+      <tr><td><code>VITE_COGNITO_*</code> (&times;3)</td><td>Branch only</td><td>Terraform output &rarr; build arg</td><td>From the <code>identity</code> module</td></tr>
+      <tr><td><code>VITE_PLANTNET_API_KEY</code></td><td>GitHub secret</td><td>Server-side only</td><td>Proxy through the API; stop shipping it to browsers</td></tr>
+      <tr><td><code>VITE_GOOGLE_MAPS_API_KEY</code></td><td>Local</td><td>Build arg + referrer restriction</td><td>Restrict the key at the provider</td></tr>
+      <tr><td><code>VITE_BASE_PATH</code></td><td>CI literal</td><td>Build arg</td><td>Becomes <code>/</code> once CloudFront replaces Pages</td></tr>
+      <tr><td><code>VITE_BYPASS_AUTH</code></td><td>Local</td><td>Never set outside dev</td><td>Add a CI guard that fails the build if truthy</td></tr>
+      <tr><td><code>DATABASE_URL</code></td><td>Lambda env var</td><td>Secrets Manager, then RDS IAM auth</td><td>Rotated; the password is removed entirely in Phase 5</td></tr>
+      <tr><td><code>DATABASE_SSL</code>, <code>DATABASE_SSL_REJECT_UNAUTH</code></td><td>Lambda env vars</td><td>Helm values</td><td>TLS always on outside local development</td></tr>
+      <tr><td><code>DYNAMODB_PLANNER_LAYOUT_TABLE</code></td><td>Lambda env var</td><td>Terraform output &rarr; ConfigMap</td><td>The table name stops being a magic string</td></tr>
+      <tr><td><code>FIREBASE_SERVICE_ACCOUNT_JSON</code></td><td>Lambda env var</td><td>Secrets Manager, then deleted</td><td>Gone once Cognito is the only provider</td></tr>
+      <tr><td><code>PLANTNET_API_KEY</code></td><td>Lambda env var</td><td>Secrets Manager</td><td>The server-side counterpart of the public key above</td></tr>
+      <tr><td><code>CORS_ORIGIN</code></td><td>Lambda env var</td><td>Helm values per environment</td><td>An explicit allow-list, never a wildcard</td></tr>
+      <tr><td><code>AWS_REGION</code>, <code>PORT</code></td><td>Defaults</td><td>ConfigMap</td><td>No behavioural change</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pfoot"><span>Appendix A &mdash; Configuration migration</span><span class="n"></span></div>
+</section>
+
+<section class="page">
+  <div class="contd">14 &middot; Appendix B</div>
+  <h2 class="sect">Repository files this roadmap touches</h2>
+  <p class="dek">A change map for reviewers: which parts of the codebase each phase reaches into, and what
+  kind of change it makes.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:56mm">Path</th><th style="width:16mm">Phase</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>terraform/**</code></td><td>0, 1, 3</td><td>New. Bootstrap first, then modules and environments</td></tr>
+      <tr><td><code>.github/workflows/**</code></td><td>2</td><td>Eight workflows replace the current two; <code>pages.yml</code> retired</td></tr>
+      <tr><td><code>server/app.mjs</code></td><td>3, 4</td><td>Probe split, metrics middleware, JSON logging</td></tr>
+      <tr><td><code>server/metrics.mjs</code></td><td>4</td><td>New. The <code>prom-client</code> registry and instruments</td></tr>
+      <tr><td><code>server/index.mjs</code></td><td>3</td><td>Graceful <code>SIGTERM</code> shutdown so rollouts do not drop requests</td></tr>
+      <tr><td><code>server/*.mjs</code> query modules</td><td>2, 4</td><td>Unit tests, plus <code>dbQueryDuration</code> timers</td></tr>
+      <tr><td><code>server/cognitoAuth.mjs</code></td><td>5</td><td>Merged from <code>cognito-migration</code>; the Firebase path is removed after cut-over</td></tr>
+      <tr><td><code>Dockerfile</code>, <code>Dockerfile.api</code>, <code>nginx.conf</code></td><td>3</td><td>Restored from <code>6be8279</code> and hardened</td></tr>
+      <tr><td><code>k8s/**</code>, <code>charts/rootvio/**</code></td><td>3, 4</td><td>Helm chart, ServiceMonitors, PrometheusRules, dashboards</td></tr>
+      <tr><td><code>vite.config.ts</code>, <code>src/lib/predict.ts</code></td><td>0, 1</td><td>Hard-coded API Gateway hosts replaced with variables</td></tr>
+      <tr><td><code>tests/**</code></td><td>2</td><td>New. Vitest unit, Supertest integration, Playwright end-to-end</td></tr>
+      <tr><td><code>docs/adr/**</code>, <code>docs/runbooks/**</code></td><td>all</td><td>New. Decision records and one runbook per critical alert</td></tr>
+      <tr><td><code>README.md</code></td><td>0, 5</td><td>Corrected; the stale <code>lambda/</code> and <code>npm test</code> claims removed</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Where to start on Monday</h3>
+  <div class="cols3">
+    <div class="card soft"><h4>Hour one</h4><p style="margin:0;font-size:8.3pt"><code>git branch rescue/docs 107129f</code>. The security plan is the only written record of the intended AWS topology, and it is currently unreachable from any branch.</p></div>
+    <div class="card soft"><h4>Day one</h4><p style="margin:0;font-size:8.3pt">Turn on branch protection and secret scanning, and cherry-pick the reverted container work onto <code>feat/containers</code> so Phase&nbsp;3 does not start from a blank page.</p></div>
+    <div class="card soft"><h4>Week one</h4><p style="margin:0;font-size:8.3pt">Enumerate the live AWS estate with the CLI and write down every ARN. Phase&nbsp;1 cannot be estimated, let alone executed, without that inventory.</p></div>
+  </div>
+
+  <div class="callout"><b>A closing note on sequencing.</b> The temptation with a roadmap like this is to start
+  with the most interesting phase. Resist it. Phases&nbsp;0&ndash;2 remove all four critical gaps, cost
+  seventeen of the forty-six person-weeks, and add roughly $84 per month. Phase&nbsp;3 adds $345 per month
+  and a permanent operational surface. Do the cheap, high-value work first, and let the evidence from
+  Phase&nbsp;4's metrics inform whether Phase&nbsp;3 was the right call after all.</div>
+
+  <div class="pfoot"><span>Appendix B &mdash; Repository change map</span><span class="n"></span></div>
+</section>
+
+<!-- ============================================================ APPENDIX C -->
+<section class="page">
+  <div class="contd">14 &middot; Appendix C</div>
+  <h2 class="sect">Open decisions</h2>
+  <p class="dek">Each of these blocks a phase. The default column is what will happen if no decision is taken,
+  so that the absence of a decision does not become an absence of progress.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:8mm">#</th><th style="width:52mm">Question</th><th style="width:18mm">Needed by</th><th>Default if unanswered</th></tr></thead>
+    <tbody>
+      <tr><td class="num">D1</td><td>Is EKS a requirement in itself, or is production fit the goal?</td><td>Week 9</td><td>Proceed with EKS as written, holding &sect;9.6 as the fallback</td></tr>
+      <tr><td class="num">D2</td><td>One AWS account, or separate staging and production accounts?</td><td>Week 3</td><td>One account with two VPCs and strict tag-scoped IAM. Separate accounts are better practice but add Organizations overhead disproportionate to the team size</td></tr>
+      <tr><td class="num">D3</td><td>Cognito or Firebase as the final identity provider?</td><td>Week 5</td><td>Cognito &mdash; the branch work already exists and it keeps identity inside the Terraform-managed estate</td></tr>
+      <tr><td class="num">D4</td><td>Retire GitHub Pages in favour of CloudFront?</td><td>Week 6</td><td>Yes. One hosting story, and it ends the Pages / Netlify / Cloudflare fork recorded as gap&nbsp;10</td></tr>
+      <tr><td class="num">D5</td><td>Self-hosted Prometheus or Amazon Managed Prometheus?</td><td>Week 13</td><td>Self-hosted <code>kube-prometheus-stack</code> &mdash; cheaper at this scale and a better learning outcome</td></tr>
+      <tr><td class="num">D6</td><td>Move the weedscan ONNX Lambda into the cluster?</td><td>Week 14</td><td>No. Bursty scale-to-zero inference is the workload Lambda is genuinely best at</td></tr>
+      <tr><td class="num">D7</td><td>Who carries the pager, and during what hours?</td><td>Week 16</td><td>Business-hours best-effort, with Alertmanager routing to Slack only until a real rotation exists</td></tr>
+      <tr><td class="num">D8</td><td>Which of the three <code>cloudflare/*</code> branches survives?</td><td>Week 2</td><td>Delete all three once D4 is settled in favour of CloudFront</td></tr>
+    </tbody>
+  </table>
+
+  <h3>How a decision gets recorded</h3>
+  <p>Each decision above becomes an architecture decision record in <code>docs/adr/</code> once taken, using
+  the standard four-part form: context, the options considered, the decision, and the consequences accepted.
+  The value is almost entirely in the last two sections &mdash; in a year, nobody will remember why EKS was
+  chosen over ECS Fargate, and the cost difference in section&nbsp;12 makes that a question somebody will
+  eventually ask.</p>
+
+  <p>Decisions D1 and D3 are the two worth writing up in detail. D1 sets the cost and operational profile of
+  the entire platform, and D3 determines whether two identity providers have to be secured indefinitely or
+  only during a bounded migration window.</p>
+
+  <div class="pfoot"><span>Appendix C &mdash; GardenWise / RootVio Cloud Platform Roadmap v1.0</span><span class="n"></span></div>
+</section>
+
+<script>
+(function () {
+  var pages = document.querySelectorAll('.page');
+  pages.forEach(function (p, i) {
+    p.dataset.pageno = i + 1;
+    var n = p.querySelector('.pfoot .n');
+    if (n) n.textContent = String(i + 1).padStart(2, '0');
+  });
+  document.querySelectorAll('[data-ref]').forEach(function (el) {
+    var t = document.querySelector(el.getAttribute('data-ref'));
+    el.textContent = t ? String(t.dataset.pageno).padStart(2, '0') : '--';
+  });
+
+  // Layout probe: reports any page whose content collides with its footer.
+  var bad = [];
+  pages.forEach(function (p, i) {
+    if (p.classList.contains('cover')) return;
+    var over = p.scrollHeight - p.clientHeight;
+    var foot = p.querySelector('.pfoot');
+    var footTop = foot ? foot.getBoundingClientRect().top : 0;
+    var last = null;
+    for (var c = p.children.length - 1; c >= 0; c--) {
+      if (!p.children[c].classList.contains('pfoot')) { last = p.children[c]; break; }
+    }
+    var clash = last ? Math.round(last.getBoundingClientRect().bottom - footTop) : -999;
+    if (over > 0 || clash > -8) bad.push('p' + (i + 1) + ':over=' + over + ',clash=' + clash);
+  });
+  document.title = 'RPT[' + pages.length + '|' + (bad.join(' ') || 'ALL-CLEAN') + ']';
+})();
+</script>
+</body>
+</html>
