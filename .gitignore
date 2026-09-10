@@ -19,6 +19,12 @@ gardenwise-lambda.zip
 lambda-server.zip
 lambda-build/
 
+# Terraform generated state, working directory, and local variable overrides
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+
 # One-off DB exploration / smoke-test helper scripts (kept local; not part of build)
 scripts/db-explore.mjs
 scripts/db-samples.mjs

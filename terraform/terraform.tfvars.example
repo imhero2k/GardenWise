@@ -1,0 +1,32 @@
+aws_region  = "ap-southeast-2"
+project_name = "gardenwise"
+environment  = "dev"
+
+# Leave null until the image has been built and pushed to ECR.
+lambda_image_uri = null
+
+# Build server/lambda.mjs and deploy it as a zip Lambda.
+api_lambda_enabled = true
+
+# Use this instead when the API Lambda is deployed outside Terraform.
+api_lambda_arn = null
+
+api_cors_origins = [
+  "http://localhost:5173",
+]
+
+# Provisions private PostgreSQL RDS with PostGIS support available through the
+# normal RDS extension. The API Lambda is placed in the same VPC when both are enabled.
+rds_enabled          = true
+rds_database_name    = "gardenwise"
+rds_master_username  = "gardenwise_admin"
+rds_instance_class   = "db.t4g.micro"
+rds_allocated_storage = 20
+# Add a VPN or migration-host CIDR only when you need direct psql access.
+rds_ingress_cidr_blocks = []
+
+tags = {
+  ManagedBy = "terraform"
+  Project   = "gardenwise"
+  Owner     = "your-team"
+}
