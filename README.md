@@ -211,6 +211,33 @@ npm test
 
 > **Note:** The Vite dev server proxies `/api/*` requests to `VITE_API_BASE_URL` automatically, eliminating CORS issues during local development.
 
+### Run the Frontend and API with Docker
+
+Docker Compose builds the React frontend and Node API as separate containers. The frontend serves the SPA and proxies `/api/*` requests to the API container. PostgreSQL/PostGIS, Firebase, and AWS services remain external.
+
+```bash
+# Create local configuration (keep this file out of version control).
+cp .env.example .env.local
+# Fill in the VITE_FIREBASE_* values and any API service settings you use.
+
+docker compose --env-file .env.local up --build
+```
+
+Open `http://localhost:8080`. The API is also available at `http://localhost:3001/api/health`. To stop the containers, run `docker compose down`.
+
+Set `DATABASE_URL` to a reachable PostgreSQL/PostGIS database. For a database running on the host, use `host.docker.internal` as the host name; set `DATABASE_SSL=0` if that database does not support TLS. The API also accepts the existing Firebase Admin, DynamoDB, and PlantNet environment variables from `.env.local`. AWS credentials should be provided through the runtime's normal credential mechanism; do not put private credentials in the frontend build configuration.
+
+The `VITE_*` values are embedded in the frontend at build time and are public client configuration, not secrets. Changing them requires rebuilding the frontend image. The weed-scan inference service remains its separate Lambda container.
+
+### Publish Container Images
+
+The `Publish container images` workflow publishes multi-platform (`linux/amd64` and `linux/arm64`) images to GitHub Container Registry on pushes to `main`, version tags (`v*`), or a manual run:
+
+- `ghcr.io/imhero2k/gardenwise-frontend`
+- `ghcr.io/imhero2k/gardenwise-api`
+
+Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. Configure the frontend's public `VITE_*` build-time settings as GitHub Actions variables. `VITE_PLANTNET_API_KEY`, which is embedded in the browser bundle, is read from the `VITE_PLANTNET_API_KEY` Actions secret. These values are included in the public frontend image and must not be private credentials. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
+
 ---
 
 ## 📁 Project Structure
