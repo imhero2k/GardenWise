@@ -28,7 +28,7 @@ jobs:
             platforms: linux/amd64,linux/arm64
           - image: gardenwise-weedscan-v2
             context: lambda_weedscan
-            dockerfile: Dockerfile
+            dockerfile: lambda_weedscan/Dockerfile
             platforms: linux/amd64
     steps:
       - name: Check out source
