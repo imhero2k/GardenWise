@@ -18,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: gardenwise-frontend
+          - image: gardenwise-frontend-v2
             dockerfile: Dockerfile
-          - image: gardenwise-api
+          - image: gardenwise-api-v2
             dockerfile: server/Dockerfile
     steps:
       - name: Check out source
@@ -55,7 +55,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and publish frontend
-        if: matrix.image == 'gardenwise-frontend'
+        if: matrix.image == 'gardenwise-frontend-v2'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -81,7 +81,7 @@ jobs:
             VITE_PREDICT_API_URL=${{ vars.VITE_PREDICT_API_URL }}
 
       - name: Build and publish API
-        if: matrix.image == 'gardenwise-api'
+        if: matrix.image == 'gardenwise-api-v2'
         uses: docker/build-push-action@v6
         with:
           context: .
