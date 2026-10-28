@@ -1,20 +1,16 @@
-# Build with this directory as context (includes model/):
-#   docker build -f lambda_weedscan/Dockerfile -t weedscan-lambda:test lambda_weedscan
-#
-# From repo root (e.g. RootVio):
-#   docker build -f lambda_weedscan/Dockerfile -t weedscan-lambda:test lambda_weedscan
-#
-# Local invoke (Lambda Runtime Interface Emulator is in the base image):
-#   docker run -p 9000:8080 weedscan-lambda:test
-#
-# Push to ECR, then create a Lambda function from the image (same architecture as build).
+# Build with lambda_weedscan as the context:
+#   docker build -f lambda_weedscan/Dockerfile -t gardenwise-weedscan:test lambda_weedscan
+# Run locally:
+#   docker run --rm -p 8080:8080 gardenwise-weedscan:test
 
-FROM public.ecr.aws/lambda/python:3.11
+FROM python:3.11-slim
 
-COPY requirements.txt ${LAMBDA_TASK_ROOT}/
-RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
+WORKDIR /app
 
-COPY app ${LAMBDA_TASK_ROOT}/app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --only-binary=:all: -r requirements.txt
+
+COPY app ./app
 
 COPY model/weedscan19_epoch_300.ort /opt/model/weedscan19_epoch_300.ort
 COPY model/weedscan.json /opt/model/weedscan.json
@@ -23,5 +19,8 @@ COPY labels.json /opt/model/labels.json
 ENV WEEDSCAN_MODEL_PATH=/opt/model/weedscan19_epoch_300.ort
 ENV WEEDSCAN_CONFIG_PATH=/opt/model/weedscan.json
 ENV WEEDSCAN_LABELS_PATH=/opt/model/labels.json
+ENV PORT=8080
 
-CMD ["app.handler.lambda_handler"]
+EXPOSE 8080
+
+CMD ["python", "-m", "app.http_server"]

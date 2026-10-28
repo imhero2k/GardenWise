@@ -227,7 +227,7 @@ Open `http://localhost:8080`. The API is also available at `http://localhost:300
 
 Set `DATABASE_URL` to a reachable PostgreSQL/PostGIS database. For a database running on the host, use `host.docker.internal` as the host name; set `DATABASE_SSL=0` if that database does not support TLS. The API also accepts the existing Firebase Admin, DynamoDB, and PlantNet environment variables from `.env.local`. AWS credentials should be provided through the runtime's normal credential mechanism; do not put private credentials in the frontend build configuration.
 
-The `VITE_*` values are embedded in the frontend at build time and are public client configuration, not secrets. Changing them requires rebuilding the frontend image. The weed-scan inference service remains its separate Lambda container.
+The `VITE_*` values are embedded in the frontend at build time and are public client configuration, not secrets. Changing them requires rebuilding the frontend image. The weed-scan inference service is published as an HTTP container for ECS.
 
 ### Publish Container Images
 
@@ -235,9 +235,9 @@ The `Publish container images` workflow publishes images to GitHub Container Reg
 
 - `ghcr.io/imhero2k/gardenwise-frontend-v2`
 - `ghcr.io/imhero2k/gardenwise-api-v2`
-- `ghcr.io/imhero2k/gardenwise-weedscan-v2` (AWS Lambda image, `linux/amd64`)
+- `ghcr.io/imhero2k/gardenwise-weedscan-v2` (ECS HTTP service, `linux/amd64`, port `8080`)
 
-The frontend and API images support `linux/amd64` and `linux/arm64`; the weed-scan image targets `linux/amd64` for AWS Lambda. Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. Configure the frontend's public `VITE_*` build-time settings as GitHub Actions variables. `VITE_PLANTNET_API_KEY`, which is embedded in the browser bundle, is read from the `VITE_PLANTNET_API_KEY` Actions secret. These values are included in the public frontend image and must not be private credentials. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
+The frontend and API images support `linux/amd64` and `linux/arm64`; the weed-scan ECS image targets `linux/amd64`. It accepts `POST /testing/predict` and `POST /predict` with an `image_base64` JSON field, and exposes `GET /health` for container health checks. Set `CORS_ALLOW_ORIGIN` to the frontend origin when deploying it. Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. Configure the frontend's public `VITE_*` build-time settings as GitHub Actions variables. `VITE_PLANTNET_API_KEY`, which is embedded in the browser bundle, is read from the `VITE_PLANTNET_API_KEY` Actions secret. These values are included in the public frontend image and must not be private credentials. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
 
 ---
 

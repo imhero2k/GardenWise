@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
-# Test the Lambda container image locally using the Runtime Interface Emulator (in the base image).
+# Test the ECS-compatible HTTP container image locally.
 #
-# AWS Lambda synchronous invoke accepts at most 6 MB request payload. Base64 inflates
-# size by ~4/3, so large camera JPEGs often exceed the limit and the runtime returns:
-#   Runtime.UnmarshalError: Unterminated string...
+# Large image payloads can use significant memory after base64 decoding.
 # This script downscales with `sips` (macOS) when needed.
 #
 # Usage (from repo root):
-#   docker build -f lambda_weedscan/Dockerfile -t weedscan-lambda:test lambda_weedscan
-#   ./lambda_weedscan/test_local.sh weedscan-lambda:test path/to/photo.jpg
+#   docker build -f lambda_weedscan/Dockerfile -t gardenwise-weedscan:test lambda_weedscan
+#   ./lambda_weedscan/test_local.sh gardenwise-weedscan:test path/to/photo.jpg
 #
 set -euo pipefail
 
-IMAGE="${1:-weedscan-lambda:test}"
+IMAGE="${1:-gardenwise-weedscan:test}"
 ORIG_JPEG="${2:?Usage: $0 [docker-image] path/to/image.jpg}"
-
-# Stay under Lambda's 6,291,456-byte invoke limit (leave JSON overhead headroom).
-MAX_PAYLOAD=5500000
+MAX_PAYLOAD=9000000
 
 write_payload() {
   local src="$1"
@@ -31,27 +27,38 @@ with open(dest, "w", encoding="utf-8") as f:
 PY
 }
 
-NAME="weedscan-lambda-test-$$"
+NAME="weedscan-ecs-test-$$"
+PAYLOAD=""
 cleanup() {
   docker rm -f "$NAME" >/dev/null 2>&1 || true
   [[ -n "${TMP_SMALL:-}" && -f "$TMP_SMALL" ]] && rm -f "$TMP_SMALL"
+  [[ -n "$PAYLOAD" && -f "$PAYLOAD" ]] && rm -f "$PAYLOAD"
 }
 trap cleanup EXIT
 
 docker run -d --name "$NAME" -p 9000:8080 "$IMAGE" >/dev/null
-sleep 3
+for _ in {1..60}; do
+  if curl -fsS http://localhost:9000/health >/dev/null; then
+    break
+  fi
+  sleep 2
+done
+if ! curl -fsS http://localhost:9000/health >/dev/null; then
+  docker logs "$NAME" >&2
+  echo "WeedScan container did not become healthy." >&2
+  exit 1
+fi
 
 PAYLOAD="$(mktemp)"
 JPEG="$ORIG_JPEG"
-
 write_payload "$JPEG" "$PAYLOAD"
 BYTES=$(wc -c < "$PAYLOAD" | tr -d ' ')
 if [[ "$BYTES" -gt "$MAX_PAYLOAD" ]]; then
   if ! command -v sips >/dev/null 2>&1; then
-    echo "Payload is ${BYTES} bytes (> ${MAX_PAYLOAD}). Install macOS sips or resize the image so JSON stays under ~6 MB." >&2
+    echo "Payload is ${BYTES} bytes (> ${MAX_PAYLOAD}). Install macOS sips or resize the image." >&2
     exit 1
   fi
-  echo "Payload ${BYTES} bytes exceeds Lambda 6 MB invoke limit; downscaling for local test ..." >&2
+  echo "Payload ${BYTES} bytes exceeds ${MAX_PAYLOAD}; downscaling for local test ..." >&2
   TMP_SMALL="$(mktemp).jpg"
   for z in 2560 1920 1600 1280 1024 800; do
     sips -Z "$z" "$ORIG_JPEG" --out "$TMP_SMALL" >/dev/null
@@ -68,9 +75,7 @@ if [[ "$BYTES" -gt "$MAX_PAYLOAD" ]]; then
   fi
 fi
 
-echo "POSTing $(wc -c < "$PAYLOAD") bytes to http://localhost:9000/ ..." >&2
-curl -sS -X POST "http://localhost:9000/2015-03-31/functions/function/invocations" \
+echo "POSTing $(wc -c < "$PAYLOAD") bytes to http://localhost:9000/testing/predict ..." >&2
+curl -fsS -X POST "http://localhost:9000/testing/predict" \
   -H "Content-Type: application/json" \
   --data-binary "@$PAYLOAD" | python3 -m json.tool
-
-rm -f "$PAYLOAD"

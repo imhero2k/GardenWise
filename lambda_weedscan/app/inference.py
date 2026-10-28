@@ -14,7 +14,7 @@ import numpy as np
 import onnxruntime as ort
 from PIL import Image
 
-# Default paths inside the Lambda container image
+# Default paths inside the inference container image
 _MODEL_PATH = os.environ.get(
     "WEEDSCAN_MODEL_PATH",
     "/opt/model/weedscan19_epoch_300.ort",
@@ -38,7 +38,8 @@ def _load_json(path: str) -> dict[str, Any]:
         return json.load(f)
 
 
-def _ensure_loaded() -> None:
+def ensure_model_loaded() -> None:
+    """Load the model and metadata before marking the HTTP service ready."""
     global _session, _labels, _preprocess
     if _session is None:
         if not Path(_MODEL_PATH).is_file():
@@ -69,7 +70,7 @@ def _ensure_loaded() -> None:
 
 def preprocess_pil(image: Image.Image) -> np.ndarray:
     """Return NCHW float32 tensor, batch 1, RGB, Custom Vision–style normalization."""
-    _ensure_loaded()
+    ensure_model_loaded()
     assert _preprocess is not None
     cw = _preprocess["crop_w"]
     ch = _preprocess["crop_h"]
@@ -105,7 +106,7 @@ def _softmax(x: np.ndarray) -> np.ndarray:
 
 def predict_image_bytes(data: bytes) -> dict[str, Any]:
     """Run inference on raw image bytes (JPEG/PNG/etc.)."""
-    _ensure_loaded()
+    ensure_model_loaded()
     assert _session is not None
 
     img = Image.open(io.BytesIO(data))
