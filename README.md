@@ -231,12 +231,13 @@ The `VITE_*` values are embedded in the frontend at build time and are public cl
 
 ### Publish Container Images
 
-The `Publish container images` workflow publishes multi-platform (`linux/amd64` and `linux/arm64`) images to GitHub Container Registry on pushes to `main`, version tags (`v*`), or a manual run:
+The `Publish container images` workflow publishes images to GitHub Container Registry on pushes to `main`, version tags (`v*`), or a manual run:
 
 - `ghcr.io/imhero2k/gardenwise-frontend-v2`
 - `ghcr.io/imhero2k/gardenwise-api-v2`
+- `ghcr.io/imhero2k/gardenwise-weedscan-v2` (AWS Lambda image, `linux/amd64`)
 
-Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. Configure the frontend's public `VITE_*` build-time settings as GitHub Actions variables. `VITE_PLANTNET_API_KEY`, which is embedded in the browser bundle, is read from the `VITE_PLANTNET_API_KEY` Actions secret. These values are included in the public frontend image and must not be private credentials. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
+The frontend and API images support `linux/amd64` and `linux/arm64`; the weed-scan image targets `linux/amd64` for AWS Lambda. Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. Configure the frontend's public `VITE_*` build-time settings as GitHub Actions variables. `VITE_PLANTNET_API_KEY`, which is embedded in the browser bundle, is read from the `VITE_PLANTNET_API_KEY` Actions secret. These values are included in the public frontend image and must not be private credentials. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
 
 ---
 
