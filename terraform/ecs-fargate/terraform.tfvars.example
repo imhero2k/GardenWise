@@ -1,0 +1,13 @@
+aws_region   = "us-east-1"
+project_name = "gardenwise"
+
+# Check that all GHCR packages are public and these image tags exist.
+deploy_services = true
+
+# Configure this with the ARN of a Secrets Manager secret containing DATABASE_URL.
+# Keep the populated value in the ignored terraform.tfvars file.
+# backend_database_url_secret_arn = ""
+
+# For an existing execution role, set its ARN here and grant it
+# secretsmanager:GetSecretValue for the configured backend secret.
+# execution_role_arn = ""

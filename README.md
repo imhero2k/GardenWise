@@ -63,33 +63,23 @@ RootVio addresses the gap between Victorians wanting to garden sustainably and t
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────┐
-│           Browser (React 19 SPA)            │
-│              Vite · TypeScript              │
-└──────────────────┬──────────────────────────┘
-                   │ HTTPS
-┌──────────────────▼──────────────────────────┐
-│           GitHub Pages (CDN)                │
-│            Static Asset Hosting             │
-└──────────────────┬──────────────────────────┘
-                   │ /api/* REST calls
-┌──────────────────▼──────────────────────────┐
-│     AWS API Gateway → AWS Lambda            │
-│          Node.js / Express                  │
-└────────┬─────────────────────┬──────────────┘
-         │                     │
-┌────────▼────────┐   ┌────────▼────────┐
-│  Amazon RDS     │   │ Amazon DynamoDB │
-│ PostgreSQL +    │   │ Planner layouts │
-│   PostGIS       │   └─────────────────┘
-└─────────────────┘
-         │
-┌────────▼────────────────────────────────────┐
-│         Firebase Authentication             │
-│    Google OAuth · Email/Password · JWT      │
-└─────────────────────────────────────────────┘
-```
+![GardenWise — ECS Fargate, Private PostgreSQL/PostGIS and Prometheus Monitoring](./docs/gardenwise-aws-architecture.png)
+
+The diagram shows the ECS/Fargate and private RDS deployment in `us-east-1`. Each ECS service is represented by one running task; the diagram does not imply replicas in both Availability Zones. The database subnet group spans two isolated subnets, but contains one Single-AZ RDS PostgreSQL instance with PostGIS and no public access.
+
+### Request and data flow
+
+- Users enter through the Internet Gateway to an internet-facing Application Load Balancer spanning public subnets `10.42.1.0/24` (`us-east-1a`) and `10.42.2.0/24` (`us-east-1b`).
+- The ALB sends website requests to the React/Nginx frontend on port `80`, `/api/*` to the Node.js/Express API on port `3001`, and `/predict` to the Python WeedScan service on port `8080`.
+- Backend database traffic uses a private PostgreSQL/TLS connection on TCP `5432`. RDS security-group ingress is restricted to the backend and temporary loader security groups. The database subnets have no internet default route.
+- A temporary EC2 loader in a public subnet uses AWS Systems Manager Session Manager and Python import scripts to load the database. Terminating the loader does not remove data stored in RDS.
+- GHCR stores the service container images. Terraform provisions AWS infrastructure. CloudWatch remains in use for container logs and AWS service metrics.
+
+### Planned monitoring
+
+Prometheus is a planned addition, not an existing deployed service. It will run on a separate EC2 instance in a private monitoring subnet, with port `9090` kept private and time-series data stored on its own EBS volume. Deployment automation will provide updated task addresses for scrape target discovery. Prometheus will scrape the backend and prediction services over their private IPs for request counts, error rates, latency histograms, and application processing metrics. Both services require `/metrics` instrumentation before scraping is available. Prometheus will not scrape RDS or Fargate host metrics.
+
+AWS Secrets Manager integration to supply `DATABASE_URL` to new backend tasks is also planned.
 
 ---
 
@@ -107,19 +97,24 @@ RootVio addresses the gap between Victorians wanting to garden sustainably and t
 ### Backend
 | Technology | Version | Purpose |
 |---|---|---|
-| Node.js | 18 LTS | Lambda runtime |
+| Node.js | — | API container runtime |
 | Express | 4.x | HTTP routing and middleware |
-| PostgreSQL | 15 | Plant, weed, bioregion, and nursery data |
+| PostgreSQL | — | Plant, weed, bioregion, and nursery data |
 | PostGIS | 3.x | Spatial bioregion resolution (point-in-polygon) |
 | Amazon DynamoDB | — | Garden planner layout persistence |
 
 ### Infrastructure
 | Service | Provider | Purpose |
 |---|---|---|
-| GitHub Pages | GitHub | Static SPA hosting |
-| AWS API Gateway | AWS | REST API routing and CORS |
-| AWS Lambda | AWS | Serverless API and ML inference |
-| Amazon RDS | AWS | Managed PostgreSQL database |
+| Amazon ECS on AWS Fargate | AWS | Frontend, Node.js API, and WeedScan container services |
+| Application Load Balancer | AWS | Internet-facing entry point and path-based service routing |
+| Amazon RDS for PostgreSQL | AWS | Private Single-AZ PostgreSQL database with PostGIS |
+| Amazon EC2 | AWS | Temporary database loader; planned private Prometheus server |
+| AWS Systems Manager | AWS | Session Manager access to the temporary loader |
+| Amazon CloudWatch | AWS | Existing container logs and AWS service metrics |
+| AWS Secrets Manager | AWS | Planned delivery of `DATABASE_URL` to new backend tasks |
+| Terraform | HashiCorp | AWS infrastructure provisioning |
+| GitHub Container Registry | GitHub | Container image registry |
 | Firebase Authentication | Google | User identity and JWT issuance |
 | Google Maps Platform | Google | Nursery map and weather notices |
 | Pl@ntNet API | Pl@ntNet | Secondary plant/weed identification |
@@ -388,25 +383,9 @@ psql $DATABASE_URL -f dataclean.sql
 
 ## 🚢 Deployment
 
-Deployment is fully automated via GitHub Actions on every push to `main`:
+The container publishing workflow builds and publishes the frontend, API, and WeedScan images to GitHub Container Registry on pushes to `main`, version tags (`v*`), or a manual run. Image publishing is separate from provisioning AWS infrastructure and updating ECS services.
 
-```
-Push to main
-    │
-    ├── npm ci
-    ├── npm run typecheck   ← blocking gate
-    ├── npm run lint        ← blocking gate
-    ├── vite build          ← injects VITE_* secrets from GitHub Secrets
-    └── Deploy to GitHub Pages
-```
-
-### Manual deployment steps (first-time setup)
-
-1. **GitHub Pages** — Enable in repo Settings → Pages → Source: GitHub Actions
-2. **AWS Lambda** — Deploy `lambda/` as a Node.js 18.x function; attach to API Gateway
-3. **API Gateway** — Create REST API, configure CORS, deploy to `production` stage
-4. **Firebase** — Add `rootivio.app` to Authorised Domains in Firebase Console → Authentication
-5. **Environment secrets** — Add all `VITE_*` variables to GitHub repository secrets
+For Terraform setup and deployment examples, see [`terraform/README.md`](./terraform/README.md). The ECS/Fargate and PostGIS configurations are separate Terraform roots under [`terraform/ecs-fargate/`](./terraform/ecs-fargate/README.md) and [`terraform/postgis/`](./terraform/postgis/README.md); apply ECS first, then pass its VPC and security-group outputs to the PostGIS root. The root `terraform/` configuration remains a separate Lambda/API Gateway deployment path. Keep AWS credentials and application secrets out of the repository. Prometheus and its application instrumentation remain planned.
 
 ### Application URLs
 

@@ -1,0 +1,41 @@
+# Copy this file to task.yaml (ignored by Git) before deploying.
+# Fill in public Firebase web configuration if Firebase Auth is enabled.
+# Never put private credentials or a literal DATABASE_URL in this file.
+services:
+  frontend:
+    image: ghcr.io/imhero2k/gardenwise-frontend-v2:sha-63f5424
+    port: 80
+    cpu: 256
+    memory: 512
+    health_path: /
+    environment:
+      APP_API_BASE_URL: ""
+      APP_FIREBASE_API_KEY: ""
+      APP_FIREBASE_AUTH_DOMAIN: ""
+      APP_FIREBASE_PROJECT_ID: ""
+      APP_FIREBASE_APP_ID: ""
+      APP_FIREBASE_MEASUREMENT_ID: ""
+      APP_FIREBASE_STORAGE_BUCKET: ""
+      APP_FIREBASE_MESSAGING_SENDER_ID: ""
+      APP_PREDICT_API_URL: "/predict"
+
+  backend:
+    image: ghcr.io/imhero2k/gardenwise-api-v2:sha-20eadf3
+    port: 3001
+    cpu: 512
+    memory: 1024
+    health_path: /api/health
+    environment:
+      NODE_ENV: "production"
+      PORT: "3001"
+      LOG_LEVEL: "info"
+      DATABASE_SSL: "1"
+
+  prediction:
+    image: ghcr.io/imhero2k/gardenwise-weedscan-v2:sha-20eadf3
+    port: 8080
+    cpu: 512
+    memory: 1024
+    health_path: /health
+    environment:
+      PORT: "8080"

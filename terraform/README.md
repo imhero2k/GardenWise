@@ -1,6 +1,13 @@
 # GardenWise Terraform
 
-This starter provisions:
+The repository includes two Terraform deployment paths:
+
+- The root configuration in this directory provisions the existing optional Lambda/API Gateway stack described below.
+- [`ecs-fargate/`](./ecs-fargate/) and [`postgis/`](./postgis/) contain the ECS/Fargate and private PostGIS Terraform from `gardenwise-infra-backup.zip`. These are separate Terraform roots and are applied in sequence so the database stack can use the VPC and backend security group created by the ECS stack.
+
+The ECS/PostGIS architecture provisions the ALB routes, three Fargate services, private PostgreSQL/PostGIS, and temporary SSM-managed loader. Prometheus and creating the database URL secret remain planned/external; the ECS root can inject an existing Secrets Manager secret ARN into the backend.
+
+## Existing Lambda/API Gateway Terraform
 
 - The DynamoDB table required by `server/plannerLayoutDynamo.mjs`.
 - An ECR repository for the `lambda_weedscan` container.
@@ -8,6 +15,8 @@ This starter provisions:
 - A zip-deployed Node API Lambda when `api_lambda_enabled` is true.
 - An HTTP API Gateway in front of the API Lambda when either API Lambda option is enabled.
 - A private PostgreSQL RDS instance and VPC networking when `rds_enabled` is true.
+
+Use the Lambda configuration only when deploying that separate serverless architecture. Do not initialize/apply this root as a replacement for the ECS roots.
 
 ## Usage
 

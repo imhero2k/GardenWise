@@ -1,0 +1,12 @@
+aws_region = "us-east-1"
+name       = "gardenwise-db"
+
+# Fill these from outputs in ../ecs-fargate after that stack is applied.
+vpc_id                    = ""
+backend_security_group_id = ""
+public_subnet_id          = ""
+
+database_subnet_cidrs = ["10.42.20.0/24", "10.42.21.0/24"]
+create_loader         = true
+deletion_protection   = true
+skip_final_snapshot   = false

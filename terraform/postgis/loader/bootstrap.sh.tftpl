@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+# No database credentials are placed in EC2 user data or cloud-init logs.
+dnf install -y git python3 python3-pip postgresql17
+systemctl enable --now amazon-ssm-agent
+install -d -m 755 /opt/gardenwise-db
+%{ for name, content in files ~}
+printf '%s' '${content}' | base64 -d > /opt/gardenwise-db/${name}
+%{ endfor ~}
+python3 -m venv /opt/gardenwise-db/venv
+/opt/gardenwise-db/venv/bin/pip install 'psycopg[binary]>=3.2,<4'
+curl --fail --silent --show-error --retry 3 \
+  https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+  -o /opt/gardenwise-db/rds-ca.pem
+git init /opt/gardenwise-db/GardenWise
+git -C /opt/gardenwise-db/GardenWise remote add origin https://github.com/imhero2k/GardenWise.git
+GIT_LFS_SKIP_SMUDGE=1 git -C /opt/gardenwise-db/GardenWise fetch --depth 1 origin 63f54249c5a70289f87bfa8ab6269c4615173a3a
+GIT_LFS_SKIP_SMUDGE=1 git -C /opt/gardenwise-db/GardenWise checkout --detach FETCH_HEAD
+chown -R ec2-user:ec2-user /opt/gardenwise-db
+touch /opt/gardenwise-db/READY

@@ -25,6 +25,11 @@ terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/terraform.tfvars
+terraform/**/.terraform/
+terraform/**/*.tfstate
+terraform/**/*.tfstate.*
+terraform/**/terraform.tfvars
+terraform/**/task.yaml
 
 # One-off DB exploration / smoke-test helper scripts (kept local; not part of build)
 scripts/db-explore.mjs
