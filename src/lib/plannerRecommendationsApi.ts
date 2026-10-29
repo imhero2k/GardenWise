@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '../config/runtimeConfig'
+
 export type PlannerGoal = 'bird' | 'pollinator'
 
 export type PlannerRecommendationPlant = {
@@ -33,11 +35,6 @@ export type PlannerRecommendationsResponse = {
   groups: PlannerRecommendationGroup[]
 }
 
-function apiBase(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL
-  return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
-}
-
 export async function fetchPlannerRecommendations(
   goal: PlannerGoal,
   lat: number,
@@ -50,7 +47,7 @@ export async function fetchPlannerRecommendations(
     lng: String(lng),
   })
   const path = `/api/planner/recommendations?${qs.toString()}`
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const url = base ? `${base}${path}` : path
   const r = await fetch(url, { signal })
   if (!r.ok) {

@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '../config/runtimeConfig'
+
 /**
  * Single-plant detail fetcher used by the "View details" modal. Currently surfaces
  * `wildlifeAttracted` derived from `plant_trait` on the backend; extend with more fields
@@ -16,11 +18,6 @@ export type PlantDetail = {
   wildlifeAttracted: WildlifeGroup[]
 }
 
-function apiBase(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL
-  return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
-}
-
 /**
  * Fetch a plant by its database id. Returns null on 404 (caller hides the section
  * gracefully) and throws on transport / 5xx errors so the UI can surface them.
@@ -29,7 +26,7 @@ export async function fetchPlantDetail(
   id: string | number,
   signal?: AbortSignal,
 ): Promise<PlantDetail | null> {
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const path = `/api/plants/${encodeURIComponent(String(id))}`
   const url = base ? `${base}${path}` : path
   const r = await fetch(url, { signal })

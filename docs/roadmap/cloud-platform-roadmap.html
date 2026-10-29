@@ -286,7 +286,7 @@ svg{ display:block; width:100%; height:auto; }
       <tr><td><strong>Orchestration</strong></td><td>No cluster and no manifests. <code>k8s/</code> and <code>scripts/deploy-localstack-eks.sh</code> were removed by the same revert.</td><td><span class="tag t-none">Absent</span></td></tr>
       <tr><td><strong>Observability</strong></td><td><code>GET /api/health</code> reports database, planner-storage and Firebase Admin status. Otherwise <code>console.*</code>. No metrics endpoint, no Prometheus, no tracing, no error tracking.</td><td><span class="tag t-none">Minimal</span></td></tr>
       <tr><td><strong>Testing</strong></td><td>No test runner in <code>package.json</code>, no <code>*.test.*</code> files, no end-to-end suite, no coverage. The README's reference to <code>npm test</code> is stale.</td><td><span class="tag t-none">Absent</span></td></tr>
-      <tr><td><strong>Secrets</strong></td><td>Seven <code>VITE_FIREBASE_*</code> values plus a PlantNet key held as GitHub secrets. Server secrets such as <code>DATABASE_URL</code> and the service-account JSON live in operator-managed Lambda environment variables.</td><td><span class="tag t-low">Ad hoc</span></td></tr>
+      <tr><td><strong>Secrets</strong></td><td>Firebase web config is public frontend runtime configuration. The private PlantNet key stays server-side; database credentials and service-account JSON are backend-only.</td><td><span class="tag t-low">Ad hoc</span></td></tr>
     </tbody>
   </table>
 
@@ -733,7 +733,7 @@ svg{ display:block; width:100%; height:auto; }
     </ul></div>
     <div class="card soft"><h4>Watch out for</h4><ul style="margin:0;font-size:8.4pt">
       <li>An over-broad trust policy. Omitting the <code>sub</code> condition is the classic OIDC mistake.</li>
-      <li>The seven <code>VITE_FIREBASE_*</code> values are compiled into a public bundle. They are configuration, not secrets; enforce Firebase security rules instead of hiding them.</li>
+      <li>The <code>APP_FIREBASE_*</code> values are written to the public frontend runtime config at container startup. They are configuration, not secrets; enforce Firebase security rules instead of hiding them.</li>
       <li>Bootstrap state is chicken-and-egg. Apply locally once, then migrate its own state into the bucket it just created.</li>
     </ul></div>
   </div>
@@ -1682,12 +1682,12 @@ app.get(<span class="s">"/metrics"</span>, <span class="k">async</span> (_req, r
   <table class="tight">
     <thead><tr><th style="width:52mm">Variable</th><th style="width:20mm">Today</th><th style="width:34mm">Target home</th><th>Note</th></tr></thead>
     <tbody>
-      <tr><td><code>VITE_API_BASE_URL</code></td><td>CI literal</td><td>Terraform output &rarr; build arg</td><td>Removes the <code>tcal5txtn8</code> hard-code</td></tr>
-      <tr><td><code>VITE_PREDICT_API_URL</code></td><td>Source literal</td><td>Terraform output &rarr; build arg</td><td>Removes the <code>7muezhf0bl</code> hard-code</td></tr>
-      <tr><td><code>VITE_FIREBASE_*</code> (&times;7)</td><td>GitHub secrets</td><td>Deleted in Phase 5</td><td>Public in the bundle; not secrets</td></tr>
+      <tr><td><code>APP_API_BASE_URL</code></td><td>Runtime config</td><td>ECS task environment</td><td>Blank for same-origin ALB routing</td></tr>
+      <tr><td><code>APP_PREDICT_API_URL</code></td><td>Runtime config</td><td>ECS task environment</td><td>Points to the separate prediction service</td></tr>
+      <tr><td><code>APP_FIREBASE_*</code> (&times;7)</td><td>Runtime config</td><td>ECS task environment</td><td>Public web app configuration, not secrets</td></tr>
       <tr><td><code>VITE_COGNITO_*</code> (&times;3)</td><td>Branch only</td><td>Terraform output &rarr; build arg</td><td>From the <code>identity</code> module</td></tr>
-      <tr><td><code>VITE_PLANTNET_API_KEY</code></td><td>GitHub secret</td><td>Server-side only</td><td>Proxy through the API; stop shipping it to browsers</td></tr>
-      <tr><td><code>VITE_GOOGLE_MAPS_API_KEY</code></td><td>Local</td><td>Build arg + referrer restriction</td><td>Restrict the key at the provider</td></tr>
+      <tr><td><code>PLANTNET_API_KEY</code></td><td>Backend secret</td><td>Secrets Manager</td><td>Proxy through the API; never expose it to browsers</td></tr>
+      <tr><td><code>APP_GOOGLE_MAPS_API_KEY</code></td><td>Runtime config</td><td>ECS task environment</td><td>Public browser key; restrict by allowed website referrer</td></tr>
       <tr><td><code>VITE_BASE_PATH</code></td><td>CI literal</td><td>Build arg</td><td>Becomes <code>/</code> once CloudFront replaces Pages</td></tr>
       <tr><td><code>VITE_BYPASS_AUTH</code></td><td>Local</td><td>Never set outside dev</td><td>Add a CI guard that fails the build if truthy</td></tr>
       <tr><td><code>DATABASE_URL</code></td><td>Lambda env var</td><td>Secrets Manager, then RDS IAM auth</td><td>Rotated; the password is removed entirely in Phase 5</td></tr>

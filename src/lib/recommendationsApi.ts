@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '../config/runtimeConfig'
+
 export type RecommendedPlant = {
   id: string
   scientificName: string
@@ -36,14 +38,9 @@ export type RecommendationsResponse = {
   wildlife?: WildlifeCategory[]
 }
 
-function apiBase(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL
-  return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
-}
-
 /**
  * Native / regional recommendations from the app’s PostgreSQL API (see `server/`).
- * In dev, Vite proxies `/api` to the local API server when `VITE_API_BASE_URL` is unset.
+ * In dev, Vite proxies `/api` to the local API server when `APP_API_BASE_URL` is unset.
  */
 export async function fetchRecommendations(
   lat: number,
@@ -62,7 +59,7 @@ export async function fetchRecommendations(
   const q = (options?.q ?? '').trim()
   const lfCode = (options?.lfCode ?? '').trim().toUpperCase()
   const wildlife = options?.wildlife ?? []
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const qs = new URLSearchParams({
     lat: String(lat),
     lng: String(lng),

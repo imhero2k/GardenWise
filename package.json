@@ -9,6 +9,7 @@
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev\"",
     "build": "vite build",
     "postbuild": "node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
+    "test:runtime-config": "node --experimental-strip-types --test scripts/runtime-config.test.mjs",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "data:vic-nurseries": "curl -sL 'https://www.google.com/maps/d/kml?mid=1yOtzP69AwraWmug_YTr2BThjLD16yFpa&forcekml=1' | node scripts/kml-placemarks-to-json.mjs > src/data/vic-nurseries.json",
     "lint": "eslint .",

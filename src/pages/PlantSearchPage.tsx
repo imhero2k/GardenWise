@@ -575,7 +575,7 @@ export function PlantSearchPage() {
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 'var(--space-sm) 0 0' }}>
               In the project root, add <code>DATABASE_URL=postgresql://…</code> to <code>.env.local</code> (or{' '}
               <code>.env</code>), restart <code>npm run dev:api</code> (or <code>npm run dev:all</code>), then refresh.
-              See <code>.env.example</code>. For production, deploy the API and set <code>VITE_API_BASE_URL</code>.
+              See <code>.env.example</code>. For production, set <code>APP_API_BASE_URL</code> on the frontend runtime.
             </p>
           </div>
         )}

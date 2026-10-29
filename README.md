@@ -161,23 +161,26 @@ Copy `.env.example` to `.env.local` and populate all required values:
 cp .env.example .env.local
 ```
 
-#### Frontend Variables (`VITE_` prefix — bundled into JavaScript at build time)
+#### Frontend Runtime Configuration
 
-> ⚠️ **Security:** `VITE_` variables are visible in the compiled bundle. Never use this prefix for private keys or secrets.
+These values are loaded from `/runtime-config.js` when the container starts. Firebase web configuration and the Google Maps key are public browser settings, not secrets. Never put private credentials in `APP_*` frontend variables.
 
 | Variable | Required | Description |
 |---|---|---|
-| `VITE_API_BASE_URL` | ✅ Required | Full HTTPS URL of the deployed API Gateway |
-| `VITE_FIREBASE_API_KEY` | ✅ Required | Firebase project public API key |
-| `VITE_FIREBASE_AUTH_DOMAIN` | ✅ Required | Firebase Auth domain |
-| `VITE_FIREBASE_PROJECT_ID` | ✅ Required | Firebase project ID |
-| `VITE_FIREBASE_APP_ID` | ✅ Required | Firebase app ID |
-| `VITE_PREDICT_API_URL` | ✅ Required | Weed scan Lambda inference endpoint URL |
-| `VITE_GOOGLE_MAPS_API_KEY` | ⚪ Optional | Enables nursery map and weather notices |
-| `VITE_BASE_PATH` | ⚪ Conditional | SPA base path for sub-directory deployments (e.g. `/iteration3`) |
-| `VITE_BYPASS_AUTH` | 🚫 Staging only | Skips auth guards — **never `true` on production** |
+| `APP_API_BASE_URL` | ⚪ Optional | API origin; leave empty when the API is routed through the same ALB origin |
+| `APP_FIREBASE_API_KEY` | ✅ Required for Firebase Auth | Public Firebase web API key |
+| `APP_FIREBASE_AUTH_DOMAIN` | ✅ Required for Firebase Auth | Firebase Auth domain |
+| `APP_FIREBASE_PROJECT_ID` | ✅ Required for Firebase Auth | Firebase project ID |
+| `APP_FIREBASE_APP_ID` | ⚪ Optional | Firebase app ID |
+| `APP_FIREBASE_MESSAGING_SENDER_ID` | ⚪ Optional | Firebase messaging sender ID |
+| `APP_FIREBASE_STORAGE_BUCKET` | ⚪ Optional | Firebase storage bucket |
+| `APP_FIREBASE_MEASUREMENT_ID` | ⚪ Optional | Firebase Analytics measurement ID |
+| `APP_PREDICT_API_URL` | ✅ Required for prediction | Prediction service URL, e.g. `https://predict.example.com/testing/predict` |
+| `APP_GOOGLE_MAPS_API_KEY` | ⚪ Optional | Enables Google Maps Weather API; restrict by allowed website referrer |
+| `VITE_BASE_PATH` | ⚪ Conditional | Build-time SPA path for GitHub Pages subdirectory deployments |
+| `VITE_BYPASS_AUTH` | 🚫 Local dev only | Skips auth guards only in Vite development mode |
 
-#### Backend Variables (Lambda environment — never exposed to browser)
+#### Backend Variables (never exposed to browser)
 
 | Variable | Sensitivity | Description |
 |---|---|---|
@@ -186,7 +189,7 @@ cp .env.example .env.local
 | `DYNAMODB_PLANNER_LAYOUT_TABLE` | Required | DynamoDB table name for planner layouts |
 | `AWS_REGION` | Required | AWS region (e.g. `ap-southeast-2`) |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | 🔒 Secret | Firebase Admin SDK service account JSON |
-| `PLANTNET_API_KEY` | 🔒 Secret | Pl@ntNet API key — server-side only |
+| `PLANTNET_API_KEY` | 🔒 Secret | Pl@ntNet API key — server-side only; supply to the API container through Secrets Manager |
 | `CORS_ORIGIN` | Required | Allowed browser origins (e.g. `https://rootivio.app`) |
 
 ### Running Locally
@@ -195,9 +198,8 @@ cp .env.example .env.local
 # Start the frontend development server (http://localhost:5173)
 npm run dev
 
-# In a separate terminal — run the Lambda API server locally
-cd lambda
-node index.js
+# In a separate terminal — run the API server locally
+npm run dev:api
 
 # Type check
 npm run typecheck
@@ -209,25 +211,66 @@ npm run lint
 npm test
 ```
 
-> **Note:** The Vite dev server proxies `/api/*` requests to `VITE_API_BASE_URL` automatically, eliminating CORS issues during local development.
+> **Note:** The Vite dev server serves `/runtime-config.js` from `APP_*` values in `.env.local` and proxies `/api/*` requests to the local API server.
 
-### Run the Frontend and API with Docker
+### Run the Frontend Container with Runtime Configuration
 
-Docker Compose builds the React frontend and Node API as separate containers. The frontend serves the SPA and proxies `/api/*` requests to the API container. PostgreSQL/PostGIS, Firebase, and AWS services remain external.
+Copy the example runtime environment, fill in public Firebase web config and any required endpoint settings, then run the same frontend image with different runtime values as needed:
 
 ```bash
-# Create local configuration (keep this file out of version control).
-cp .env.example .env.local
-# Fill in the VITE_FIREBASE_* values and any API service settings you use.
+cp .env.runtime.example .env.runtime
+docker build -t gardenwise-frontend:local .
+docker run --rm -p 8080:80 --env-file .env.runtime gardenwise-frontend:local
+curl http://localhost:8080/runtime-config.js
+```
 
+The runtime config endpoint is served with `Cache-Control: no-store`. Missing required Firebase settings generate a non-secret warning and disable Firebase Authentication without preventing the frontend from starting. To run frontend and API together locally, configure `.env.local` with the `APP_*` browser values and server-only values, then use:
+
+```bash
 docker compose --env-file .env.local up --build
 ```
 
-Open `http://localhost:8080`. The API is also available at `http://localhost:3001/api/health`. To stop the containers, run `docker compose down`.
+Open `http://localhost:8080`. The API is also available at `http://localhost:3001/api/health`. Stop the containers with `docker compose down`.
 
-Set `DATABASE_URL` to a reachable PostgreSQL/PostGIS database. For a database running on the host, use `host.docker.internal` as the host name; set `DATABASE_SSL=0` if that database does not support TLS. The API also accepts the existing Firebase Admin, DynamoDB, and PlantNet environment variables from `.env.local`. AWS credentials should be provided through the runtime's normal credential mechanism; do not put private credentials in the frontend build configuration.
+Set `DATABASE_URL` to a reachable PostgreSQL/PostGIS database. For a database running on the host, use `host.docker.internal` as the host name; set `DATABASE_SSL=0` if that database does not support TLS. The API also accepts Firebase Admin, DynamoDB, and PlantNet settings. AWS credentials should be provided through the runtime's normal credential mechanism.
 
-The `VITE_*` values are embedded in the frontend at build time and are public client configuration, not secrets. Changing them requires rebuilding the frontend image. The weed-scan inference service is published as an HTTP container for ECS.
+The frontend image contains no environment-specific Firebase configuration; ECS task environment values are serialized safely into the browser-readable runtime config at startup. Firebase web config remains public by design. Never pass private credentials to the frontend task. The weed-scan inference service is published as an HTTP container for ECS.
+
+### ECS Fargate Task Environment Example
+
+The current repository does not contain a `task.yaml`; configure these values on the frontend container definition in the task definition consumed by your Terraform deployment. Keep API and prediction services on their existing ports (3001 and 8080):
+
+```yaml
+containerDefinitions:
+  - name: gardenwise-frontend
+    image: ghcr.io/imhero2k/gardenwise-frontend-v2:sha-<commit>
+    portMappings:
+      - containerPort: 80
+        protocol: tcp
+    environment:
+      - name: APP_API_BASE_URL
+        value: "" # same ALB origin; /api/* is routed to the API on port 3001
+      - name: APP_PREDICT_API_URL
+        value: "https://predict.example.com/testing/predict" # reachable prediction service on port 8080
+      - name: APP_FIREBASE_API_KEY
+        value: "<Firebase web API key (public)>"
+      - name: APP_FIREBASE_AUTH_DOMAIN
+        value: "<project>.firebaseapp.com"
+      - name: APP_FIREBASE_PROJECT_ID
+        value: "<project-id>"
+      - name: APP_FIREBASE_APP_ID
+        value: "<Firebase app ID>"
+      - name: APP_FIREBASE_MESSAGING_SENDER_ID
+        value: "<sender ID>"
+      - name: APP_FIREBASE_STORAGE_BUCKET
+        value: "<project>.firebasestorage.app"
+      - name: APP_FIREBASE_MEASUREMENT_ID
+        value: "<measurement ID or empty>"
+      - name: APP_GOOGLE_MAPS_API_KEY
+        value: "<referrer-restricted public key or empty>"
+```
+
+The Pl@ntNet key is private and belongs only in the backend task's `secrets` list, sourced from AWS Secrets Manager as `PLANTNET_API_KEY`. Do not add it to frontend environment values or `runtime-config.js`.
 
 ### Publish Container Images
 
@@ -237,7 +280,7 @@ The `Publish container images` workflow publishes images to GitHub Container Reg
 - `ghcr.io/imhero2k/gardenwise-api-v2`
 - `ghcr.io/imhero2k/gardenwise-weedscan-v2` (ECS HTTP service, `linux/amd64`, port `8080`)
 
-The frontend and API images support `linux/amd64` and `linux/arm64`; the weed-scan ECS image targets `linux/amd64`. It accepts `POST /testing/predict` and `POST /predict` with an `image_base64` JSON field, and exposes `GET /health` for container health checks. Set `CORS_ALLOW_ORIGIN` to the frontend origin when deploying it. Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. Configure the frontend's public `VITE_*` build-time settings as GitHub Actions variables. `VITE_PLANTNET_API_KEY`, which is embedded in the browser bundle, is read from the `VITE_PLANTNET_API_KEY` Actions secret. These values are included in the public frontend image and must not be private credentials. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
+The frontend and API images support `linux/amd64` and `linux/arm64`; the weed-scan ECS image targets `linux/amd64`. It accepts `POST /testing/predict` and `POST /predict` with an `image_base64` JSON field, and exposes `GET /health` for container health checks. Set `CORS_ALLOW_ORIGIN` to the frontend origin when deploying it. Each run publishes a commit SHA tag; `main` publishes `latest`, and version tags publish their matching tag. The frontend image is environment-independent; configure Firebase, API, prediction, and optional Google Maps values on the ECS task. The workflow uses `GITHUB_TOKEN` with package-write permission to publish.
 
 ---
 
@@ -279,7 +322,7 @@ GardenWise/
 
 ## 📡 API Reference
 
-All endpoints are prefixed with `{VITE_API_BASE_URL}`.
+All endpoints are prefixed with `{APP_API_BASE_URL}`.
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
@@ -405,10 +448,10 @@ Push to main
 
 ## 🔒 Security
 
-- **Secrets management:** All private keys, service account JSON, and database credentials are stored in GitHub Secrets (build-time) or Lambda environment variables (runtime) — never in source code
+- **Secrets management:** Store private keys, service account JSON, and database credentials in GitHub Secrets or AWS Secrets Manager, then inject them only into backend runtime containers — never into frontend builds or browser runtime configuration
 - **Dependency auditing:** Run `npm audit` before every release; remediate all High and Critical advisories
-- **API key restriction:** Restrict `VITE_GOOGLE_MAPS_API_KEY` to the `rootivio.app` HTTP referrer in GCP Console
-- **Known risk:** `VITE_` variables are embedded in the compiled JS bundle and visible to users — only Firebase public config values are acceptable with this prefix
+- **API key restriction:** Restrict `APP_GOOGLE_MAPS_API_KEY` to the `rootivio.app` HTTP referrer in GCP Console
+- **Known risk:** Firebase and Google Maps browser configuration is public. Private keys must remain in backend runtime secrets and must never be exposed in `runtime-config.js`.
 
 To report a security vulnerability, please contact the team directly rather than opening a public issue.
 

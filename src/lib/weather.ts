@@ -1,3 +1,5 @@
+import { getAppConfig } from '../config/runtimeConfig'
+
 /** WMO codes from Open-Meteo — map to simple icon buckets. */
 export type WeatherKind = 'sunny' | 'cloudy' | 'rainy'
 
@@ -32,7 +34,7 @@ export interface HeatWindow {
 }
 
 function getGoogleApiKey(): string | undefined {
-  const k = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  const k = getAppConfig().googleMapsApiKey
   return typeof k === 'string' && k.trim() ? k.trim() : undefined
 }
 
@@ -128,7 +130,7 @@ async function fetchGoogleWeather(
 }
 
 /**
- * Prefer Google Maps Weather API when `VITE_GOOGLE_MAPS_API_KEY` is set;
+ * Prefer Google Maps Weather API when `APP_GOOGLE_MAPS_API_KEY` is set;
  * otherwise Open-Meteo. If Google fails (network, billing, CORS), falls back to Open-Meteo.
  */
 export async function fetchCurrentWeather(

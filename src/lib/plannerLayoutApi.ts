@@ -1,6 +1,7 @@
 import type { PlantSpec } from '../data/plantSpecs'
 import type { PlacedPlant } from '../components/GardenPlannerScene'
 import { getFirebaseAuth, isFirebaseAuthConfigured } from '../auth/firebase'
+import { getApiBaseUrl } from '../config/runtimeConfig'
 
 /**
  * Persisted planner state (stored in DynamoDB via API).
@@ -17,11 +18,6 @@ export type PlannerLayoutPayloadV1 = {
   viewMode: 'iso' | 'top'
   placed: Pick<PlacedPlant, 'uid' | 'specId' | 'x' | 'z'>[]
   specsPatch?: Record<string, PlantSpec>
-}
-
-function apiBase(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL
-  return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
 }
 
 function isPlannerLayoutPayloadV1(x: unknown): x is PlannerLayoutPayloadV1 {
@@ -46,7 +42,7 @@ export async function fetchPlannerLayoutFromApi(signal?: AbortSignal): Promise<{
   if (!user) throw new Error('Not signed in')
 
   const token = await user.getIdToken()
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const path = '/api/planner/layout'
   const url = base ? `${base}${path}` : path
   const res = await fetch(url, {
@@ -85,7 +81,7 @@ export async function savePlannerLayoutToApi(
   if (!user) throw new Error('Not signed in')
 
   const token = await user.getIdToken()
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const path = '/api/planner/layout'
   const url = base ? `${base}${path}` : path
   const res = await fetch(url, {

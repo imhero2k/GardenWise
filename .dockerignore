@@ -17,3 +17,6 @@ terraform
 lambda_weedscan
 docs
 scripts
+!scripts/
+scripts/*
+!scripts/runtime-config.mjs

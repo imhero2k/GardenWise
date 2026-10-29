@@ -1,3 +1,5 @@
+import { getAppConfig } from '../config/runtimeConfig'
+
 export interface PredictResponse {
   class_index: number
   confidence: number
@@ -10,11 +12,11 @@ export interface PredictResponse {
 }
 
 function getPredictApiUrl(): string {
-  const fromEnv = import.meta.env.VITE_PREDICT_API_URL
+  const fromEnv = getAppConfig().predictApiUrl
   if (typeof fromEnv === 'string' && fromEnv.trim()) return fromEnv.trim()
   // Same-origin in dev → vite proxy (see vite.config.ts `/dev/predict`) avoids CORS "Load failed".
   if (import.meta.env.DEV) return '/dev/predict'
-  return 'https://7muezhf0bl.execute-api.ap-southeast-2.amazonaws.com/testing/predict'
+  throw new Error('Prediction API is not configured; set APP_PREDICT_API_URL')
 }
 
 function normalizeBase64(input: string): string {
@@ -54,7 +56,7 @@ export async function predictPlantFromBase64(
     const msg = e instanceof Error ? e.message : String(e)
     if (/load failed|failed to fetch|networkerror/i.test(msg)) {
       throw new Error(
-        'Could not reach the prediction API (network/CORS). In local dev, use `npm run dev` so `/dev/predict` is proxied, or set VITE_PREDICT_API_URL to an HTTPS endpoint that allows your origin.',
+        'Could not reach the prediction API (network/CORS). In local dev, use `npm run dev` so `/dev/predict` is proxied, or set APP_PREDICT_API_URL to an HTTPS endpoint that allows your origin.',
       )
     }
     throw e

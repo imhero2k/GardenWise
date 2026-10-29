@@ -1,3 +1,4 @@
 *.csv filter=lfs diff=lfs merge=lfs -text
 Data[[:space:]]files[[:space:]]for[[:space:]]IT-2/traits.csv filter=lfs diff=lfs merge=lfs -text
+docker/runtime-config.sh text eol=lf
 lambda_weedscan/test_local.sh text eol=lf

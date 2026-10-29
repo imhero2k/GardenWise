@@ -1,37 +1,32 @@
-import { initializeApp, type FirebaseApp } from 'firebase/app'
+import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth'
+import {
+  getAppConfig,
+  isFirebaseAuthConfigured as isRuntimeFirebaseAuthConfigured,
+} from '../config/runtimeConfig'
 
-let app: FirebaseApp | null = null
 let auth: Auth | null = null
 
-function required(name: keyof ImportMetaEnv): string {
-  const v = import.meta.env[name]
-  if (!v) throw new Error(`Missing required env: ${name}`)
-  return v
-}
-
 export function isFirebaseAuthConfigured(): boolean {
-  return Boolean(
-    import.meta.env.VITE_FIREBASE_API_KEY &&
-      import.meta.env.VITE_FIREBASE_AUTH_DOMAIN &&
-      import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  )
+  return isRuntimeFirebaseAuthConfigured()
 }
 
 export function getFirebaseAuth(): Auth {
   if (auth) return auth
-
-  const cfg = {
-    apiKey: required('VITE_FIREBASE_API_KEY'),
-    authDomain: required('VITE_FIREBASE_AUTH_DOMAIN'),
-    projectId: required('VITE_FIREBASE_PROJECT_ID'),
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  const runtimeConfig = getAppConfig()
+  if (!isRuntimeFirebaseAuthConfigured(runtimeConfig)) {
+    throw new Error('Firebase Authentication is not configured at runtime')
   }
 
-  app = initializeApp(cfg)
+  const app = initializeApp({
+    apiKey: runtimeConfig.firebaseApiKey,
+    authDomain: runtimeConfig.firebaseAuthDomain,
+    projectId: runtimeConfig.firebaseProjectId,
+    appId: runtimeConfig.firebaseAppId,
+    measurementId: runtimeConfig.firebaseMeasurementId,
+    storageBucket: runtimeConfig.firebaseStorageBucket,
+    messagingSenderId: runtimeConfig.firebaseMessagingSenderId,
+  })
   auth = getAuth(app)
   return auth
 }
@@ -39,4 +34,3 @@ export function getFirebaseAuth(): Auth {
 export function googleProvider() {
   return new GoogleAuthProvider()
 }
-

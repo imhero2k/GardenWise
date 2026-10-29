@@ -22,7 +22,7 @@ import { AboutPage } from './pages/AboutPage'
 const routerBasename =
   import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '')
 
-const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH === 'true'
+const BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_BYPASS_AUTH === 'true'
 
 export default function App() {
   const protectedLayout = BYPASS_AUTH ? (

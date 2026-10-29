@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '../config/runtimeConfig'
+
 import type { RegionMatchKind } from './recommendationsApi'
 
 export type RegionWeed = {
@@ -45,11 +47,6 @@ export type WeedLookupResponse = {
   match: WeedLookupMatch | null
 }
 
-function apiBase(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL
-  return typeof raw === 'string' ? raw.replace(/\/$/, '') : ''
-}
-
 export async function fetchRegionWeeds(
   lat: number,
   lng: number,
@@ -59,7 +56,7 @@ export async function fetchRegionWeeds(
   const pageSize = options?.pageSize ?? 12
   const offset = options?.offset ?? 0
   const q = (options?.q ?? '').trim()
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const qs = new URLSearchParams({
     lat: String(lat),
     lng: String(lng),
@@ -99,7 +96,7 @@ export async function fetchTopWeeds(
   const pageSize = options?.pageSize ?? 12
   const offset = options?.offset ?? 0
   const q = (options?.q ?? '').trim()
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const qs = new URLSearchParams({
     pageSize: String(pageSize),
     offset: String(offset),
@@ -134,7 +131,7 @@ export async function fetchWeedLookup(
 ): Promise<WeedLookupResponse> {
   const name = String(scientificName ?? '').trim()
   if (!name) return { match: null }
-  const base = apiBase()
+  const base = getApiBaseUrl()
   const qs = new URLSearchParams({ name })
   const lat = options?.lat
   const lng = options?.lng
@@ -158,4 +155,3 @@ export async function fetchWeedLookup(
   const j = (await r.json()) as Partial<WeedLookupResponse>
   return { match: j.match ?? null }
 }
-

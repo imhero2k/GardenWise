@@ -173,16 +173,13 @@ app.use(
 /**
  * Pl@ntNet proxy — browser calls same-origin `/api/...`; server forwards to my-api.plantnet.org
  * (avoids Pl@ntNet "Origin not allowed" CORS on direct browser calls).
- * Env: PLANTNET_API_KEY or VITE_PLANTNET_API_KEY (server loads `.env.local` via `server/index.mjs`).
+ * Env: PLANTNET_API_KEY (server loads `.env.local` via `server/index.mjs`).
  */
 app.post('/api/plantnet/identify', express.json({ limit: '35mb' }), async (req, res) => {
-  const key =
-    String(process.env.PLANTNET_API_KEY ?? '').trim() ||
-    String(process.env.VITE_PLANTNET_API_KEY ?? '').trim()
+  const key = String(process.env.PLANTNET_API_KEY ?? '').trim()
   if (!key) {
     return res.status(503).json({
-      error:
-        'PlantNet key not configured on API server (set PLANTNET_API_KEY or VITE_PLANTNET_API_KEY in .env.local for the API process)',
+      error: 'PlantNet key not configured on API server (set PLANTNET_API_KEY)',
     })
   }
   const imageBase64 = req.body?.imageBase64
